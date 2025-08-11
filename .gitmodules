@@ -1,0 +1,3 @@
+[submodule "twf-site"]
+	path = twf-site
+	url = https://github.com/lossless-group/the-water-foundation-site.git
