@@ -1,0 +1,71 @@
+---
+import "../styles/tailwind.css";
+import tokens from "@knots/tokens";
+import { water } from "@knots/brand-config";
+import getIcon from "@knots/icons";
+import { Button } from "@knots/astro";
+
+const colorEntries = Object.entries(tokens.colors).map(([name, scale]) => ({
+  name,
+  scale
+}));
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design System Viewer</title>
+  </head>
+  <body class="min-h-screen bg-neutral-50 text-neutral-900">
+    <main class="mx-auto max-w-5xl p-6 space-y-10">
+      <section>
+        <h1 class="text-3xl font-semibold">Design System Viewer</h1>
+        <p class="text-neutral-600">Explore tokens, icons, brands, and base components.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Brand: {water.name}</h2>
+        <div class="flex gap-4 items-center">
+          <div class="w-10 h-10 rounded" style={`background:${water.colors.primary}`}></div>
+          <div class="w-10 h-10 rounded" style={`background:${water.colors.secondary}`}></div>
+          <div class="w-10 h-10 rounded" style={`background:${water.colors.accent}`}></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Tokens</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {colorEntries.map(({ name, scale }) => (
+            <div class="border rounded p-4">
+              <h3 class="font-medium mb-2">{name}</h3>
+              <div class="flex gap-2 flex-wrap">
+                {Object.entries(scale).map(([k, v]) => (
+                  <div class="w-16 h-10 rounded shadow-sm" title={`${name}-${k}`} style={`background:${v}`}></div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Icons</h2>
+        <div class="flex gap-6 items-center">
+          <div innerHTML={getIcon("arrowRight")} class="w-8 h-8 text-neutral-800"></div>
+          <div innerHTML={getIcon("logo")} class="w-8 h-8 text-neutral-800"></div>
+          <div innerHTML={getIcon("brand")} class="w-8 h-8 text-neutral-800"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Components</h2>
+        <div class="flex gap-3 items-center">
+          <Button label="Astro Button" />
+          <button class="btn">Plugin Primary</button>
+          <button class="btn-secondary">Plugin Secondary</button>
+          <button class="btn-accent">Plugin Accent</button>
+        </div>
+      </section>
+    </main>
+  </body>
+  </html>

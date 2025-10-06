@@ -1,0 +1,16 @@
+{
+  "name": "@knots/svelte",
+  "version": "0.1.0",
+  "description": "Base Svelte UI components",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "files": ["src"],
+  "peerDependencies": {
+    "svelte": "^4.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@knots/tailwind",
+  "version": "0.1.0",
+  "description": "Shared Tailwind preset and plugin for Astro/Svelte sites",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "preset.mjs",
+    "plugin.mjs",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "tailwindcss": ">=3.3.0"
+  },
+  "dependencies": {
+    "@knots/tokens": "workspace:*"
+  }
+}
