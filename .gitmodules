@@ -1,5 +1,5 @@
-[submodule "hypernova-site"]
-	path = hypernova-site
+[submodule "sites/hypernova-site"]
+	path = sites/hypernova-site
 	url = https://github.com/lossless-group/hypernova-site.git
 [submodule "sites/cilantro-site"]
 	path = sites/cilantro-site

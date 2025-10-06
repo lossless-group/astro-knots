@@ -1,4 +1,5 @@
 packages:
   - "packages/*"
-  - "hypernova-site"
+  - "sites/hypernova-site"
+  - "sites/cilantro-site"
   - "design-system-viewer"
