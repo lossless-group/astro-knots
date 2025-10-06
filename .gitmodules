@@ -1,3 +1,7 @@
 [submodule "hypernova-site"]
 	path = hypernova-site
 	url = https://github.com/lossless-group/hypernova-site.git
+[submodule "sites/cilantro-site"]
+	path = sites/cilantro-site
+	url = https://github.com/lossless-group/cilantro-site.git
+	branch = main
