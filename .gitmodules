@@ -1,0 +1,3 @@
+[submodule "hypernova-site"]
+	path = hypernova-site
+	url = https://github.com/lossless-group/hypernova-site.git
