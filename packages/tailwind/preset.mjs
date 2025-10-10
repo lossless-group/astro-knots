@@ -1,14 +1,12 @@
-import tokens from "@knots/tokens";
-
-// Tailwind preset that extends theme using shared tokens
+// Tailwind preset that extends theme using CSS variables
 const preset = {
   theme: {
     extend: {
       colors: {
-        primary: tokens.colors.primary,
-        secondary: tokens.colors.secondary,
-        accent: tokens.colors.accent,
-        neutral: tokens.colors.neutral ?? { 50: "#f8fafc", 900: "#0f172a" }
+        primary: { DEFAULT: "var(--primary)", 500: "var(--primary)" },
+        secondary: { DEFAULT: "var(--secondary)", 500: "var(--secondary)" },
+        accent: { DEFAULT: "var(--accent)", 500: "var(--accent)" },
+        neutral: { 50: "#f8fafc", 900: "#0f172a" }
       }
     }
   }

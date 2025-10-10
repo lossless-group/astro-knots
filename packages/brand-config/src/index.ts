@@ -12,18 +12,6 @@ export interface BrandConfig {
   };
 }
 
-export const water: BrandConfig = {
-  name: "Water Foundation",
-  colors: {
-    primary: "#2563eb",
-    secondary: "#06b6d4",
-    accent: "#f59e0b"
-  },
-  assets: {
-    logoLight: "/logos/logo-light.svg",
-    logoDark: "/logos/logo-dark.svg",
-    favicon: "/favicon.svg"
-  }
-};
-
-export default { water };
+export function brandConfigToCSSVars(config: BrandConfig): string {
+  return `:root[data-brand="${config.name.toLowerCase()}"]{--primary:${config.colors.primary};--secondary:${config.colors.secondary};--accent:${config.colors.accent};--color-primary-500:${config.colors.primary};--color-secondary-500:${config.colors.secondary};--color-accent-500:${config.colors.accent};}`;
+}

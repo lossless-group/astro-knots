@@ -1,0 +1,69 @@
+/* Shared theme mode variables for sites consuming @knots/tokens */
+/* Default (light) mode */
+:root,
+:root[data-theme="light"],
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #111928;
+  --card: #ffffff;
+  --card-foreground: #111928;
+  --popover: #ffffff;
+  --popover-foreground: #6b7280;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111928;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --accent-foreground: #ffffff;
+  --destructive: #fde8e8;
+  --destructive-foreground: #9b1c1c;
+  --border: #e5e7eb;
+  --input: #f9fafb;
+  --input-background: #f9fafb;
+  --ring: #2563eb;
+}
+
+/* Dark mode */
+[data-theme="dark"],
+.dark {
+  --background: #111928;
+  --foreground: #ffffff;
+  --card: #1f2937;
+  --card-foreground: #ffffff;
+  --popover: #1f2937;
+  --popover-foreground: #e5e7eb;
+  --primary-foreground: #ffffff;
+  --secondary: #374151;
+  --secondary-foreground: #ffffff;
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+  --accent-foreground: #111827;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fecaca;
+  --border: #374151;
+  --input: #1f2937;
+  --input-background: #1f2937;
+  --ring: #3b82f6;
+}
+
+/* Vibrant mode (higher saturation accents) */
+[data-theme="vibrant"] {
+  --background: #ffffff;
+  --foreground: #0b1220;
+  --card: #ffffff;
+  --card-foreground: #0b1220;
+  --popover: #ffffff;
+  --popover-foreground: #4b5563;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff; /* indigo-50 */
+  --secondary-foreground: #0b1220;
+  --muted: #f5f3ff; /* violet-50 */
+  --muted-foreground: #4338ca; /* indigo-600 */
+  --accent-foreground: #0b1220;
+  --destructive: #fee2e2;
+  --destructive-foreground: #7f1d1d;
+  --border: #e5e7eb;
+  --input: #f3f4f6;
+  --input-background: #f3f4f6;
+  --ring: #2563eb;
+}

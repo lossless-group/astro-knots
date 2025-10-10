@@ -1,0 +1,50 @@
+/* Base design token variables shared across sites */
+:root {
+  /* Core palette */
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111928;
+  --accent: #f59e0b;
+  --accent-foreground: #111928;
+
+  /* Surface + text */
+  --background: #ffffff;
+  --foreground: #111928;
+  --card: #ffffff;
+  --card-foreground: #111928;
+  --popover: #ffffff;
+  --popover-foreground: #6b7280;
+
+  /* UI affordances */
+  --border: #e5e7eb;
+  --input: #f9fafb;
+  --input-background: #f9fafb;
+  --ring: #2563eb;
+
+  /* Status */
+  --destructive: #fde8e8;
+  --destructive-foreground: #9b1c1c;
+
+  /* Optional charts */
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
+  --chart-3: #f59e0b;
+  --chart-4: #ef4444;
+  --chart-5: #8b5cf6;
+
+  /* Radii */
+  --radius: 0.5rem;
+  --radius-button: 0.375rem;
+  --radius-badge: 0.25rem;
+
+  /* Sidebar */
+  --sidebar: #f9fafb;
+  --sidebar-foreground: #0b1220;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f59e0b;
+  --sidebar-accent-foreground: #111928;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #2563eb;
+}

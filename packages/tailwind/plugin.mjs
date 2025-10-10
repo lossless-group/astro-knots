@@ -9,15 +9,15 @@ const plugin = tailwindPlugin(function ({ addComponents, addUtilities, theme }) 
       gap: "0.5rem",
       padding: "0.5rem 0.875rem",
       borderRadius: "0.375rem",
-      backgroundColor: theme("colors.primary.500"),
+      backgroundColor: theme("colors.primary.DEFAULT"),
       color: "#fff"
     },
     ".btn-secondary": {
-      backgroundColor: theme("colors.secondary.500"),
+      backgroundColor: theme("colors.secondary.DEFAULT"),
       color: "#fff"
     },
     ".btn-accent": {
-      backgroundColor: theme("colors.accent.500"),
+      backgroundColor: theme("colors.accent.DEFAULT"),
       color: "#111827"
     }
   };
