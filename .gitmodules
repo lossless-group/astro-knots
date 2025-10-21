@@ -5,3 +5,6 @@
 	path = sites/cilantro-site
 	url = https://github.com/lossless-group/cilantro-site.git
 	branch = main
+[submodule "sites/coglet-shuffle"]
+	path = sites/coglet-shuffle
+	url = https://github.com/lossless-group/steampunk-site.git
