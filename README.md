@@ -1,6 +1,15 @@
 # Astro Knots
 
-Shared packages for Astro/Svelte sites. This workspace provides design tokens, icons, and base UI components that can be consumed by multiple websites with minimal coupling.
+Shared packages for Astro/Svelte content-driven websites. This workspace provides design tokens, icons, and base UI components that can be consumed by multiple websites with minimal coupling.
+
+## Current Sites:
+- [The Lossless Group](https://github.com/lossless-group/lossless-site)
+- [Water Themed Site](https://github.com/lossless-group/the-water-foundation-site)
+- [Hypernova Site](https://github.com/hypernova-labs/hypernova-site)
+- [Cilantro Site](https://github.com/lossless-group/cilantro-site)
+- [Steampunk Site](https://github.com/lossless-group/steampunk-site)
+
+We are trying to maintain these as elegant design systems, in addition to robust, state-of-the-art websites. 
 
 ## Workspace
 

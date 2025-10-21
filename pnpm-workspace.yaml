@@ -1,5 +1,11 @@
 packages:
-  - "packages/*"
-  - "sites/hypernova-site"
-  - "sites/cilantro-site"
-  - "design-system-viewer"
+  - packages/*
+  - sites/hypernova-site
+  - sites/cilantro-site
+  - design-system-viewer
+
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+  - inotify
+  - sharp
