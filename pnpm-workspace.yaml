@@ -2,6 +2,8 @@ packages:
   - packages/*
   - sites/hypernova-site
   - sites/cilantro-site
+  - sites/coglet-shuffle
+  - sites/coglet-shuffle/astro-site
   - design-system-viewer
 
 onlyBuiltDependencies:
