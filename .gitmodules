@@ -8,3 +8,6 @@
 [submodule "sites/coglet-shuffle"]
 	path = sites/coglet-shuffle
 	url = https://github.com/lossless-group/steampunk-site.git
+[submodule "sites/cogs-site"]
+	path = sites/cogs-site
+	url = https://github.com/lossless-group/cogs-site.git
