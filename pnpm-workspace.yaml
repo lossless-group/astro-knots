@@ -4,6 +4,7 @@ packages:
   - sites/cilantro-site
   - sites/coglet-shuffle
   - sites/coglet-shuffle/astro-site
+  - sites/twf_site
   - design-system-viewer
 
 onlyBuiltDependencies:

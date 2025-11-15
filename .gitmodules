@@ -11,3 +11,6 @@
 [submodule "sites/cogs-site"]
 	path = sites/cogs-site
 	url = https://github.com/lossless-group/cogs-site.git
+[submodule "sites/twf_site"]
+	path = sites/twf_site
+	url = https://github.com/lossless-group/the-water-foundation-site.git
