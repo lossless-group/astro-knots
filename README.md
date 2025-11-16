@@ -35,7 +35,24 @@ The monorepo is a "pattern library" approach, NOT a "shared dependency" approach
 - [Cilantro Site](https://github.com/lossless-group/cilantro-site)
 - [Steampunk Site](https://github.com/lossless-group/steampunk-site)
 
-We are trying to maintain these as elegant design systems, in addition to robust, state-of-the-art websites. 
+We are trying to maintain these as elegant design systems, in addition to robust, state-of-the-art websites.
+
+## Submodule Progress
+
+- Hypernova (`sites/hypernova-site`)
+  - Portfolio page renders via `LogoGrid--LogoOnly.astro` accepting `portfolio` data; Class5 and Kearny Jackson logos fixed.
+  - Brand mark uses public SVGs: `/trademarks/trademark__Hypernova--Dark-Mode.svg` and light variant; header background around logo removed.
+  - Astro config type mismatch resolved using a JSDoc cast for Vite plugins; removed `// @ts-check`.
+  - Content collections build error fixed by removing the missing `facts` collection.
+
+- The Water Foundation (`sites/twf_site`)
+  - Brand mark wrapper supports light/dark assets placed in `public/trademarks` and referenced by absolute paths.
+  - Follows the copy-pattern workflow; keeps zero runtime deps on `@knots/*`.
+
+Quick dev:
+
+- `pnpm --filter hypernova-site dev`
+- `pnpm --filter twf_site dev` 
 
 ## Workspace
 

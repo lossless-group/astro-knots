@@ -399,6 +399,23 @@ git checkout main
 - No vendor lock-in to our monorepo infrastructure
 - Sites must work from their own repos (Vercel auto-deploy)
 
+### Recent Progress (Nov 2025)
+
+- Hypernova (`sites/hypernova-site`)
+  - Fixed portfolio page blank render by normalizing grid props (`LogoGrid--LogoOnly.astro`).
+  - Corrected Class5 logo asset paths and extensions in `src/content/page-content/portfolio.json`.
+  - Replaced inline brand mark with public SVG asset; removed header background block.
+  - Resolved TypeScript plugin mismatch in `astro.config.mjs` with a JSDoc cast.
+  - Removed missing `facts` content collection to fix build.
+
+- The Water Foundation (`sites/twf_site`)
+  - Ensured brand mark wrapper supports light/dark assets from `public/trademarks` referenced by absolute paths.
+  - Continues to follow copy-pattern workflow; site remains fully independent.
+
+Guidance:
+- Use public assets via absolute paths for logos when they live in `public/`.
+- Only import assets (e.g., `?url`, `?raw`) from `src/` when you need bundling or inlining.
+
 **Development Benefits:**
 - See all sites together for pattern inspiration
 - Extract common solutions to avoid reinventing

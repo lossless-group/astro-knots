@@ -52,6 +52,18 @@ pnpm dev    # Site runs standalone
 pnpm build  # Site builds standalone
 ```
 
+### Submodule Progress (Hypernova & TWF)
+
+- Hypernova:
+  - Portfolio grid fixed to accept `portfolio` data; logo asset paths corrected.
+  - Brand mark now uses public SVGs and no background block in header.
+  - TypeScript plugin mismatch in `astro.config.mjs` resolved via JSDoc cast; removed `// @ts-check`.
+  - Removed missing `facts` collection to restore build.
+
+- The Water Foundation:
+  - Brand mark wrapper supports light/dark assets from `public/trademarks` using absolute paths.
+  - Same copy-pattern workflow; site remains independent of `@knots/*` at runtime.
+
 ### Copying Patterns to Sites
 
 The primary workflow is copying patterns from packages into sites:
