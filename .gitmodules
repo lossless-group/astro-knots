@@ -14,3 +14,6 @@
 [submodule "sites/twf_site"]
 	path = sites/twf_site
 	url = https://github.com/lossless-group/the-water-foundation-site.git
+[submodule "sites/dark-matter"]
+	path = sites/dark-matter
+	url = https://github.com/lossless-group/matter-site.git

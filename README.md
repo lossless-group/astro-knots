@@ -34,6 +34,7 @@ The monorepo is a "pattern library" approach, NOT a "shared dependency" approach
 - [Hypernova Site](https://github.com/hypernova-labs/hypernova-site)
 - [Cilantro Site](https://github.com/lossless-group/cilantro-site)
 - [Steampunk Site](https://github.com/lossless-group/steampunk-site)
+- [Dark Matter Site](https://github.com/lossless-group/matter-site)
 
 We are trying to maintain these as elegant design systems, in addition to robust, state-of-the-art websites.
 
