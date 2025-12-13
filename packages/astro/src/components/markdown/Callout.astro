@@ -1,0 +1,73 @@
+---
+import type { Content } from "mdast";
+import { toString } from "mdast-util-to-string";
+import type { Props as MarkdownProps } from "./AstroMarkdown.astro";
+
+interface CalloutNode extends Content {
+  name?: string;
+  attributes?: Record<string, any>;
+}
+
+export interface Props {
+  node: CalloutNode;
+  data?: any;
+}
+
+const { node, data } = Astro.props as Props;
+const attrs = (node as any).attributes || {};
+const tone = attrs.type ?? "info";
+const title = attrs.title ?? undefined;
+
+function childrenOf(n: any): any[] {
+  return Array.isArray(n?.children) ? n.children : [];
+}
+---
+
+<div class={`ak-callout ak-callout-${tone}`}>
+  {title && <div class="ak-callout-title">{title}</div>}
+  <div class="ak-callout-body">
+    {childrenOf(node).length > 0 ? (
+      childrenOf(node).map((child) => (
+        // reuse AstroMarkdown for nested markdown
+        <Astro.self client:load={false} node={child} data={data} />
+      ))
+    ) : (
+      <p>{toString(node as any)}</p>
+    )}
+  </div>
+</div>
+
+<style>
+  .ak-callout {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-width: 1px;
+    border-style: solid;
+    background: rgba(59, 130, 246, 0.04);
+  }
+
+  .ak-callout-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .ak-callout-body {
+    font-size: 0.95rem;
+  }
+
+  .ak-callout-info {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.05);
+  }
+
+  .ak-callout-warning {
+    border-color: rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.05);
+  }
+
+  .ak-callout-danger {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.05);
+  }
+</style>

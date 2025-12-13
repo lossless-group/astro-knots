@@ -1,0 +1,32 @@
+---
+export interface Props {
+  language?: string;
+  code: string;
+  meta?: string;
+}
+
+const { language, code } = Astro.props as Props;
+
+const langClass = language ? `language-${language}` : undefined;
+---
+
+<pre class="ak-codeblock">
+  <code class={langClass}>{code}</code>
+</pre>
+
+<style>
+  .ak-codeblock {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #0f172a;
+    color: #e5e7eb;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .ak-codeblock code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+  }
+</style>

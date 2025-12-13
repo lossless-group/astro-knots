@@ -1,0 +1,46 @@
+---
+import AstroMarkdown from "../markdown/AstroMarkdown.astro";
+import type { Root } from "mdast";
+
+export interface Props {
+  content: Root;
+  data: any;
+  title?: string;
+}
+
+const { content, data, title } = Astro.props as Props;
+
+const effectiveTitle = title ?? data?.title ?? "";
+---
+
+<article class="ak-article">
+  {effectiveTitle && (
+    <header class="ak-article-header">
+      <h1 class="ak-article-title">{effectiveTitle}</h1>
+    </header>
+  )}
+
+  <section class="ak-article-body">
+    <AstroMarkdown node={content} data={data} />
+  </section>
+</article>
+
+<style>
+  .ak-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem;
+  }
+
+  .ak-article-title {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .ak-article-body {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+</style>
