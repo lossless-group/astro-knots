@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat(memos): implement secure GitHub content fetching for confidential memos\n\nAdd a complete content fetching system that retrieves confidential investment\nmemos from a private GitHub repository (lossless-group/hypernova-secure-data)\nat runtime using fine-grained PAT authentication.\n\n## New Library: src/lib/github-content.ts\n\nCore functionality for secure content fetching:\n- fetchGitHubContent() - Fetch raw markdown via GitHub Raw API with PAT auth\n- fetchMemoBySlug() - High-level function to fetch memos by URL slug\n- deriveGitHubPathFromSlug() - Convert URL slugs to GitHub file paths\n  - Handles URL-safe versions: Aito-v002-draft → deals/Aito/outputs/Aito-v0.0.2/Aito-v0.0.2-draft.md\n  - Converts v002 → v0.0.2 automatically (dots break URL routing)\n- parseFrontmatter() - Extract YAML frontmatter from markdown content\n- listGitHubDirectory() - List files in a GitHub directory\n- isLocalDemoMode() - Check if running without PAT (local fallback)\n- 5-minute in-memory cache to reduce GitHub API calls\n\n## Local Demo Mode\n\nWhen GITHUB_CONTENT_PAT is empty, falls back to reading from\nsrc/content/markdown-memos/ for local testing:\n- Yellow banner: \"Local Demo Mode — Content loaded from local files\"\n- Server logs: [memos] LOCAL DEMO MODE - fetching from src/content/markdown-memos/\n\n## Updated Memo Page: src/pages/memos/[slug].astro\n\n- Now uses fetchMemoBySlug() from the new library\n- SSR-only (prerender = false) to fetch at runtime\n- Requires passcode auth via /portfolio-gate before loading content\n- Logs fetch mode to server console for debugging\n\n## Configuration\n\nRequired environment variables for production:\n- GITHUB_CONTENT_PAT: Fine-grained PAT with Contents read-only\n- GITHUB_CONTENT_OWNER: lossless-group\n- GITHUB_CONTENT_REPO: hypernova-secure-data\n- GITHUB_CONTENT_BRANCH: main\n\n## Security\n\n- PAT only needs Contents:Read permission on single repo\n- Server-side only - PAT never exposed to client\n- Auth-gated - requires passcode before content loads\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
