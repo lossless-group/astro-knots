@@ -1,7 +1,7 @@
 # Confidential Content Access Control Blueprint
 
-> **Status:** Implemented (Tier 1) in hypernova-site | Ready for dark-matter
-> **Target Sites:** hypernova-site (complete), dark-matter (next), all sites (eventual)
+> **Status:** Implemented (Tier 1) in hypernova-site | Tier 1.5 in dark-matter
+> **Target Sites:** hypernova-site (complete), dark-matter (in progress), all sites (eventual)
 > **Author:** AI-assisted
 > **Created:** December 2024
 > **Last Updated:** December 2024
@@ -17,10 +17,12 @@
 - **UI Components:** ✅ AuthenticationStatus, AuthenticationModal, Button--AccessConfidentialInfo
 - **Grid Components:** ✅ LogoGrid--ConfidentialAccess, LogoCardExpanded--ConfidentialAccess
 
-### Dark-matter (Next Implementation)
-- **Tier 1 Passcode Gate:** 🔲 Not started
-- **Confidential Portfolio View:** 🔲 Not started
-- **GitHub Memo Integration:** 🔲 Not started
+### Dark-matter (Tier 1.5 with NocoDB)
+- **Tier 1 Passcode Gate:** ✅ Complete
+- **Tier 1.5 Email + Domain Auth:** ✅ Complete with NocoDB session tracking
+- **NocoDB Integration:** ✅ Email access table with session tracking
+- **Confidential Portfolio View:** ✅ Complete
+- **GitHub Memo Integration:** ✅ Complete
 
 ## Executive Summary
 
@@ -1557,6 +1559,238 @@ This gives each site a self-contained, database-free confidential content gate t
 
 ---
 
+## Tier 1.5: Email + Domain Auth with NocoDB Session Tracking
+
+### Overview
+
+A hybrid approach that combines passcode authentication with email-based access and session tracking. Users can authenticate via passcode OR email. Approved email domains get instant access, while all sessions are logged to NocoDB for analytics and audit purposes.
+
+**Key differentiator from Tier 1:** Email capture with domain-based auto-authorization and session tracking in NocoDB.
+
+**Key differentiator from Tier 2:** No magic links or email delivery required — instant access for approved domains.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          Astro Site                                      │
+│  ┌──────────────┐    ┌──────────────────┐    ┌────────────────────┐    │
+│  │ Gate Page    │    │ API: Verify      │    │ Protected Pages    │    │
+│  │ (tabs:       │───▶│ Passcode OR      │───▶│ (confidential)     │    │
+│  │  passcode/   │    │ Email            │    │                    │    │
+│  │  email)      │    └──────────────────┘    └────────────────────┘    │
+│  └──────────────┘             │                       ▲                 │
+│                               ▼                       │                 │
+│                    ┌─────────────────────┐            │                 │
+│                    │ NocoDB              │────────────┘                 │
+│                    │ (session tracking)  │                              │
+│                    └─────────────────────┘                              │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Implementation (Dark-Matter Reference)
+
+#### 1. NocoDB Table Structure
+
+Table: `emailAccess` (ID: `ms0dzr6telg2cxu`)
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `emailOfAccessor` | Text | User's email address |
+| `sessionStartTime` | DateTime | When access session began |
+| `sessionEndTime` | DateTime | When session ended (optional) |
+
+#### 2. Environment Configuration
+
+```bash
+# .env
+# Passcode (same as Tier 1)
+UNIVERSAL_PORTFOLIO_PASSCODE_PLAINTEXT=YOUR_PASSCODE_HERE
+
+# NocoDB Integration
+NOCODB_API_KEY=your_nocodb_api_key_here
+NOCODB_BASE_ID=pvop0ydhmtugzvv
+
+# Allowed email domains (comma-separated)
+# Users with these domains get instant access
+ALLOWED_EMAIL_DOMAINS=darkmatter.vc,darkmatterlongevity.com,lossless.group
+```
+
+#### 3. NocoDB Library Extension
+
+```typescript
+// src/lib/nocodb.ts (additions)
+export const NOCODB_TABLES = {
+  // ... existing tables
+  emailAccess: 'ms0dzr6telg2cxu',
+} as const;
+
+export interface EmailAccessFields {
+  emailOfAccessor: string;
+  sessionStartTime: string;
+  sessionEndTime?: string | null;
+}
+
+export type EmailAccessStatus = 'domain_allowed' | 'approved' | 'pending' | 'new';
+
+/**
+ * Check if an email is allowed access (domain check + previous session lookup)
+ */
+export async function checkEmailAccess(email: string): Promise<{
+  allowed: boolean;
+  status: EmailAccessStatus;
+}> {
+  // 1. Check domain allowlist first
+  if (isAllowedDomain(email)) {
+    return { allowed: true, status: 'domain_allowed' };
+  }
+
+  // 2. Check for previous approved sessions in NocoDB
+  const response = await fetchRecords(NOCODB_TABLES.emailAccess, {
+    where: `(emailOfAccessor,eq,${email.toLowerCase()})`,
+    limit: 1,
+  });
+
+  if (response.records.length > 0) {
+    return { allowed: true, status: 'approved' };
+  }
+
+  return { allowed: false, status: 'new' };
+}
+
+/**
+ * Create a new email access session in NocoDB
+ */
+export async function createEmailAccessSession(email: string): Promise<void> {
+  await fetch(nocodbUrl, {
+    method: 'POST',
+    body: JSON.stringify({
+      emailOfAccessor: email.toLowerCase(),
+      sessionStartTime: new Date().toISOString(),
+    }),
+  });
+}
+```
+
+#### 4. Email Verification API
+
+```typescript
+// src/pages/api/verify-email.ts
+import { checkEmailAccess, createEmailAccessSession } from '@lib/nocodb';
+
+export const POST: APIRoute = async ({ request, cookies, redirect }) => {
+  const formData = await request.formData();
+  const email = formData.get('email') as string;
+  const redirectTo = formData.get('redirect') as string;
+
+  const accessResult = await checkEmailAccess(email);
+
+  if (accessResult.allowed) {
+    // Create session record in NocoDB
+    await createEmailAccessSession(email);
+
+    // Set auth cookie
+    cookies.set('universal_portfolio_access', sessionToken, {
+      httpOnly: true,
+      secure: import.meta.env.PROD,
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+
+    return redirect(redirectTo);
+  }
+
+  // Not allowed - log request and show pending message
+  await createEmailAccessSession(email);
+  return redirect('/portfolio-gate?error=pending&email=' + email);
+};
+```
+
+#### 5. Gate Page with Tab Switcher
+
+The gate page provides a tab interface for switching between passcode and email authentication:
+
+```astro
+<!-- src/pages/portfolio-gate.astro -->
+<!-- Tab Switcher -->
+<div class="flex rounded-xl bg-surface/30 p-1" role="tablist">
+  <button data-tab="passcode" class="tab-button">Passcode</button>
+  <button data-tab="email" class="tab-button">Email</button>
+</div>
+
+<!-- Passcode Form -->
+<form id="passcode-form" action="/api/verify-portfolio-passcode">
+  <input type="password" name="passcode" placeholder="Enter passcode" />
+  <button type="submit">Access with Passcode</button>
+</form>
+
+<!-- Email Form -->
+<form id="email-form" action="/api/verify-email" class="hidden">
+  <input type="email" name="email" placeholder="you@company.com" />
+  <button type="submit">Access with Email</button>
+  <p class="text-xs">Team members and approved partners get instant access.</p>
+</form>
+```
+
+### Authentication Flow
+
+```
+User visits /portfolio/confidential
+         │
+         ▼
+    Has cookie? ────Yes───▶ Show confidential content
+         │
+         No
+         │
+         ▼
+    Redirect to /portfolio-gate
+         │
+         ▼
+    User chooses: Passcode OR Email
+         │
+    ┌────┴────┐
+    │         │
+Passcode    Email
+    │         │
+    ▼         ▼
+  Valid?    Domain in
+    │       allowlist?
+    │         │
+  ┌─┴─┐    ┌──┴──┐
+  │   │    │     │
+ Yes  No  Yes    No
+  │   │    │     │
+  │   │    ▼     ▼
+  │   │  Log to  Log to NocoDB
+  │   │  NocoDB  Show "pending"
+  │   │    │     message
+  │   │    │
+  │   │    ▼
+  ▼   ▼   Set cookie
+Set cookie  Redirect
+Redirect    to content
+to content
+```
+
+### Pros & Cons
+
+| Pros | Cons |
+|------|------|
+| Dual auth methods (passcode + email) | Requires NocoDB setup |
+| Domain-based instant access | Session tracking adds complexity |
+| Session tracking for analytics | Non-approved domains need manual review |
+| No email delivery needed | Slightly more complex than Tier 1 |
+| NocoDB as lightweight backend | |
+
+### When to Use Tier 1.5
+
+- You want to track who accesses confidential content
+- You have known partner/investor domains that should get automatic access
+- You don't want to set up email delivery (no magic links)
+- You already use NocoDB for other data management
+- You need both passcode sharing AND email-based access
+
+---
+
 ## Tier 2: Email Verification with Domain Allowlist
 
 ### Overview
@@ -1993,17 +2227,18 @@ const confidentialDocs = defineCollection({
 
 ## Comparison Matrix
 
-| Feature | Tier 1 (Passcode) | Tier 2 (Email) | Tier 3 (Clerk) |
-|---------|-------------------|----------------|----------------|
-| Implementation time | 2-4 hours | 1-2 days | 4-8 hours |
-| Database required | No | KV (optional) | No (Clerk manages) |
-| Identity verification | None | Email | Full (email, social, phone) |
-| Domain allowlist | No | Yes (custom) | Yes (built-in) |
-| Audit trail | No | Basic | Comprehensive |
-| Role-based access | No | No | Yes |
-| User persistence | Session only | Email-based | Full accounts |
-| Static hosting | Yes | Partial | No (needs server) |
-| Cost | Free | Email service | Free tier, then $25+/mo |
+| Feature | Tier 1 (Passcode) | Tier 1.5 (Email+NocoDB) | Tier 2 (Magic Link) | Tier 3 (Clerk) |
+|---------|-------------------|-------------------------|---------------------|----------------|
+| Implementation time | 2-4 hours | 4-6 hours | 1-2 days | 4-8 hours |
+| Database required | No | NocoDB | KV (optional) | No (Clerk manages) |
+| Identity verification | None | Email (domain-based) | Email (verified) | Full (email, social, phone) |
+| Domain allowlist | No | Yes | Yes (custom) | Yes (built-in) |
+| Audit trail | No | Session tracking | Basic | Comprehensive |
+| Role-based access | No | No | No | Yes |
+| User persistence | Session only | Session + NocoDB log | Email-based | Full accounts |
+| Email delivery needed | No | No | Yes (Resend/Plunk) | No (Clerk handles) |
+| Static hosting | Yes | No (needs server) | No (needs server) | No (needs server) |
+| Cost | Free | Free (NocoDB free tier) | Email service cost | Free tier, then $25+/mo |
 
 ---
 
