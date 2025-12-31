@@ -120,27 +120,19 @@ See all themes: https://shiki.style/themes
 
 ---
 
-## 4. CSS Theme Switching
+## 4. CSS Configuration
 
 Add to `src/styles/global.css` (or equivalent):
 
 ```css
-/* Shiki dual-theme switching for code blocks */
-[data-theme][data-mode="light"] .shiki,
-[data-theme][data-mode="light"] .shiki span {
-  color: var(--shiki-light) !important;
-  background-color: var(--shiki-light-bg) !important;
-}
-
-[data-theme][data-mode="dark"] .shiki,
-[data-theme][data-mode="dark"] .shiki span,
-[data-theme][data-mode="vibrant"] .shiki,
-[data-theme][data-mode="vibrant"] .shiki span {
+/* Shiki syntax highlighting - always use dark theme for better contrast */
+.shiki,
+.shiki span {
   color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+  background-color: transparent !important;
 }
 
-/* Code block base styling */
+/* Code block base styling - dark background in all modes */
 pre.shiki {
   padding: 1rem;
   border-radius: var(--border-radius-lg, 0.5rem);
@@ -148,13 +140,24 @@ pre.shiki {
   font-family: var(--font-family-mono, monospace);
   font-size: 0.875rem;
   line-height: 1.7;
+  background-color: #1a1b26 !important; /* tokyo-night background */
 }
 ```
 
+**Design Decision: Always Dark Code Blocks**
+
+We keep code blocks dark in ALL modes (including light mode) because:
+- Provides consistent visual contrast and separation from content
+- Dark backgrounds are easier on the eyes for reading code
+- Most developers are used to dark editor themes
+- Eliminates the need for maintaining two color schemes
+- Follows the pattern used by GitHub, VS Code docs, and many documentation sites
+
 **How it works:**
-- Shiki with dual themes outputs inline styles using CSS variables: `--shiki-light`, `--shiki-dark`, etc.
-- The CSS above activates the appropriate variables based on `data-mode` attribute
-- This integrates with the theme/mode system from `Maintain-Themes-Mode-Across-CSS-Tailwind.md`
+- Shiki outputs inline styles using CSS variables: `--shiki-light`, `--shiki-dark`
+- We force `--shiki-dark` in all modes via CSS
+- Background is hardcoded to tokyo-night's `#1a1b26`
+- In light mode, the dark code block provides nice contrast against the light page
 
 ---
 
