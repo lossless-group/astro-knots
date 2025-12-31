@@ -419,14 +419,19 @@ button.addEventListener('click', async () => {
 ```
 src/
 ├── components/
-│   └── codeblocks/
-│       ├── BaseCodeblock.astro      # Direct use with <Code />
-│       └── CodeblockWrapper.astro   # Wraps pre-rendered HTML
+│   ├── codeblocks/
+│   │   ├── BaseCodeblock.astro      # Direct use with <Code />
+│   │   └── CodeblockWrapper.astro   # Wraps pre-rendered HTML
+│   ├── content/
+│   │   └── ContentEnhancer.astro    # Combined code + mermaid wrapper
+│   └── diagrams/
+│       ├── MermaidDiagram.astro     # Direct mermaid component
+│       └── MermaidWrapper.astro     # Mermaid wrapper for HTML
 ├── styles/
 │   └── global.css                   # Shiki theme switching CSS
 └── pages/
     └── changelog/
-        └── [id].astro               # Example using CodeblockWrapper
+        └── [id].astro               # Example using ContentEnhancer
 ```
 
 ---
@@ -490,20 +495,184 @@ See `astro-knots/sites/dark-matter` for the complete implementation:
 
 - `astro.config.mjs` - Shiki config
 - `src/styles/global.css` - Theme switching CSS
-- `src/components/codeblocks/` - Both components
-- `src/pages/changelog/[id].astro` - Usage with unified pipeline
-- `changelog/2025-12-31_02.md` - Detailed changelog
+- `src/components/codeblocks/` - Codeblock components
+- `src/components/content/ContentEnhancer.astro` - Combined wrapper
+- `src/components/diagrams/` - Mermaid components
+- `src/pages/changelog/[id].astro` - Usage with unified pipeline + mermaid
+- `changelog/2025-12-31_02.md` - Shiki implementation changelog
+- `changelog/2025-12-31_03.md` - Mermaid integration changelog
 
 ---
 
-## 12. Dependencies
+## 12. Mermaid Diagram Integration
+
+When using `rehypeShiki`, mermaid code blocks get syntax-highlighted as code, preventing Mermaid.js from rendering them as diagrams. The solution is a custom rehype plugin that extracts mermaid blocks BEFORE Shiki processes them.
+
+### 12.1 The Problem
+
+```markdown
+```mermaid
+graph TD
+    A --> B
+```
+```
+
+With just `rehypeShiki`, this becomes syntax-highlighted text instead of a diagram because Shiki converts it to colored HTML tokens.
+
+### 12.2 Solution: rehypeMermaidPre Plugin
+
+Create a custom rehype plugin that runs BEFORE `rehypeShiki`:
+
+```typescript
+import { visit } from 'unist-util-visit';
+
+/**
+ * Converts mermaid code blocks from:
+ *   <pre><code class="language-mermaid">...</code></pre>
+ * To:
+ *   <pre class="mermaid">...</pre>
+ *
+ * This format won't match rehypeShiki's selector.
+ */
+function rehypeMermaidPre() {
+  return (tree: any) => {
+    visit(tree, 'element', (node: any) => {
+      if (
+        node.tagName === 'pre' &&
+        node.children?.[0]?.tagName === 'code'
+      ) {
+        const codeNode = node.children[0];
+        const classList = codeNode.properties?.className || [];
+
+        const isMermaid = classList.some((c: string) =>
+          c === 'language-mermaid' || c === 'mermaid'
+        );
+
+        if (isMermaid) {
+          const mermaidCode = codeNode.children?.[0]?.value || '';
+          node.properties = { className: ['mermaid'] };
+          node.children = [{ type: 'text', value: mermaidCode }];
+        }
+      }
+    });
+  };
+}
+```
+
+### 12.3 Updated Pipeline Order
+
+The plugin order is CRITICAL:
+
+```typescript
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeMermaidPre)  // BEFORE rehypeShiki!
+  .use(rehypeShiki, { ... })
+  .use(rehypeStringify, { allowDangerousHtml: true });
+```
+
+### 12.4 ContentEnhancer Component
+
+The `ContentEnhancer` component handles BOTH code blocks AND mermaid diagrams:
+
+```astro
+<ContentEnhancer>
+  <div set:html={htmlContent} />
+</ContentEnhancer>
+```
+
+It loads Mermaid.js from CDN and renders diagrams client-side:
+
+```javascript
+import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')
+  .then(({ default: mermaid }) => {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: { /* matter-theme colors */ },
+    });
+    mermaid.run({
+      querySelector: '.content-enhanced pre.mermaid',
+    });
+  });
+```
+
+### 12.5 Mermaid Theme Variables
+
+For matter-theme integration:
+
+```javascript
+themeVariables: {
+  primaryColor: '#6643e2',
+  primaryTextColor: '#F9FAFB',
+  primaryBorderColor: '#9C85DF',
+  lineColor: '#9C85DF',
+  secondaryColor: '#1a1b26',
+  tertiaryColor: '#0F0923',
+  background: '#0F0923',
+  mainBkg: '#1a1b26',
+  nodeBorder: '#9C85DF',
+  clusterBkg: '#1a1b26',
+  clusterBorder: '#6643e2',
+  titleColor: '#F9FAFB',
+  edgeLabelBackground: '#1a1b26',
+  textColor: '#F9FAFB',
+}
+```
+
+### 12.6 Mermaid CSS
+
+```css
+.content-enhanced pre.mermaid {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--color-surface, #111827);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg, 0.5rem);
+  text-align: center;
+}
+
+/* Hide raw code while rendering */
+.content-enhanced pre.mermaid:not([data-processed="true"]) {
+  color: transparent;
+  min-height: 100px;
+}
+```
+
+### 12.7 Common Pitfall: Variable Naming Collision
+
+Avoid naming functions the same as prop variables in Astro scripts:
+
+**Bad:**
+```javascript
+<script define:vars={{ enhanceCodeblocks }}>
+function enhanceCodeblocks() {
+  if (!enhanceCodeblocks) return; // Always truthy (function ref)!
+```
+
+**Good:**
+```javascript
+<script define:vars={{ enhanceCodeblocks }}>
+const shouldEnhance = enhanceCodeblocks;
+function processCodeblocks() {
+  if (!shouldEnhance) return; // Correct boolean check
+```
+
+---
+
+## 13. Dependencies
 
 ```json
 {
   "dependencies": {
-    "@shikijs/rehype": "^3.20.0"
+    "@shikijs/rehype": "^3.20.0",
+    "unist-util-visit": "^5.0.0"
   }
 }
 ```
 
 Astro's `<Code />` component uses Shiki internally, so no additional dependency needed for `BaseCodeblock.astro`.
+
+Mermaid.js is loaded from CDN at runtime (no npm dependency).
