@@ -1,6 +1,6 @@
 # Codeblock Syntax Highlighting with Shiki (Astro-Knots Pattern)
 
-This blueprint captures how to implement syntax-highlighted code blocks across astro-knots sites using Shiki with dual-theme support (light/dark modes) and reusable wrapper components.
+This blueprint captures how to implement syntax-highlighted code blocks across astro-knots sites using Shiki with the tokyo-night theme and reusable wrapper components.
 
 Reference implementation: `astro-knots/sites/dark-matter`
 
@@ -9,10 +9,10 @@ Reference implementation: `astro-knots/sites/dark-matter`
 ## 1. Goals
 
 - **Syntax highlighting** for all code blocks using Shiki
-- **Dual-theme support**: Different color schemes for light and dark modes
+- **Always-dark code blocks**: Dark background in ALL modes (dark, vibrant, light) for consistent contrast
 - **Consistent UX**: Compact header with language label and copy button
 - **Flexible integration**: Works with both Astro's built-in markdown and custom unified/remark pipelines
-- **Theme-aware**: Colors adapt to the site's theme system via CSS variables
+- **Mode-independent**: Code blocks look the same regardless of page theme mode
 
 ---
 
@@ -23,22 +23,33 @@ The system has three layers:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  1. Shiki Configuration (astro.config.mjs or rehypeShiki)   │
-│     - Theme selection (tokyo-night, github-light, etc.)     │
-│     - Language class output                                 │
+│     - Theme: tokyo-night (dark theme used in all modes)     │
+│     - Language class output for detection                   │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
-│  2. CSS Theme Switching (global.css)                        │
-│     - Maps data-mode to Shiki CSS variables                 │
-│     - Base styling for pre.shiki elements                   │
+│  2. CSS Configuration (global.css)                          │
+│     - Forces dark theme colors (--shiki-dark)               │
+│     - Dark background (#1a1b26) in all modes                │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  3. Component Layer                                         │
 │     - BaseCodeblock.astro: Direct use with <Code />         │
 │     - CodeblockWrapper.astro: Enhances pre-rendered HTML    │
+│     - Both maintain dark styling across all modes           │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Mode Behavior
+
+| Page Mode | Code Block Background | Syntax Colors | Result |
+|-----------|----------------------|---------------|--------|
+| `dark` | `#1a1b26` (tokyo-night) | tokyo-night | Dark on dark - seamless |
+| `vibrant` | `#1a1b26` (tokyo-night) | tokyo-night | Dark on vibrant - contrast |
+| `light` | `#1a1b26` (tokyo-night) | tokyo-night | Dark on light - strong contrast |
+
+Code blocks remain dark in ALL modes, providing consistent developer experience and good contrast regardless of the page's theme mode.
 
 ---
 
@@ -345,6 +356,35 @@ The codeblock header should be compact and unobtrusive:
 - Language font: 0.65rem uppercase
 - Copy button: 12x12px icon, label hidden on mobile
 
+### Light Mode Component Styling
+
+Even in light mode, code blocks stay dark. Add these styles to maintain proper contrast:
+
+```css
+/* Light mode - keep code blocks dark for contrast */
+:global([data-mode="light"]) .codeblock-container {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+:global([data-mode="light"]) .codeblock-header {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+:global([data-mode="light"]) .codeblock-content {
+  background: #1a1b26; /* tokyo-night background */
+}
+
+:global([data-mode="light"]) .copy-button {
+  color: #F9FAFB; /* Light text on dark background */
+}
+```
+
+This ensures:
+- Slightly stronger shadow in light mode (code block "pops" more)
+- Header stays dark to match content area
+- Copy button text remains visible
+
 ---
 
 ## 7. Copy Button Behavior
@@ -427,13 +467,16 @@ The wrapper checks in order:
 
 Ensure `addLanguageClass: true` is set in `rehypeShiki` options.
 
-### Colors wrong for current mode
+### Code blocks look wrong in light mode
 
-Check that the CSS selectors match your theme attribute structure:
+Ensure you have the light mode overrides that keep code blocks dark:
 ```css
-/* Adjust selector to match your theme system */
-[data-theme="your-theme"][data-mode="dark"] .shiki { ... }
+:global([data-mode="light"]) .codeblock-content {
+  background: #1a1b26; /* Must stay dark */
+}
 ```
+
+If the background is white/light, the CSS isn't being applied correctly.
 
 ### Copy button doesn't work
 
