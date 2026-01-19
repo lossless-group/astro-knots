@@ -5,6 +5,7 @@ packages:
   - sites/coglet-shuffle
   - sites/coglet-shuffle/astro-site
   - sites/twf_site
+  - sites/banner-site
   - design-system-viewer
 
 onlyBuiltDependencies:
