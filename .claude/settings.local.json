@@ -10,7 +10,8 @@
       "Bash(tree:*)",
       "Bash(pkill:*)",
       "Bash(pnpm build:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(magick:*)"
     ],
     "deny": [],
     "ask": []
