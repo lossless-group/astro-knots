@@ -20,3 +20,6 @@
 [submodule "sites/banner-site"]
 	path = sites/banner-site
 	url = https://github.com/lossless-group/emblem-site.git
+[submodule "sites/mpstaton-site"]
+	path = sites/mpstaton-site
+	url = https://github.com/lossless-group/mpstaton-site.git
