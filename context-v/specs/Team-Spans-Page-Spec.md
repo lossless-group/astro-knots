@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Specifications
-tags: [team-pages, CSS-grid, responsive-layout, components]
+tags: [Team-Pages, CSS-Grid, Responsive-Layout, Components]
 authors:
   - Michael Staton
 ---

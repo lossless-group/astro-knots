@@ -15,7 +15,7 @@ authors:
   - Michael Staton
 augmented_with: Claude Code
 category: Blueprints
-tags: [open-graph, SEO, metadata, social-sharing, messaging]
+tags: [Open-Graph, SEO, Metadata, Social-Sharing, Messaging]
 image_prompt: A robot conducting a symphony.  Each musician is playing a social media branded instrument.  Above them, shares are going to Facebook, LinkedIn, and X
 banner_image: https://ik.imagekit.io/xvpgfijuw/uploads/lossless/2025-sept/Maintain-an-Elegant-Open-Graph-System_banner_image_1760114662425_616dxZwfn.webp
 portrait_image: https://ik.imagekit.io/xvpgfijuw/uploads/lossless/2025-sept/Maintain-an-Elegant-Open-Graph-System_portrait_image_1760114663984_D3P-Xr_MB.webp

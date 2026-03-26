@@ -5,7 +5,7 @@ date_created: 2024-12-01
 date_modified: 2024-12-15
 status: Published
 category: Blueprints
-tags: [github, secure-content, SSR, confidential, private-repos]
+tags: [GitHub, Secure-Content, SSR, Confidential, Private-Repos]
 authors:
   - Michael Staton
 ---

@@ -5,7 +5,7 @@ date_created: 2024-12-01
 date_modified: 2024-12-15
 status: Published
 category: Blueprints
-tags: [slides, presentations, RevealJS, Three.js, markdown]
+tags: [Slides, Presentations, RevealJS, Three.js, Markdown]
 authors:
   - Michael Staton
 ---

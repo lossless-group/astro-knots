@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Prompts
-tags: [brand-theme, index-page, components, dark-matter, prompt-plan]
+tags: [Brand-Theme, Index-Page, Components, Dark-Matter, Prompt-Plan]
 authors:
   - Michael Staton
 ---

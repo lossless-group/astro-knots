@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Blueprints
-tags: [shiki, syntax-highlighting, code-blocks, astro, tokyo-night]
+tags: [Shiki, Syntax-Highlighting, Code-Blocks, Astro, Tokyo-Night]
 authors:
   - Michael Staton
 ---

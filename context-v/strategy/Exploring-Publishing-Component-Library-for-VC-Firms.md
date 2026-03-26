@@ -5,7 +5,7 @@ date_created: 2024-12-18
 date_modified: 2024-12-18
 status: Draft
 category: Blueprints
-tags: [component-library, publishing, VC-firms, strategy, distribution]
+tags: [Component-Library, Publishing, VC-Firms, Strategy, Distribution]
 authors:
   - Michael Staton
 ---

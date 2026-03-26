@@ -5,7 +5,7 @@ date_created: 2025-12-13
 date_modified: 2025-12-15
 status: Draft
 category: Prompts
-tags: [portfolio, confidential-access, dark-matter, implementation-plan]
+tags: [Portfolio, Confidential-Access, Dark-Matter, Implementation-Plan]
 authors:
   - Michael Staton
 ---

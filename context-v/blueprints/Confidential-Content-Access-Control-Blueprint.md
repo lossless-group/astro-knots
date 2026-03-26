@@ -5,7 +5,7 @@ date_created: 2024-12-01
 date_modified: 2024-12-15
 status: Published
 category: Blueprints
-tags: [authentication, access-control, confidential-content, security, portfolio]
+tags: [Authentication, Access-Control, Confidential-Content, Security, Portfolio]
 authors:
   - Michael Staton
 ---

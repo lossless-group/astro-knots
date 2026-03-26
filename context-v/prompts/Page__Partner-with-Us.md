@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Draft
 category: Prompts
-tags: [partner-page, LP-types, tabs, venture-capital]
+tags: [Partner-Page, LP-Types, Tabs, Venture-Capital]
 authors:
   - Michael Staton
 ---

@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Draft
 category: Specifications
-tags: [media-coverage, articles, portfolio, press, layout]
+tags: [Media-Coverage, Articles, Portfolio, Press, Layout]
 authors:
   - Michael Staton
 ---

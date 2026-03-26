@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Blueprints
-tags: [themes, dark-mode, tailwind, CSS-variables, design-tokens]
+tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens]
 authors:
   - Michael Staton
 ---

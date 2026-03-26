@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Reminders
-tags: [monorepo, architecture, astro-knots, patterns]
+tags: [Monorepo, Architecture, Astro-Knots, Patterns]
 authors:
   - Michael Staton
 ---

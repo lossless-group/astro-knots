@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Published
 category: Reminders
-tags: [tech-stack, Astro, Svelte, Tailwind, preferences]
+tags: [Tech-Stack, Astro, Svelte, Tailwind, Preferences]
 authors:
   - Michael Staton
 ---

@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2025-12-15
 status: Draft
 category: Blueprints
-tags: [CSS, tailwind, theming, dark-matter, design-tokens]
+tags: [CSS, Tailwind, Theming, Dark-Matter, Design-Tokens]
 authors:
   - Michael Staton
 ---

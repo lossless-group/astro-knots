@@ -12,7 +12,7 @@ category: Prompts
 date_created: 2025-11-15
 date_modified: 2025-11-16
 status: Draft
-tags: [features, UI-components, team-page, responsive-design]
+tags: [Features, UI-Components, Team-Page, Responsive-Design]
 authors:
   - Michael Staton
   - Tugce Ergul

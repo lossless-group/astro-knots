@@ -12,7 +12,7 @@ category: Prompts
 date_created: 2025-11-15
 date_modified: 2025-11-16
 status: Proposed
-tags: [Refactor, code-cleanup, Hypernova, site-migration]
+tags: [Refactor, Code-Cleanup, Hypernova, Site-Migration]
 authors:
   - Michael Staton
   - Tugce Ergul
