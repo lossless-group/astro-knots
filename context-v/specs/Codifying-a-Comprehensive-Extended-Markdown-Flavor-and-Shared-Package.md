@@ -1077,7 +1077,32 @@ More than two participants get distinct colors auto-assigned from a palette, or 
 
 **Why this matters**: A huge amount of valuable content in our workflow IS the conversation — the back-and-forth with AI where decisions get made, alternatives get explored, and reasoning gets documented. Right now that content either gets lost (context window clears) or gets pasted as raw text with no visual structure. A first-class dialog component makes AI collaboration a publishable content type.
 
-#### 4.31 CSS-in-Markdown
+#### 4.31 Obsidian Bases (`.base` Files)
+
+Obsidian introduced [Bases](https://help.obsidian.md/bases) — a YAML-based file format (`.base`) that defines database-like views over your vault's frontmatter properties. Think of it as a lightweight Notion/Airtable that lives as a plain-text file and queries your existing markdown files by their frontmatter.
+
+A `.base` file defines filters, formulas, and views — and Obsidian renders it as a sortable, filterable table UI. We want to support rendering `.base` files (or the equivalent syntax embedded in a code fence) as interactive data tables on our sites.
+
+```markdown
+```base
+filters:
+  and:
+    - "category = Specification"
+    - "status != Archived"
+formulas:
+  age: "dateDiff(now(), prop('date_created'), 'days')"
+views:
+  - type: table
+    columns: [title, category, status, age, authors]
+    sort: { property: date_modified, direction: desc }
+```
+```
+
+**Rendering**: A sortable, filterable data table populated from the site's content collection frontmatter at build time. Essentially Obsidian Dataview/Bases for Astro — query your content, render the results as a table.
+
+**Status**: Wish List. The `.base` YAML schema is straightforward; the interesting work is connecting the filter/formula engine to Astro content collections at build time.
+
+#### 4.32 CSS-in-Markdown
 
 One of our strongest differentiators from other markdown flavors: the ability to specify CSS directly in content without dropping into raw HTML. Three levels of control:
 
