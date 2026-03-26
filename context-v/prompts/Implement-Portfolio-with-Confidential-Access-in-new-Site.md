@@ -1,3 +1,15 @@
+---
+title: "Implement Portfolio with Confidential Access in New Site"
+lede: "Step-by-step implementation plan for adding portfolio features with confidential access control to the dark-matter site, based on proven patterns from hypernova-site."
+date_created: 2025-12-13
+date_modified: 2025-12-15
+status: Draft
+category: Prompts
+tags: [portfolio, confidential-access, dark-matter, implementation-plan]
+authors:
+  - Michael Staton
+---
+
 # Implementation Plan: Portfolio with Confidential Access in Dark-Matter
 
 > **Status:** Ready to Implement

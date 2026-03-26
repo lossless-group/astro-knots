@@ -1,3 +1,14 @@
+---
+title: "Page: Partner with Us"
+lede: "Prompt plan for creating a tabbed Partner with Us page showcasing different LP types including corporate investors, family offices, fund of funds, and institutional managers."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Draft
+category: Prompts
+tags: [partner-page, LP-types, tabs, venture-capital]
+authors:
+  - Michael Staton
+---
 
 # Create Tabs for Partner with Us
 

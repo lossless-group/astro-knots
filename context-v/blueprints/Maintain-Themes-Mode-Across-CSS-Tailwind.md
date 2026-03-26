@@ -1,3 +1,15 @@
+---
+title: "Maintain Themes and Modes Across CSS and Tailwind"
+lede: "Implementation blueprint for dual-axis theme and mode control using Tailwind CSS v4 custom properties, with runtime utilities and Vitest verification."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Published
+category: Blueprints
+tags: [themes, dark-mode, tailwind, CSS-variables, design-tokens]
+authors:
+  - Michael Staton
+---
+
 # Maintain Themes & Modes Across CSS and Tailwind (Hypernova Implementation Blueprint)
 
 This blueprint captures how `astro-knots/sites/hypernova-site` actually implements themes and modes today, so the same patterns can be reused or adapted (for example, when moving toward implementation in **dark-matter**).

@@ -1,9 +1,13 @@
 ---
 date_created: 2025-12-10
+date_modified: 2025-12-15
 publish: false
 title: "Managing Complex Markdown Content at Build Time"
+lede: "Patterns and tradeoffs for managing markdown content that lives outside an Astro project but must be available at build time, with strategies for Vercel deployment."
 slug: managing-complex-markdown-content-at-build-time
 at_semantic_version: 0.0.0.1
+status: Draft
+category: Blueprints
 authors:
   - Michael Staton
 augmented_with: "Windsurf Cascade on GPT-5.1"

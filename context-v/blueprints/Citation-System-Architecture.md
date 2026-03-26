@@ -1,3 +1,15 @@
+---
+title: "Citation System Architecture"
+lede: "A citation and reference management system for Astro sites using hex codes as stable identifiers that convert to sequential integers at render time."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Draft
+category: Blueprints
+tags: [citations, markdown, content-rendering, hex-codes]
+authors:
+  - Michael Staton
+---
+
 # Citation System Architecture
 
 ## Overview

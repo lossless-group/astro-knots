@@ -1,6 +1,6 @@
 ---
-title: Removing Unnecessary Code Step-by-Step
-lede: We have developed a number of great patterns, components, and utilities that we use on a regular basis.  To start with a robust set of included functionality, we cloned The Water Foundation site (twf_site), but now need to strip out any code that is not directly related to the Hypernova brand and desired site functionality.
+title: "Introducing Features and UI Components"
+lede: "Prompt for introducing features and UI components to the Hypernova site, including team pages, responsive design patterns, and branded exports."
 date_authored_initial_draft: 2025-11-16
 date_authored_current_draft: 2025-11-16
 date_authored_final_draft: "[]"
@@ -8,11 +8,11 @@ date_first_published: "[]"
 date_last_updated: "[]"
 at_semantic_version: 0.0.1.0
 generated_with: Claude Code (Claude Sonnet 4.5)
-category: Technical-Specification
+category: Prompts
 date_created: 2025-11-15
 date_modified: 2025-11-16
-status: Proposed
-tags: [Refactor]
+status: Draft
+tags: [features, UI-components, team-page, responsive-design]
 authors:
   - Michael Staton
   - Tugce Ergul

@@ -1,3 +1,15 @@
+---
+title: "Confidential Content Access Control Blueprint"
+lede: "A tiered pattern for protecting privileged or confidential content across astro-knots sites, from simple passcodes to full OAuth integration."
+date_created: 2024-12-01
+date_modified: 2024-12-15
+status: Published
+category: Blueprints
+tags: [authentication, access-control, confidential-content, security, portfolio]
+authors:
+  - Michael Staton
+---
+
 # Confidential Content Access Control Blueprint
 
 > **Status:** Implemented (Tier 1) in hypernova-site | Tier 1.5 in dark-matter

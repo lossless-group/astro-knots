@@ -1,3 +1,15 @@
+---
+title: "Slides System for Astro and Markdown"
+lede: "A comprehensive specification for building presentation slide systems in Astro-Knots sites with RevealJS, Three.js, and full theme/mode integration."
+date_created: 2024-12-01
+date_modified: 2024-12-15
+status: Published
+category: Blueprints
+tags: [slides, presentations, RevealJS, Three.js, markdown]
+authors:
+  - Michael Staton
+---
+
 # Slides System Living Specification
 
 A comprehensive specification for building presentation slide systems in Astro-Knots sites, supporting both component-based (Astro/HTML-CSS) and Markdown-based content with full theme/mode integration and Three.js visualization capabilities.

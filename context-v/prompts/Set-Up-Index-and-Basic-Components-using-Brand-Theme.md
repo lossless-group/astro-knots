@@ -1,3 +1,15 @@
+---
+title: "Set Up Index and Basic Components Using Brand Theme"
+lede: "A prompt plan for evolving index pages and basic components to use the brand theme system instead of hard-coded colors, with step-by-step instructions for Cascade/Windsurf."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Published
+category: Prompts
+tags: [brand-theme, index-page, components, dark-matter, prompt-plan]
+authors:
+  - Michael Staton
+---
+
 ## Blueprint: Set Up Index and Basic Components Using Brand Theme
 
 This document is a **prompt plan** for working on Astro-Knots sites that follow the Hypernova patterns.

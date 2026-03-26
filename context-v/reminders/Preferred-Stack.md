@@ -1,4 +1,14 @@
-
+---
+title: "Preferred Stack"
+lede: "A quick reference for the preferred technology stack: HTML/CSS first, Astro for SSG, Svelte for interactivity, Tailwind for styling, and no React."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Published
+category: Reminders
+tags: [tech-stack, Astro, Svelte, Tailwind, preferences]
+authors:
+  - Michael Staton
+---
 
 To the extent possible, we like to default to HTML & CSS, and plain JavaScript. 
 

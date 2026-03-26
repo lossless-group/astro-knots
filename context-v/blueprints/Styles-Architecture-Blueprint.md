@@ -1,3 +1,15 @@
+---
+title: "Styles Architecture Blueprint"
+lede: "Architecture blueprint for Dark Matter's CSS and Tailwind v4 theming system, defining named brand colors, derived scales, semantic tokens, and three display modes."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Draft
+category: Blueprints
+tags: [CSS, tailwind, theming, dark-matter, design-tokens]
+authors:
+  - Michael Staton
+---
+
 # Styles Architecture Blueprint for Dark Matter
 
 ## 1. Context and Goals

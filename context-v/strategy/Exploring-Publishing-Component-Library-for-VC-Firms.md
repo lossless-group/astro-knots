@@ -1,3 +1,15 @@
+---
+title: "Exploring Publishing Component Library for VC Firms"
+lede: "Strategic exploration of publishing @knots packages as a component library for venture capital firms, evaluating approaches from Web Components to shadcn-style CLI distribution."
+date_created: 2024-12-18
+date_modified: 2024-12-18
+status: Draft
+category: Blueprints
+tags: [component-library, publishing, VC-firms, strategy, distribution]
+authors:
+  - Michael Staton
+---
+
 # Exploring Publishing a Component Library for VC Firms
 
 **Date:** 2024-12-18

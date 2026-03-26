@@ -1,3 +1,14 @@
+---
+title: "In The News"
+lede: "Specification for a media coverage section with article display components, sidebar layout, and links to relevant press coverage of portfolio companies."
+date_created: 2025-11-15
+date_modified: 2025-12-15
+status: Draft
+category: Specifications
+tags: [media-coverage, articles, portfolio, press, layout]
+authors:
+  - Michael Staton
+---
 
 Closable sidebar, expandable to full page.  
 
