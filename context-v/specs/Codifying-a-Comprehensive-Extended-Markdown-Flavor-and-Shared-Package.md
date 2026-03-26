@@ -1255,7 +1255,160 @@ The convenience that justified these plugins no longer outweighs the dependency 
 
 This also means `@lossless/lfm` is a *lightweight* package. It doesn't pull in 50 transitive dependencies. It installs fast, builds fast, and has a dependency footprint comparable to `remark-gfm` itself rather than a bloated preset.
 
-### 6.3 Distribution Strategy: Internal First, Public When Ready
+### 6.3 The Core Mechanism: A Trigger Map
+
+Strip away all the architecture and the answer to "what is `@lossless/lfm`?" is embarrassingly simple:
+
+**It's a config file that maps syntax patterns to behaviors. The developer-user defines the behaviors. Done.**
+
+The entire extension system reduces to a JSON or YAML file like this:
+
+```yaml
+# lfm.triggers.yaml — this IS your extended markdown flavor
+
+triggers:
+
+  # Container triggers: match opening/closing delimiters, capture children as markdown
+  - name: callout
+    syntax:
+      - pattern: ':::callout{$attrs}\n$children\n:::'     # directive
+      - pattern: '> [!$type] $title\n$children'            # obsidian
+      - pattern: '{% callout $attrs %}$children{% /callout %}' # markdoc
+    component: Callout
+    props:
+      type: { required: true, enum: [info, tip, warning, danger, note, success, quote, example] }
+      title: { required: false, type: string }
+
+  - name: details
+    syntax:
+      - pattern: ':::details{$attrs}\n$children\n:::'
+    component: Details
+    props:
+      title: { required: true, type: string }
+      open: { required: false, type: boolean, default: false }
+
+  # Leaf triggers: self-closing, no children
+  - name: youtube
+    syntax:
+      - pattern: '::youtube{$attrs}'                         # directive
+      - pattern: 'https://www.youtube.com/watch?v=$id'       # bare URL (auto-unfurl)
+      - pattern: 'https://youtu.be/$id'                      # short URL
+    component: YouTubeEmbed
+    props:
+      id: { required: true, type: string }
+      start: { required: false, type: number }
+
+  - name: soundcloud
+    syntax:
+      - pattern: '::soundcloud{$attrs}'
+      - pattern: 'https://soundcloud.com/$path'
+    component: SoundCloudEmbed
+    props:
+      url: { required: true, type: string }
+
+  # Inline triggers: appear within paragraph text
+  - name: badge
+    syntax:
+      - pattern: ':badge[$content]{$attrs}'
+    component: Badge
+    inline: true
+    props:
+      variant: { required: false, enum: [default, success, warning, danger, date, version] }
+
+  - name: tooltip
+    syntax:
+      - pattern: ':tooltip[$content]{$attrs}'
+    component: Tooltip
+    inline: true
+    props:
+      content: { required: true, type: string }
+
+  # Code fence triggers: identifier string escapes syntax highlighting
+  - name: card-grid
+    syntax:
+      - pattern: ':::card-grid{$attrs}\n$children\n:::'     # directive (markdown children)
+      - pattern: '```card-grid\n$raw\n```'                   # code fence (JSON/YAML content)
+    component: CardGrid
+    props:
+      columns: { required: false, type: number, default: 3 }
+
+  - name: mermaid
+    syntax:
+      - pattern: '```mermaid\n$raw\n```'
+    component: MermaidDiagram
+    skipHighlighting: true
+
+  # Citation trigger: special syntax with definition pairs
+  - name: citation
+    syntax:
+      - pattern: '[^$hexcode]'                               # inline reference
+    definition:
+      - pattern: '[^$hexcode]: $definition'                  # footnote-style definition
+    component: InlineCitation
+    inline: true
+```
+
+That's it. That's the whole extension system. A developer who wants to add a new component to their markdown just adds a trigger entry — a name, one or more syntax patterns, a component reference, and a props schema. The LFM parser reads this file, scans the markdown for matches, and produces component nodes. The rendering layer maps component names to actual component files.
+
+**What the LFM package provides:**
+1. A parser that reads this trigger map and knows how to match the syntax patterns against markdown text
+2. A handful of built-in triggers (the ones in this spec) shipped as a default `lfm.triggers.yaml`
+3. A way for sites to extend or override the trigger map with their own entries
+4. The normalized component node type that all triggers produce
+
+**What the developer-user provides:**
+1. The actual components (Astro, Svelte, React, whatever)
+2. Any custom trigger entries for their domain-specific components
+3. The rendering layer that maps component names to component files (or uses the default AstroMarkdown recursive renderer)
+
+The trigger map is the **single source of truth** for what syntax does what. It replaces:
+- The directive registry (section 13.4)
+- The component mapping table (section 7.2)
+- The auto-unfurl platform table (section 4.12)
+- The code fence component identifier list (section 4.3.1)
+- Half the validation logic (props schema is right there in the trigger)
+
+And because it's a YAML file, not code, a content author or project manager can read it and understand exactly what extended syntax their site supports — without reading a line of TypeScript.
+
+**Configuration layering:**
+
+```
+@lossless/lfm built-in triggers (the defaults — callouts, embeds, citations, etc.)
+        ↓ merged with
+Site-level lfm.triggers.yaml (custom components, overrides)
+        ↓ merged with
+Collection-level overrides (optional — e.g., slide content enables slide triggers)
+```
+
+A site that just wants the defaults:
+
+```javascript
+import { remarkLfm } from '@lossless/lfm';
+// Uses built-in triggers. Done. That's the whole setup.
+```
+
+A site that adds custom triggers:
+
+```javascript
+import { remarkLfm } from '@lossless/lfm';
+
+remarkLfm({
+  triggers: './lfm.triggers.yaml',  // extends built-in triggers with site-specific ones
+});
+```
+
+A site that wants to start from scratch:
+
+```javascript
+import { remarkLfm } from '@lossless/lfm';
+
+remarkLfm({
+  triggers: './lfm.triggers.yaml',
+  builtins: false,  // don't load default triggers — only use what's in the file
+});
+```
+
+### 6.4 Distribution Strategy: Internal First, Public When Ready
 
 The package should work for us *today* across our 5-7 sites, and be structured so it *can* be published to npm for the world *later* — but publishing is not a prerequisite for internal use.
 
