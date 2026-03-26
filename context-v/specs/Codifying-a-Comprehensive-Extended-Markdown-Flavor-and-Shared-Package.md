@@ -1186,7 +1186,76 @@ Right now, each of the 5-7 sites we maintain has its own copy of the remark/rehy
 
 The astro-knots monorepo was supposed to help with this via the copy-pattern philosophy, but in practice "copy when you remember" means "never copy." We need an actual package.
 
-### 6.2 Distribution Strategy: Internal First, Public When Ready
+### 6.2 Architectural Choice: Plugin Assembly vs. Owning the Parser
+
+Before deciding how to distribute the package, we need to decide what's *in* it. There are two fundamentally different approaches:
+
+**Option A — Plugin assembly (the conventional approach)**:
+
+`@lossless/lfm` is a preset that installs and configures ~12 remark/rehype plugins from the unified ecosystem. Our package is thin glue code — it pulls in `remark-gfm`, `remark-directive`, `@shikijs/rehype`, `unist-util-visit`, etc., wires them together with opinionated defaults, and adds our custom plugins (citations, auto-unfurl, polyglot parsers) on top.
+
+```
+@lossless/lfm
+├── depends on remark-parse (CommonMark parser)
+├── depends on remark-gfm (tables, task lists, strikethrough)
+├── depends on remark-directive (:::directive syntax)
+├── depends on remark-rehype (MDAST → HAST bridge)
+├── depends on rehype-raw (HTML passthrough)
+├── depends on @shikijs/rehype (syntax highlighting)
+├── depends on unist-util-visit (tree walker)
+├── depends on rehype-stringify (HTML output)
+└── our code: citations, callouts, auto-unfurl, polyglot parsers, validation
+```
+
+*Pros*: Battle-tested parsers, community-maintained, familiar to anyone who's used unified.
+
+*Cons*: Deep dependency tree (~50+ transitive packages), version conflicts between unified ecosystem versions (`unified@10` vs `@11`), debugging through multiple abstraction layers, we inherit every upstream maintainer's opinions and breaking changes.
+
+**Option B — Own the extension parser, minimize dependencies (our preference)**:
+
+`@lossless/lfm` depends on a CommonMark parser for the genuinely hard base-level parsing, and then does **everything else ourselves** in a single, readable codebase with no additional dependencies.
+
+```
+@lossless/lfm
+├── peer dependency: remark-parse OR markdown-it (CommonMark + GFM baseline)
+├── peer dependency: shiki (syntax highlighting — genuinely complex, worth the dep)
+└── our code: EVERYTHING ELSE
+    ├── directive parser (~150 lines)
+    ├── Markdoc tag parser (~100 lines)
+    ├── MDX-lite parser (~120 lines)
+    ├── code-fence component router (~80 lines)
+    ├── Obsidian callout transformer (~60 lines)
+    ├── citation parser (~200 lines)
+    ├── auto-unfurl URL detector (~100 lines)
+    ├── CSS attribute parser (~80 lines)
+    ├── TOC generator (~100 lines)
+    ├── wikilink resolver (~80 lines)
+    ├── tree walker utility (~50 lines — replaces unist-util-visit)
+    ├── validation / linting (~200 lines)
+    └── types (~150 lines)
+    ≈ 1,500 lines total
+```
+
+*Pros*: Near-zero dependency surface (2 peer deps instead of 12+ direct deps), no version conflicts, no transitive dependency bloat, debugging means reading *our* code not someone else's, AI assistants can iterate on any part of the parser in minutes, the parsing code *is* the spec — there's no disconnect between what we document and what runs.
+
+*Cons*: We own the bugs, edge cases accumulate over time, less community leverage for features we haven't thought of yet.
+
+**Why Option B makes sense now in a way it didn't 3 years ago:**
+
+The unified/remark/rehype ecosystem was built in an era when writing parsers was expensive. A developer who needed directive syntax in markdown would spend days writing and debugging a parser, so depending on `remark-directive` (maintained by someone who already did that work) was an obvious win.
+
+But the calculus has changed. With AI-assisted development:
+- Writing a directive parser from scratch takes 20 minutes, not 2 days
+- Iterating on edge cases takes one conversation, not a deep debugging session
+- The "cost" of owning parser code has collapsed while the "cost" of managing dependencies has stayed the same (or gotten worse, as the ecosystem fragments across major versions)
+
+The convenience that justified these plugins no longer outweighs the dependency management overhead they impose. Our extensions — directives, callouts, citations, embeds, auto-unfurl, Markdoc tags — are all fundamentally simple string-parsing tasks. The only genuinely complex parsing problems are CommonMark itself (keep the dependency) and syntax highlighting (keep Shiki). Everything else, we can write and maintain ourselves with less total effort than managing the plugin ecosystem.
+
+**The recommendation**: Start with Option B. Use `remark-parse` + `remark-gfm` for the base CommonMark/GFM layer (that parsing is legitimately hard and well-tested). Use Shiki for syntax highlighting (same reasoning). Write everything else ourselves. If we later discover that some specific unified plugin does something we need that would be painful to replicate, we can add it as a targeted dependency — but the default posture is to own the code rather than depend on a package.
+
+This also means `@lossless/lfm` is a *lightweight* package. It doesn't pull in 50 transitive dependencies. It installs fast, builds fast, and has a dependency footprint comparable to `remark-gfm` itself rather than a bloated preset.
+
+### 6.3 Distribution Strategy: Internal First, Public When Ready
 
 The package should work for us *today* across our 5-7 sites, and be structured so it *can* be published to npm for the world *later* — but publishing is not a prerequisite for internal use.
 
@@ -1343,17 +1412,15 @@ packages/lfm/
     "prepublishOnly": "pnpm build && pnpm test"
   },
   "peerDependencies": {
-    "unified": ">=10.0.0"
+    "unified": ">=10.0.0",
+    "remark-parse": ">=10.0.0",
+    "remark-gfm": ">=4.0.0",
+    "shiki": ">=1.0.0"
   },
-  "dependencies": {
-    "remark-parse": "^11.0.0",
-    "remark-gfm": "^4.0.0",
-    "remark-directive": "^3.0.0",
-    "remark-rehype": "^11.0.0",
-    "rehype-raw": "^7.0.0",
-    "@shikijs/rehype": "^3.0.0",
-    "unist-util-visit": "^5.0.0"
+  "peerDependenciesMeta": {
+    "shiki": { "optional": true }
   },
+  "dependencies": {},
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
