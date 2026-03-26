@@ -59,7 +59,7 @@ This flavor is a remix. We're not inventing a new markdown standard — we're se
 
 That being said, our content preferences and standards are quite high. We want:
 
-- To handle citations more rigorously than existing libraries support — with hex-code identifiers for stability, structured reference definitions with publication dates and URLs, hover popovers with source metadata, and build-time validation that every reference has a definition
+- To handle citations more rigorously than existing libraries support — with hex-code identifiers for stability, structured reference definitions with publication dates and URLs, hover popovers with source metadata, and build-time validation that every reference has a definition.  We even want a source catalog and citation index, so readers can easily find and reference all sources... and authors can use more cannonical, valuable sources to assure the credibility and quality of our sources.
 - To be able to specify CSS styles within the markdown itself — inline style overrides, scoped style blocks, and class annotations on any element — without dropping into raw HTML
 - To embed content from YouTube, SoundCloud, and other media platforms with as little effort as possible — ideally a bare URL on its own line that auto-unfurls, or at most a one-line directive
 - Custom components usually reserved for MDX to be automagically rendered using our directive syntax — no JSX, no imports, no build-step coupling — just `:::component-name{props}` and the renderer maps it to the right Astro/Svelte component
@@ -88,20 +88,89 @@ We selectively adopt from [Obsidian's markdown extensions](https://help.obsidian
 
 | Feature | Syntax | Status |
 |---------|--------|--------|
-| Wikilinks | `[[Page Name]]` | **Wish List** |
+| Wikilinks | `[[Page Name]]` | **Wish List**, though working on https://lossless.group |
 | Wikilink with alias | `[[Page Name\|Display Text]]` | **Wish List** |
 | Embeds | `![[filename.md]]` | **Wish List** |
 | Image resize | `![[image.png\|300]]` | **Wish List** |
-| Callouts | `> [!info] Title` | **Beta** (we prefer directive syntax, but should parse these too) |
+| Callouts | `> [!info] Title` | **Beta** (We support basical callouts and even have a few design mod components to support common tags like QUOTE, WARNING, etc. Yet these could be more full featured.)|
 | Highlights | `==highlighted text==` | **Wish List** |
 | Comments | `%%hidden comment%%` | **Wish List** |
-| Tags in body | `#tag-name` inline | **Wish List** |
+| Tags in body | `#Tag-Name` inline | **Wish List** |
 
 **Design Decision**: We support Obsidian callout syntax (`> [!type]`) as an **alias** for our directive-based callouts. Authors coming from Obsidian can keep using `> [!warning]` and it renders identically to `:::callout{type="warning"}`. But our canonical documentation recommends the directive syntax because it's more expressive (supports arbitrary attributes).
 
-### 3.4 Directive Syntax (remark-directive)
+### 3.4 Core Principle: Polyglot Syntax, Unified Component Model
 
-The [generic directive proposal](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444) is our primary extension mechanism. All custom block-level and inline features use this syntax:
+This is the most important architectural decision in LFM and what sets it apart from every existing markdown extension library.
+
+**The problem with existing libraries**: Every library picks ONE syntax for triggering components and refuses the others. MDX requires JSX. Markdoc requires `{% tag %}`. remark-directive requires `:::name{}`. Obsidian uses code fences. Each library treats its chosen syntax as a *philosophy* rather than a *preference* — and forces that choice on every content author.
+
+**Our position**: There is no good reason for this. A content author writing `:::callout{type="warning"}`, `{% callout type="warning" %}`, and `` ```callout { "type": "warning" } ``` `` is doing the exact same thing — asking the system to render a component with some properties. The syntax is just a trigger. The underlying operation is identical: **resolve a component name, pass it properties, optionally pass it children, render it.**
+
+**LFM therefore supports multiple trigger syntaxes that all normalize to the same intermediate representation before the rendering layer ever sees them.** The rendering layer receives a component node with `name`, `attributes`, and `children` — it never knows or cares which syntax produced it.
+
+```
+Author writes ANY of these:          The parser normalizes ALL of them to:
+
+:::callout{type="warning"}     ─┐
+Content here.                   │
+:::                             │
+                                │    {
+{% callout type="warning" %}   ─┤      type: "componentNode",
+Content here.                   │      name: "callout",
+{% endcallout %}                │      attributes: { type: "warning" },
+                                ├──▶   children: [ ...parsed markdown... ]
+```callout                     ─┤    }
+{ "type": "warning" }          │
+```                             │
+                                │
+> [!warning]                   ─┤
+> Content here.                 │
+                               ─┘
+```
+
+**The canonical syntax for documentation is directives** (`:name`, `::name`, `:::name`) because they're the most expressive and compose well with markdown. But we parse and accept ALL of these trigger syntaxes:
+
+### 3.4.1 Supported Trigger Syntaxes
+
+| Syntax Family | Trigger Pattern | Inline | Block | Container | Status |
+|--------------|----------------|--------|-------|-----------|--------|
+| **Directive** (remark-directive) | `:name[]{}`, `::name{}`, `:::name{} ... :::` | Yes | Yes | Yes | **Stable** |
+| **Obsidian code fence** | `` ```identifier `` with JSON/YAML content | No | Yes | No | **Stable** |
+| **Obsidian callout** | `> [!type] Title` | No | No | Yes | **Stable** |
+| **Markdoc tag** | `{% name attrs %}...{% /name %}` | No | Yes | Yes | **Planned** |
+| **MDX-lite** | `<Name prop="val" />`, `<Name>...</Name>` | Yes | Yes | Yes | **Wish List** |
+| **Bare URL** (auto-unfurl) | URL on its own line matching a known platform | No | Yes | No | **Stable** |
+
+Each syntax family has its own remark plugin (parser), but ALL of them produce the same normalized node type that the rendering layer consumes. Adding a new trigger syntax is just adding a new parser — the rest of the pipeline is unchanged.
+
+### 3.4.2 Why We Accept Markdoc Syntax
+
+Markdoc (`{% tag %}`) deserves special attention because it's used by Stripe's documentation and has a growing community. The syntax is clean, well-specified, and solves the same problem we solve with directives:
+
+```markdown
+{% callout type="warning" %}
+Watch out for this.
+{% /callout %}
+
+{% youtube id="dQw4w9WgXcQ" /%}
+```
+
+Rejecting Markdoc syntax (as we originally planned) would mean an author who has existing Markdoc content — or who simply prefers the `{% %}` syntax — would have to rewrite everything. That's exactly the kind of arbitrary enforcement we're trying to avoid. The Markdoc parser is straightforward: scan for `{% name ... %}` delimiters, extract name and attributes, normalize to a component node.
+
+### 3.4.3 Why We Accept MDX-Lite Syntax (With Restrictions)
+
+Full MDX (JSX with arbitrary JavaScript expressions) is too complex and breaks content portability. But the *component invocation* part of MDX — `<ComponentName prop="value">children</ComponentName>` — is familiar to anyone who's written HTML or React. We accept this syntax with restrictions:
+
+- **No imports** — component routing is handled by the registry, not by authors
+- **No JS expressions** — prop values must be string literals (`prop="value"`), not expressions (`prop={value + 1}`)
+- **No arbitrary JSX** — only registered component names are recognized; `<div>` or `<span>` are treated as raw HTML, not component invocations
+
+This means an author can write `<Callout type="warning">Content</Callout>` and it works. It normalizes to the same node as `:::callout{type="warning"}`. The author doesn't need to care which syntax they use.
+
+### 3.4.4 Directive Syntax Detail (Canonical Form)
+
+The [generic directive proposal](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444) remains the canonical syntax for LFM documentation and examples:
 
 | Form | Syntax | Use Case |
 |------|--------|----------|
@@ -109,29 +178,94 @@ The [generic directive proposal](https://talk.commonmark.org/t/generic-directive
 | Leaf directive | `::name{attrs}` | Self-closing blocks (embeds, separators) |
 | Container directive | `:::name{attrs}\ncontent\n:::` | Wrapping blocks (callouts, galleries, details) |
 
-This is the backbone. Every new feature should be expressible as a directive before we consider alternative syntax.
+Directives are the most expressive trigger syntax because they support all three forms (inline, block, container), allow arbitrary key-value attributes, and compose naturally with markdown. When we document a feature, we show the directive syntax first. But we never tell an author they *must* use it.
 
-### 3.5 MDX (Selective Adoption)
+### 3.5 Prop Assignment and Component Routing
 
-We do **not** adopt full MDX (JSX-in-markdown). Instead, we borrow specific ideas:
+Regardless of which trigger syntax an author uses, the component model is the same:
 
-| Feature | MDX Syntax | Our Approach | Status |
-|---------|-----------|--------------|--------|
-| Component rendering | `<Component />` | Directives map to components at render time | **Stable** |
-| Frontmatter | YAML frontmatter | Standard YAML frontmatter (already universal) | **Stable** |
-| Expressions | `{variable}` | Not adopted — too much complexity for content authors | **Not Planned** |
-| Import statements | `import X from Y` | Not adopted — content should be portable | **Not Planned** |
+| Concern | How It Works |
+|---------|-------------|
+| **Prop assignment** | All trigger syntaxes produce string key-value attribute pairs (`key="value"`). No JS expressions — values are always strings. The component is responsible for parsing strings into the types it needs (e.g., parsing `"3"` into the number `3`) |
+| **Component routing** | A **component registry** maps names to component file paths at build time (e.g., `'callout' → Callout.astro`). No imports in content. The registry is the single source of truth — one name, one component, regardless of which syntax triggered it |
+| **Children** | Container syntaxes (directives, Markdoc tags, MDX-lite tags) pass their body as parsed markdown children. Code fence syntaxes pass their content as a raw string (typically JSON/YAML). The component must declare which input shapes it accepts |
+| **Frontmatter as props** | YAML frontmatter can pass page-level props to layout components. This is standard Astro behavior and is orthogonal to the trigger syntax |
 
-### 3.6 Other Influences
+### 3.6 Other Technical Influences
 
 | Source | Feature | Our Adoption | Status |
 |--------|---------|-------------|--------|
-| Markdoc (Stripe) | Tag syntax `{% tag %}` | Not adopted — directives cover this | **Not Planned** |
-| AsciiDoc | Admonitions, includes | Admonitions via directives; includes via embeds | **Partial** |
+| AsciiDoc | Admonitions, includes | Admonitions via any trigger syntax; includes via embeds | **Partial** |
 | Pandoc | Citation syntax `[@key]` | Extended — see hex-code citations below | **Stable** |
+| Pandoc | Bracketed attributes `{.class #id key="val"}` | Adopted for CSS-in-markdown (see 4.30) | **Wish List** |
 | reveal.js | `---` slide separators | Adopted for slide content | **Stable** |
-| Mermaid | Fenced code blocks | `\`\`\`mermaid` renders as diagrams | **Stable** |
+| Mermaid | Fenced code blocks and Diagrams as Text/Code | `` ```mermaid `` renders as diagrams | **Stable** |
 | KaTeX/MathJax | `$inline$` and `$$block$$` | Math rendering | **Wish List** |
+| Liquid/Nunjucks | `{{ var }}` / `{% tag %}` | Overlaps with Markdoc syntax — Markdoc parser handles this | **Planned** |
+
+### 3.7 Philosophical Influences and Kindred Projects
+
+LFM didn't emerge in a vacuum. The mainstream markdown ecosystem (CommonMark, GFM, MDX) is maintained by large organizations with enterprise constraints — they move slowly, they prioritize backward compatibility over expressiveness, and they tend to treat "extended markdown" as someone else's problem. The result is a gap between what content authors actually need and what the official specs provide.
+
+That gap has been independently noticed by a number of solo developers and small teams who, like us, felt the need to improvise extended markdown because the existing options were insufficient. LFM is influenced by their work — not always by their specific syntax choices, but by the shared recognition that markdown needs to grow and that the people building the extensions shouldn't be constrained by the conservatism of the spec committees.
+
+#### WikiBonsai / CAML (Colon Attribute Markup Language)
+
+**Project**: [wikibonsai.io](https://wikibonsai.io) by a solo developer building a personal knowledge management system around semantic markdown.
+
+**What they built**: CAML (`:key::value` syntax for inline metadata), wikirefs (`[[links]]` with semantic typing), a knowledge tree indexer, and a VS Code extension — all centered on the idea that markdown files should be nodes in a semantic graph, not isolated documents.
+
+**What resonated with us**:
+- The conviction that metadata shouldn't be imprisoned in frontmatter. CAML allows attributes to live *alongside* content, like footnotes. This maps to our wish for inline annotations on claims (`:confidence::verified`, `:source-quality::high`) rather than maintaining a separate metadata structure disconnected from the prose.
+- Wikiref values inside attributes (`:competitor::[[Enzymedica]]`) — linking metadata to other documents, not just tagging with strings.
+- The Unix philosophy: modularity, plain text as the source of truth, readable by any tool. Their tagline — "readable by anyone, any model, any tool" — could be ours.
+- The loneliness of the problem. When one solo developer independently arrives at the same conclusions you did, it validates the problem space even if the solutions diverge.
+
+**What we take**: The *idea* of body-level metadata (not necessarily the `:key::value` syntax). The *idea* that wikilinks should carry semantic relationships, not just be navigation. The validation that extending markdown is a real need shared by real people, not scope creep.
+
+#### Markdoc (Stripe)
+
+**Project**: [markdoc.dev](https://markdoc.dev) by Stripe's documentation team.
+
+**What they built**: A full document authoring system with `{% tag %}` syntax for components, a schema validation layer, and a rendering pipeline that separates parsing from rendering — built because MDX was too complex for their content team.
+
+**What resonated with us**:
+- The explicit rejection of MDX as too developer-centric for content authors. They saw the same problem we did: JSX in markdown is powerful but hostile to non-developers.
+- Schema validation for content — the idea that you can define what attributes a tag accepts and get build-time errors when content violates the schema. This directly influenced our directive registry and validation mode.
+- The clean separation between parsing and rendering. Markdoc's AST is syntax-agnostic, which is the same principle behind our polyglot normalizer.
+
+**Where they stopped short**: Markdoc only supports `{% tag %}` syntax. They built a beautiful system and then locked it to a single trigger syntax, which is the exact trap we're trying to avoid with the polyglot approach.
+
+#### Djot
+
+**Project**: [djot.net](https://djot.net) by John MacFarlane (the creator of Pandoc and a CommonMark spec author).
+
+**What they built**: A new light markup language designed to fix the accumulated warts in CommonMark — cleaner parsing rules, consistent attribute syntax, and better extensibility. MacFarlane was essentially admitting that markdown's syntax has problems that can't be fixed without breaking backward compatibility.
+
+**What resonated with us**:
+- The acknowledgment, from *the person who wrote the CommonMark spec*, that markdown has fundamental design issues that the spec process is too conservative to address.
+- Djot's attribute syntax (`{.class #id key="value"}` on any element) directly influenced our CSS-in-markdown feature. Pandoc already supports a subset of this, and Djot formalizes it.
+- The idea that a markup language should have *one* consistent way to add attributes to any element, rather than the current markdown situation where attributes are possible on some elements, impossible on others, and vary by implementation.
+
+**What we take**: Attribute syntax ideas for CSS-in-markdown. The confidence that even spec authors think markdown needs to evolve. We don't adopt Djot as a syntax (it's a wholly different language), but its design decisions inform our extensions.
+
+#### Astro Content Collections / Zod Schemas
+
+**Project**: Astro's built-in content collections with Zod schema validation.
+
+**What resonated with us**:
+- Content as structured data with type-safe schemas, not just blobs of markdown. This gave us the frontmatter validation layer and the confidence that content can be programmatically reasoned about at build time.
+- The `render()` pattern that separates content body from metadata and gives the rendering layer full control.
+- This isn't a "kindred solo developer" story — it's an acknowledgment that Astro's content model is the best available foundation for what we're building. LFM extends it rather than replacing it.
+
+#### The Broader Pattern
+
+What all these influences share — and what motivated LFM — is the recognition that markdown is simultaneously the best and worst content format:
+
+- **Best** because it's plain text, universally readable, version-controllable, AI-friendly, and simple enough for anyone to learn in 10 minutes.
+- **Worst** because the moment you need anything beyond headings and paragraphs — a callout, a citation, an embedded video, a data visualization, a styled component — you fall off a cliff into fragmented, incompatible extension ecosystems where every library has its own opinion about what you're allowed to do.
+
+LFM's response is not to pick a side but to build a normalizer that accepts all sides and renders them the same way. The philosophical debt to these projects is in the shared conviction that the cliff doesn't need to exist.
 
 ---
 
@@ -189,13 +323,75 @@ return greeting;         // highlighted
 ```
 ````
 
-#### 4.3.1 Custom Code Blocks become Custom Components
+#### 4.3.1 Custom Code Blocks Become Custom Components
 
-Due to our use of Obsidian, Obsidian allows "plugins" to specify a codeblock identifier and give it custom rendering as a component. So, even though the "```identifier-string\n{content....}\n```" syntax is typically reserved for a true codeblock, there will be identifier strings that escape the codeblock render pipeline and trigger a custom component render pipeline. 
+Due to our use of Obsidian, Obsidian allows "plugins" to specify a codeblock identifier and give it custom rendering as a component. So, even though the `` ```identifier-string `` syntax is typically reserved for a true codeblock, there will be identifier strings that escape the codeblock render pipeline and trigger a custom component render pipeline instead.
 
-#### 4.3.2 Custom Code Blocks may Also Be Directives using the Same Custom Component
+Mermaid is the most familiar example of this pattern — `` ```mermaid `` is not a programming language, it's a signal to bypass syntax highlighting entirely and render a diagram component. But we extend this pattern well beyond Mermaid to any component that Obsidian plugins know how to render.
 
-If we want a component to render INSIDE Obsidian, natively, it has to use custom identifiers within the codeblock syntax.  Enough to not be an edge case, content authors and creators may switch between using Code Block syntax and Directive syntax, when they are referring to the same Custom Component.  Therefore, in many cases both will need to be supported.  This has most frequently come up in Card Carousels, Card Grids, Image Grids, Image Carousels, and Slide Embeds. 
+**Known custom code block identifiers** (not syntax-highlighted — routed to components):
+
+| Identifier | Renders As | Obsidian Plugin |
+|------------|-----------|-----------------|
+| `mermaid` | Diagram (SVG) | Built-in Mermaid support |
+| `jsoncanvas` | Interactive node-and-edge canvas | Custom plugin |
+| `card-carousel` | Horizontal scrolling card carousel | Custom plugin |
+| `card-grid` | Responsive card grid layout | Custom plugin |
+| `image-grid` | Image gallery grid | Custom plugin |
+| `image-carousel` | Horizontal scrolling image gallery | Custom plugin |
+| `slides` | Embedded slide deck preview | Custom plugin |
+
+**Implementation**: The remark pipeline maintains a **component identifier list** — code fence languages that should NOT be passed to Shiki for syntax highlighting. When the pipeline encounters one of these identifiers, the code block node is transformed into a directive-like node and routed to the component registry, just as if it were written as a directive. The fence content (typically JSON or YAML) becomes the component's configuration data.
+
+#### 4.3.2 Custom Code Blocks May Also Be Directives Using the Same Custom Component
+
+If we want a component to render INSIDE Obsidian, natively, it has to use custom identifiers within the codeblock syntax — that's the only extension point Obsidian exposes for custom rendering. But our Astro sites prefer directive syntax (`:::card-grid{columns="3"}`) because it's more expressive, supports nested markdown children, and participates in the directive validation system.
+
+This means content authors will — frequently enough to not be an edge case — switch between using Code Block syntax and Directive syntax when they are referring to the same Custom Component. An author drafting in Obsidian uses the code fence because that's what previews correctly. The same author (or a different one) editing in VS Code for an Astro site uses the directive because it's the canonical LFM syntax. Therefore, in many cases both syntaxes must be supported and must route to the same component.
+
+This has most frequently come up in Card Carousels, Card Grids, Image Grids, Image Carousels, and Slide Embeds.
+
+**Example — the same component, two syntaxes:**
+
+Code block syntax (works in Obsidian):
+
+````markdown
+```card-grid
+{
+  "columns": 3,
+  "cards": [
+    { "title": "Enzymedica", "subtitle": "Primary Competitor", "url": "/competitors/enzymedica" },
+    { "title": "FODZYME", "subtitle": "Direct Competitor", "url": "/competitors/fodzyme" },
+    { "title": "Twin Health", "subtitle": "Indirect Competitor", "url": "/competitors/twin-health" }
+  ]
+}
+```
+````
+
+Directive syntax (canonical LFM, works in Astro):
+
+```markdown
+:::card-grid{columns="3"}
+- **Enzymedica** — Primary Competitor [→](/competitors/enzymedica)
+- **FODZYME** — Direct Competitor [→](/competitors/fodzyme)
+- **Twin Health** — Indirect Competitor [→](/competitors/twin-health)
+:::
+```
+
+Both render the same `CardGrid.astro` component. The code block version passes structured JSON as config; the directive version passes markdown children that the component parses. The component must handle both input shapes.
+
+**Implementation**: The component registry supports dual registration:
+
+```typescript
+const registry = {
+  'card-grid': {
+    component: () => import('../components/CardGrid.astro'),
+    codeBlockIdentifier: 'card-grid',  // also triggers on ```card-grid
+    acceptsCodeBlockContent: true,      // fence content passed as `data` prop
+    acceptsDirectiveChildren: true,     // directive children passed as slot
+  },
+};
+```
 
 #### 4.4 Mermaid Diagrams
 
