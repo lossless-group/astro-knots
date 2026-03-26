@@ -986,7 +986,98 @@ Main paragraph content continues here.:sidenote[This is a marginal note that app
 
 **Rendering**: Interactive node-and-edge canvas rendered client-side. Already prototyped in `remark-jsoncanvas-codeblocks.ts`.
 
-#### 4.30 CSS-in-Markdown
+#### 4.30 Dialog / Chat UI
+
+Render a back-and-forth conversation between two (or more) participants as a chat interface. This is particularly relevant for documenting AI-assisted workflows, user interviews, design critiques, or any content where the exchange between speakers IS the content.
+
+**Directive syntax:**
+
+```markdown
+:::dialog{participants="Michael=human, Claude=ai"}
+Michael: So I've been thinking about the citation system. What if we used hex codes instead of sequential numbers?
+
+Claude: That solves the portability problem — a citation keeps its identifier regardless of where it appears. You could copy a paragraph between documents without renumbering.
+
+Michael: Exactly. And it makes grep actually useful across the content corpus.
+
+Claude: The only cost is readability in raw markdown — `[^a1b2c3]` is less meaningful than `[^1]` to a human scanning the source. But that's a worthwhile tradeoff given the stability benefits.
+
+Michael: Agreed. Let's do it.
+:::
+```
+
+**Rendering**: A chat-style UI with:
+- Participant avatars or initials on alternating sides (human left, AI right — or configurable)
+- Message bubbles with distinct styling per participant role
+- Participant names above or inside each bubble
+- Timestamps (optional, if provided)
+- Smooth vertical flow, mobile-friendly
+
+**Participant roles and styling:**
+
+| Role | Default Alignment | Default Style |
+|------|------------------|---------------|
+| `human` | Left | Solid bubble, primary color |
+| `ai` | Right | Outlined bubble, accent color |
+| `system` | Center | Muted, full-width, no bubble |
+| `user` | Left | Alias for `human` |
+| `assistant` | Right | Alias for `ai` |
+
+**Extended syntax with metadata per message:**
+
+```markdown
+:::dialog{participants="Michael=human, Claude=ai" theme="dark"}
+Michael [2026-03-25 14:30]: First message with timestamp.
+
+Claude [2026-03-25 14:31]: Response with timestamp.
+
+> system: Claude is now using the extended thinking model.
+
+Michael: A message without a timestamp is fine too.
+:::
+```
+
+**Code fence syntax (for Obsidian compatibility):**
+
+````markdown
+```dialog
+participants: Michael=human, Claude=ai
+---
+Michael: So I've been thinking about the citation system.
+
+Claude: That solves the portability problem.
+
+Michael: Exactly.
+```
+````
+
+The code fence version uses a YAML header (above `---`) for config and the rest as the conversation body. Both syntaxes render the same `Dialog.astro` component.
+
+**Multi-participant support:**
+
+```markdown
+:::dialog{participants="Michael=human, Sarah=human, Claude=ai"}
+Michael: What do you both think about the trigger map approach?
+
+Sarah: I love it. Way simpler than the plugin assembly.
+
+Claude: Agreed — and the YAML config makes it accessible to non-developers.
+
+Michael: Ship it.
+:::
+```
+
+More than two participants get distinct colors auto-assigned from a palette, or authors can specify colors:
+
+```markdown
+:::dialog{participants="Michael=human:#9138E0, Sarah=human:#22A6B5, Claude=ai:#F59C49"}
+```
+
+**Print behavior**: Chat bubbles flatten to a simple transcript format — participant name in bold, followed by their message. No bubbles, no alignment, just readable prose.
+
+**Why this matters**: A huge amount of valuable content in our workflow IS the conversation — the back-and-forth with AI where decisions get made, alternatives get explored, and reasoning gets documented. Right now that content either gets lost (context window clears) or gets pasted as raw text with no visual structure. A first-class dialog component makes AI collaboration a publishable content type.
+
+#### 4.31 CSS-in-Markdown
 
 One of our strongest differentiators from other markdown flavors: the ability to specify CSS directly in content without dropping into raw HTML. Three levels of control:
 
@@ -1337,6 +1428,16 @@ triggers:
       - pattern: '```mermaid\n$raw\n```'
     component: MermaidDiagram
     skipHighlighting: true
+
+  # Dialog / chat UI: renders conversation as chat bubbles
+  - name: dialog
+    syntax:
+      - pattern: ':::dialog{$attrs}\n$children\n:::'           # directive (markdown children)
+      - pattern: '```dialog\n$raw\n```'                         # code fence (YAML header + conversation)
+    component: Dialog
+    props:
+      participants: { required: true, type: string }            # "Name=role, Name=role"
+      theme: { required: false, enum: [light, dark, auto] }
 
   # Citation trigger: special syntax with definition pairs
   - name: citation
