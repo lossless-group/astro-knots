@@ -1180,44 +1180,253 @@ toc: boolean (default true for long documents)
 
 ## 6. Shared Package Architecture
 
-The flavor should be backed by a publishable (or copyable) package that sites can adopt.
+### 6.1 The Problem With How We Share Code Today
 
-### 6.1 Package: `@lossless/lfm`
+Right now, each of the 5-7 sites we maintain has its own copy of the remark/rehype plugins. When we fix a bug in `remark-directives.ts` in one site, we have to remember to copy it to the others. We usually don't. The result is that Hypernova has one version of the citation parser, Dark-Matter has a slightly different one, mpstaton-site has a third, and the Lossless site (the most mature) has a fourth that's diverged the furthest. Every site is slowly drifting apart.
 
-**Purpose**: A unified remark/rehype preset that configures the full LFM pipeline.
+The astro-knots monorepo was supposed to help with this via the copy-pattern philosophy, but in practice "copy when you remember" means "never copy." We need an actual package.
+
+### 6.2 Distribution Strategy: Internal First, Public When Ready
+
+The package should work for us *today* across our 5-7 sites, and be structured so it *can* be published to npm for the world *later* — but publishing is not a prerequisite for internal use.
+
+**Stage 1 — Workspace package (immediate)**
+
+The package lives in the astro-knots monorepo as a workspace member. Sites consume it via pnpm workspace protocol:
+
+```
+astro-knots/
+├── packages/
+│   └── lfm/                  # The shared package
+│       ├── src/
+│       ├── package.json      # name: "@lossless/lfm"
+│       └── tsconfig.json
+├── sites/
+│   ├── hypernova-site/       # depends on @lossless/lfm via workspace:*
+│   ├── dark-matter/          # depends on @lossless/lfm via workspace:*
+│   ├── mpstaton-site/        # depends on @lossless/lfm via workspace:*
+│   ├── cilantro-site/        # depends on @lossless/lfm via workspace:*
+│   └── twf_site/             # depends on @lossless/lfm via workspace:*
+└── pnpm-workspace.yaml       # includes packages/lfm
+```
+
+Each site's `package.json`:
+
+```json
+{
+  "dependencies": {
+    "@lossless/lfm": "workspace:*"
+  }
+}
+```
+
+This means: every site in the monorepo always uses the latest version of `@lossless/lfm` from source. No publishing, no version numbers, no registry. When you fix a bug in `packages/lfm/`, every site picks it up on the next `pnpm install` or build.
+
+**But wait — sites must deploy independently.** Each site deploys from its own repo via Vercel. The site repos are git submodules of astro-knots. When a site deploys from its own repo, `@lossless/lfm` is not available as a workspace sibling. We need a fallback.
+
+**Stage 2 — GitHub Packages (for independent deployment)**
+
+Publish `@lossless/lfm` to **GitHub Packages** (npm registry scoped to your GitHub org). This is free for private packages, trivial to set up, and lets each site install the package from a real registry when building outside the monorepo:
+
+```json
+{
+  "dependencies": {
+    "@lossless/lfm": "^0.1.0"
+  }
+}
+```
+
+The workflow:
+1. Develop in the monorepo (workspace protocol, instant feedback)
+2. When the package is ready for a release, bump the version and publish to GitHub Packages
+3. Each site's standalone repo (the one Vercel deploys from) depends on the published version
+4. Vercel builds pull from GitHub Packages just like any npm dependency
+
+**Stage 3 — npm public registry (when ready for the world)**
+
+When the package is stable enough that other people might find it useful, publish to the public npm registry. The package name `@lossless/lfm` requires an npm org — create the `@lossless` org on npmjs.com (free for public packages).
+
+Nothing changes for our sites — they just switch from GitHub Packages to npm. The import paths, the API, the everything stays the same.
+
+### 6.3 Package Structure
 
 ```
 packages/lfm/
 ├── src/
-│   ├── index.ts              # Main preset export
+│   ├── index.ts                # Main preset exports: remarkLfm, rehypeLfm
 │   ├── remark/
-│   │   ├── gfm.ts            # remarkGfm configuration
-│   │   ├── directives.ts     # remarkDirective + directive validation
-│   │   ├── callouts.ts       # Obsidian callout → directive transform
-│   │   ├── citations.ts      # Hex-code citation processing
-│   │   ├── backlinks.ts      # Wikilink / backlink resolution
-│   │   ├── toc.ts            # Table of contents generation
-│   │   ├── slides.ts         # Slide separator handling
-│   │   └── images.ts         # Image path resolution
+│   │   ├── polyglot.ts         # Polyglot syntax normalizer (directives, Markdoc, MDX-lite, code fences)
+│   │   ├── gfm.ts              # remarkGfm configuration
+│   │   ├── directives.ts       # remarkDirective + directive validation + registry
+│   │   ├── markdoc.ts          # {% tag %} parser → normalized component nodes
+│   │   ├── mdx-lite.ts         # <Component /> parser (restricted, no JS expressions)
+│   │   ├── code-components.ts  # Code fence identifier → component node transform
+│   │   ├── callouts.ts         # Obsidian callout → directive transform
+│   │   ├── citations.ts        # Hex-code citation processing
+│   │   ├── auto-unfurl.ts      # Bare URL → embed directive transform
+│   │   ├── backlinks.ts        # Wikilink / backlink resolution
+│   │   ├── toc.ts              # Table of contents generation
+│   │   ├── slides.ts           # Slide separator handling
+│   │   ├── images.ts           # Image path resolution
+│   │   └── css-attrs.ts        # {.class #id style="..."} attribute parsing
 │   ├── rehype/
-│   │   ├── shiki.ts          # Syntax highlighting config
-│   │   ├── mermaid-pre.ts    # Mermaid extraction (before Shiki)
-│   │   ├── autolink.ts       # Heading anchor links
-│   │   └── raw.ts            # Raw HTML passthrough
-│   ├── types.ts              # TypeScript types for all node types
-│   └── validate.ts           # Build-time syntax validation
+│   │   ├── shiki.ts            # Syntax highlighting config
+│   │   ├── mermaid-pre.ts      # Mermaid extraction (before Shiki)
+│   │   ├── scoped-css.ts       # ```css scoped → <style> injection
+│   │   ├── autolink.ts         # Heading anchor links
+│   │   └── raw.ts              # Raw HTML passthrough
+│   ├── types.ts                # TypeScript types for all custom MDAST nodes
+│   ├── registry.ts             # Built-in directive/component registry
+│   └── validate.ts             # Build-time syntax validation + linting
+├── test/
+│   ├── fixtures/               # Input markdown files for each feature
+│   │   ├── callouts.md
+│   │   ├── citations.md
+│   │   ├── embeds.md
+│   │   ├── code-components.md
+│   │   └── ...
+│   ├── snapshots/              # Expected MDAST output for each fixture
+│   └── *.test.ts               # Vitest test files
 ├── package.json
 ├── tsconfig.json
-└── README.md
+├── tsup.config.ts              # Build config (ESM + CJS dual output)
+├── CHANGELOG.md
+├── LICENSE                     # MIT
+└── README.md                   # Usage docs, quick-start, link to full spec
 ```
 
-### 6.2 Usage
+### 6.4 package.json
 
-**As a preset** (recommended):
+```json
+{
+  "name": "@lossless/lfm",
+  "version": "0.1.0",
+  "description": "Lossless Flavored Markdown — a polyglot extended markdown pipeline for remark/rehype",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./remark/*": {
+      "import": "./dist/remark/*.js",
+      "types": "./dist/remark/*.d.ts"
+    },
+    "./rehype/*": {
+      "import": "./dist/rehype/*.js",
+      "types": "./dist/rehype/*.d.ts"
+    },
+    "./validate": {
+      "import": "./dist/validate.js",
+      "types": "./dist/validate.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    },
+    "./registry": {
+      "import": "./dist/registry.js",
+      "types": "./dist/registry.d.ts"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "pnpm build && pnpm test"
+  },
+  "peerDependencies": {
+    "unified": ">=10.0.0"
+  },
+  "dependencies": {
+    "remark-parse": "^11.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-directive": "^3.0.0",
+    "remark-rehype": "^11.0.0",
+    "rehype-raw": "^7.0.0",
+    "@shikijs/rehype": "^3.0.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "markdown",
+    "remark",
+    "rehype",
+    "unified",
+    "extended-markdown",
+    "directives",
+    "callouts",
+    "citations",
+    "astro",
+    "obsidian",
+    "markdoc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lossless-group/lfm"
+  },
+  "license": "MIT",
+  "author": "Michael Staton <michael@lossless.group>"
+}
+```
+
+### 6.5 Build Configuration
+
+We use `tsup` for building because it handles ESM + CJS dual output, tree-shaking, and declaration files with zero config:
+
+```typescript
+// tsup.config.ts
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: {
+    'index': 'src/index.ts',
+    'validate': 'src/validate.ts',
+    'types': 'src/types.ts',
+    'registry': 'src/registry.ts',
+    'remark/polyglot': 'src/remark/polyglot.ts',
+    'remark/directives': 'src/remark/directives.ts',
+    'remark/citations': 'src/remark/citations.ts',
+    'remark/callouts': 'src/remark/callouts.ts',
+    'remark/auto-unfurl': 'src/remark/auto-unfurl.ts',
+    'remark/backlinks': 'src/remark/backlinks.ts',
+    'remark/toc': 'src/remark/toc.ts',
+    'remark/code-components': 'src/remark/code-components.ts',
+    'remark/css-attrs': 'src/remark/css-attrs.ts',
+    'rehype/shiki': 'src/rehype/shiki.ts',
+    'rehype/mermaid-pre': 'src/rehype/mermaid-pre.ts',
+    'rehype/scoped-css': 'src/rehype/scoped-css.ts',
+  },
+  format: ['esm', 'cjs'],
+  dts: true,
+  clean: true,
+  splitting: true,
+  treeshake: true,
+});
+```
+
+This gives consumers tree-shakeable imports — if a site only uses citations and callouts, the rest of the package is dead-code-eliminated.
+
+### 6.6 Usage
+
+**As a preset** (recommended — use everything):
 
 ```typescript
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
 import { remarkLfm, rehypeLfm } from '@lossless/lfm';
 
 const processor = unified()
@@ -1226,28 +1435,56 @@ const processor = unified()
     citations: true,
     backlinks: true,
     callouts: true,
-    slides: false,           // opt-out per feature
+    autoUnfurl: true,
+    polyglot: {
+      markdoc: true,          // parse {% tag %} syntax
+      mdxLite: false,         // don't parse <Component /> syntax
+      codeFenceComponents: ['card-grid', 'card-carousel', 'image-grid'],
+    },
+    slides: false,            // opt-out per feature
     toc: { minDepth: 2, maxDepth: 4 },
+    customDirectives: [
+      // site-specific directives
+    ],
   })
   .use(remarkRehype)
   .use(rehypeLfm, {
     shiki: { theme: 'tokyo-night' },
     mermaid: true,
+    scopedCss: true,
   })
   .use(rehypeStringify);
 ```
 
-**Cherry-picking** (for sites that want control):
+**Cherry-picking** (for sites that want surgical control):
 
 ```typescript
 import { remarkCitations } from '@lossless/lfm/remark/citations';
 import { remarkCallouts } from '@lossless/lfm/remark/callouts';
+import { remarkAutoUnfurl } from '@lossless/lfm/remark/auto-unfurl';
 import { rehypeMermaidPre } from '@lossless/lfm/rehype/mermaid-pre';
 ```
 
-### 6.3 MDAST Node Types
+**In Astro config** (the most common integration point):
 
-The package exports TypeScript types for all custom nodes:
+```javascript
+// astro.config.mjs
+import { remarkLfm } from '@lossless/lfm';
+
+export default defineConfig({
+  markdown: {
+    remarkPlugins: [
+      [remarkLfm, { citations: true, callouts: true }],
+    ],
+    // Disable Astro's built-in Shiki — LFM handles it
+    syntaxHighlight: false,
+  },
+});
+```
+
+### 6.7 MDAST Node Types
+
+The package exports TypeScript types for all custom nodes so that AstroMarkdown components (or any consumer) can type-check their rendering logic:
 
 ```typescript
 // Extended MDAST node types
@@ -1274,16 +1511,21 @@ interface BadgeNode extends Parent {
   };
 }
 
-interface EmbedNode extends Node {
-  type: 'leafDirective';
-  name: 'youtube' | 'figma' | 'loom' | 'tweet';
-  attributes: Record<string, string>;
+interface ComponentNode extends Parent {
+  // The unified node type produced by ALL trigger syntaxes (directive, Markdoc, MDX-lite, code fence)
+  type: 'componentNode';
+  name: string;                        // e.g. "callout", "youtube", "card-grid"
+  attributes: Record<string, string>;  // key-value props (always strings)
+  triggerSyntax: 'directive' | 'markdoc' | 'mdx-lite' | 'code-fence' | 'obsidian-callout' | 'auto-unfurl';
+  rawContent?: string;                 // for code fence triggers: the fence body as a string
 }
 
 // ... more types for each feature
 ```
 
-### 6.4 Validation Mode
+The `ComponentNode` type is the key — it's the unified representation that all trigger syntaxes normalize to. The `triggerSyntax` field is metadata for debugging ("which syntax produced this node?") but the rendering layer should never branch on it.
+
+### 6.8 Validation Mode
 
 ```typescript
 import { validateLfm } from '@lossless/lfm/validate';
@@ -1292,6 +1534,7 @@ const warnings = validateLfm(markdownString, {
   strictDirectives: true,   // Warn on unrecognized directive names
   checkCitations: true,     // Warn on [^hex] without definitions
   checkLinks: false,        // Skip link checking
+  customDirectives: ['investment-thesis', 'key-risk'],  // site-specific names to allow
 });
 
 // warnings: [
@@ -1299,6 +1542,78 @@ const warnings = validateLfm(markdownString, {
 //   { line: 87, message: "Citation [^abc123] has no definition" },
 // ]
 ```
+
+### 6.9 Versioning Strategy
+
+We use **semantic versioning** with a practical interpretation for a markdown pipeline:
+
+| Change Type | Version Bump | Example |
+|-------------|-------------|---------|
+| New trigger syntax parser | Minor | Adding Markdoc parser (0.2.0 → 0.3.0) |
+| New built-in directive | Minor | Adding `::spotify` embed (0.3.0 → 0.4.0) |
+| Bug fix in existing plugin | Patch | Fix citation parser edge case (0.3.0 → 0.3.1) |
+| Change to normalized node shape | **Major** | Renaming `attributes` to `props` (0.x → 1.0.0) |
+| Change that alters rendered output | **Major** | Callout HTML structure change (0.x → 1.0.0) |
+| New optional config flag | Patch | Adding `polyglot.markdoc` option (0.3.0 → 0.3.1) |
+
+**Pre-1.0 reality**: While we're pre-1.0, minor versions may include breaking changes. This is standard npm convention. We'll try to avoid it but won't contort the API to prevent it. Once we hit 1.0 (after stable use across all our sites + at least one external user), semver is strict.
+
+### 6.10 Publishing Workflow
+
+**For internal releases** (GitHub Packages):
+
+```bash
+# In packages/lfm/
+pnpm version patch        # or minor, or major
+pnpm build
+pnpm test
+pnpm publish --registry https://npm.pkg.github.com
+```
+
+**For public releases** (npm):
+
+```bash
+pnpm version patch
+pnpm build
+pnpm test
+pnpm publish --access public
+```
+
+**Automated** (when we have CI — Phase 3+):
+
+A GitHub Action on the `packages/lfm` path triggers on push to main:
+1. Run tests
+2. If `package.json` version changed, publish to GitHub Packages
+3. If a git tag like `lfm@0.3.0` is pushed, also publish to npm public
+
+### 6.11 Repository Strategy
+
+**Option A — Monorepo package (recommended for now)**:
+
+`@lossless/lfm` lives at `astro-knots/packages/lfm/`. This keeps it close to the sites that consume it, makes development trivial (edit package → reload site), and avoids managing another repo.
+
+**Option B — Standalone repo (recommended for public release)**:
+
+When/if we publish to npm public, move the package to its own repo at `github.com/lossless-group/lfm`. This gives it:
+- Its own issue tracker (people can file bugs against the package, not the monorepo)
+- Its own CI/CD pipeline
+- Its own README/docs that aren't buried in a monorepo
+- A clean git history focused on the package
+
+The migration from A to B is straightforward: `git subtree split` or just copy the directory, push to the new repo, and update the sites to depend on the published version instead of `workspace:*`.
+
+**We start with Option A and graduate to Option B when external interest justifies it.**
+
+### 6.12 How Sites Consume the Package (Summary)
+
+| Context | How the Site Gets `@lossless/lfm` | Version |
+|---------|----------------------------------|---------|
+| **Local dev in monorepo** | pnpm workspace protocol (`workspace:*`) | Always latest from source |
+| **Site deploying from its own repo (Vercel)** | npm install from GitHub Packages or npm | Pinned semver (e.g., `^0.3.0`) |
+| **External user** | npm install from public npm registry | Pinned semver |
+| **Copy-pattern holdouts** | Copy `packages/lfm/src/` into their site | Whatever they copied, frozen in time |
+
+The copy-pattern option remains available for sites that refuse dependencies or need to diverge. But the recommendation is: **use the package.** That's the whole point.
 
 ---
 
@@ -1504,28 +1819,45 @@ How our flavor interacts with common tools:
 ### Phase 1: Codify and Extract (Current)
 
 - Write this spec (you're reading it)
-- Audit all existing remark plugins across the monorepo
+- Audit all existing remark plugins across the monorepo (the Explore agent already found them — `site/src/utils/markdown/`, `packages/astro-big-doc/`, per-site copies)
 - Identify the canonical version of each plugin (most complete, most tested)
-- Create `packages/lfm/` with the extracted plugins
+- Create `packages/lfm/` in the astro-knots monorepo with the extracted plugins
+- Get `pnpm build` and `pnpm test` passing with at least the Stable tier features
 
-### Phase 2: Package and Test
+### Phase 2: Internal Package — Wire Into Our Sites
 
-- Build the preset with configurable feature flags
-- Write tests for each feature (input markdown → expected MDAST)
-- Add validation mode
-- Document every supported syntax with examples
+- Add `@lossless/lfm` to `pnpm-workspace.yaml`
+- Wire into Hypernova, Dark-Matter, and mpstaton-site via `workspace:*`
+- Replace per-site remark plugin copies with imports from the shared package
+- Verify rendering parity (no regressions) — build each site, diff the HTML output
+- Delete the per-site plugin copies once parity is confirmed
 
-### Phase 3: Adopt Across Sites
+At the end of this phase, the package works and our sites use it. Nothing is published anywhere — it's just a workspace sibling.
 
-- Wire `@lossless/lfm` into Hypernova, Dark-Matter, and mpstaton-site
-- Replace per-site remark plugin copies with the shared package
-- Verify rendering parity (no regressions)
+### Phase 3: Publish to GitHub Packages
 
-### Phase 4: Wish List Features
+- Set up the `@lossless` scope on GitHub Packages
+- Add a publish script and a basic GitHub Action for CI
+- Publish `@lossless/lfm@0.1.0`
+- Update each site's standalone repo (the one Vercel deploys from) to depend on the published version
+- Verify that Vercel builds succeed with the published package
 
-- Prioritize based on author demand
-- Implement one feature at a time through the full pipeline: remark plugin → MDAST type → AstroMarkdown branch → Astro component
+At the end of this phase, `@lossless/lfm` is installable with `pnpm add @lossless/lfm` (from GitHub Packages). This is the "works like installing Mermaid or GFM" milestone — any project can add it to their pipeline the same way they'd add `remark-gfm` or `@shikijs/rehype`.
+
+### Phase 4: Wish List Features and Stabilization
+
+- Implement Wish List features based on author demand, one at a time
+- Each feature goes through: remark plugin → MDAST type → AstroMarkdown branch → Astro component
 - Each new feature starts as Beta, graduates to Stable after use across 2+ sites
+- Build out the polyglot parsers (Markdoc, MDX-lite) as authors encounter those syntaxes
+
+### Phase 5: Public npm Release
+
+- Move the package to its own repo (`github.com/lossless-group/lfm`) if external interest justifies it
+- Create the `@lossless` org on npmjs.com
+- Publish to public npm: `pnpm add @lossless/lfm` works for anyone in the world
+- Write a proper README with quick-start guide, feature gallery, and link to this spec
+- Announce wherever markdown nerds congregate
 
 ---
 
@@ -1539,7 +1871,7 @@ How our flavor interacts with common tools:
 
 4. **Math rendering**: KaTeX (faster, smaller) or MathJax (more complete, heavier)? For our use case (occasional formulas in investment memos), KaTeX is probably sufficient.
 
-5. **Package distribution**: Copy-pattern (consistent with astro-knots philosophy) or actual npm publish? The spec supports both, but which do we recommend as default?
+5. **Package distribution**: Settled — workspace package first (Phase 2), GitHub Packages for independent deployment (Phase 3), public npm when ready (Phase 5). Copy-pattern remains an option but is no longer the recommendation. See Section 6 for the full distribution strategy.
 
 6. **Custom directive registration**: Should sites be able to register custom directive names that the shared package doesn't know about? If so, how does validation work?
 
