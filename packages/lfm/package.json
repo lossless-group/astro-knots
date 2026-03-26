@@ -1,0 +1,56 @@
+{
+  "name": "@lossless-group/lfm",
+  "version": "0.1.0",
+  "description": "Lossless Flavored Markdown — a polyglot extended markdown pipeline for remark/rehype",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": ["src", "dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "remark-directive": "^3.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "markdown",
+    "remark",
+    "rehype",
+    "unified",
+    "extended-markdown",
+    "directives",
+    "callouts",
+    "astro",
+    "obsidian"
+  ],
+  "license": "MIT",
+  "author": "Michael Staton <michael@lossless.group>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lossless-group/astro-knots",
+    "directory": "packages/lfm"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}
