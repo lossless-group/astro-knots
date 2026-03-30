@@ -1,4 +1,10 @@
-import type { Parent, Literal, PhrasingContent } from 'mdast';
+/**
+ * LFM custom MDAST node types.
+ *
+ * These are standalone type definitions that describe the shape of nodes
+ * produced by LFM plugins. They don't extend mdast types directly to
+ * maintain compatibility with JSR and other TypeScript-first registries.
+ */
 
 /**
  * The normalized component node that ALL trigger syntaxes produce.
@@ -6,12 +12,13 @@ import type { Parent, Literal, PhrasingContent } from 'mdast';
  * and Obsidian callouts all normalize to this shape before the rendering
  * layer sees them.
  */
-export interface LfmComponentNode extends Parent {
+export interface LfmComponentNode {
   type: 'componentNode';
   name: string;
   attributes: Record<string, string>;
   triggerSyntax: 'directive' | 'markdoc' | 'mdx-lite' | 'code-fence' | 'obsidian-callout' | 'auto-unfurl';
   rawContent?: string;
+  children?: unknown[];
 }
 
 /**
@@ -19,13 +26,14 @@ export interface LfmComponentNode extends Parent {
  * Both Obsidian `> [!type] Title` and directive `:::callout{type="warning"}`
  * produce this same node shape.
  */
-export interface LfmCalloutNode extends Parent {
+export interface LfmCalloutNode {
   type: 'containerDirective';
   name: 'callout';
   attributes: {
     type: string;
     title?: string;
   };
+  children?: unknown[];
 }
 
 /**
@@ -39,6 +47,3 @@ export interface RemarkLfmOptions {
   /** Enable directive syntax parsing. Default: true */
   directives?: boolean;
 }
-
-// Re-export commonly used mdast types for convenience
-export type { Root, Content, Parent, Literal, PhrasingContent } from 'mdast';

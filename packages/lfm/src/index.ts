@@ -17,7 +17,4 @@ export type {
   LfmComponentNode,
   LfmCalloutNode,
   RemarkLfmOptions,
-  Root,
-  Content,
-  Parent,
 } from './types/index.js';

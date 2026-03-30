@@ -5,7 +5,7 @@ date_authored_initial_draft: 2026-03-25
 date_authored_current_draft: 2026-03-25
 date_authored_final_draft:
 date_first_published:
-date_last_updated: 2026-03-25
+date_last_updated: 2026-03-30
 at_semantic_version: 0.0.0.1
 status: Draft
 augmented_with: Claude Code (Opus 4.6)
@@ -16,7 +16,7 @@ authors:
   - AI Labs Team
 image_prompt: A layered blueprint showing standard markdown at the base, GFM and Obsidian features in the middle, and custom directive-based extensions at the top — all flowing through a unified rendering pipeline into polished web pages and PDFs.
 date_created: 2026-03-25
-date_modified: 2026-03-25
+date_modified: 2026-03-30
 ---
 
 # Codifying a Comprehensive Extended Markdown Flavor and Shared Package
@@ -48,7 +48,7 @@ Define a **named, versioned extended markdown flavor** (working name: **Lossless
 1. **Codifies what we already support** across our best rendering pipelines
 2. **Borrows explicitly** from GFM, Obsidian, MDX, and remark-directive conventions
 3. **Defines tiers** — Stable, Beta, and Wish List — so authors know what to rely on
-4. **Backs the spec with a shared package** (`@lossless/lfm` or similar) that sites can install or copy
+4. **Backs the spec with a shared package** (`@lossless-group/lfm`) that sites can install or copy
 5. **Provides a validation mode** that warns authors about unsupported syntax at build time
 
 ---
@@ -950,7 +950,7 @@ print("hello")
 ### Install dependencies
 
 ```bash
-pnpm add @lossless/lfm
+pnpm add @lossless-group/lfm
 ```
 
 ### Configure your pipeline
@@ -1308,10 +1308,10 @@ Before deciding how to distribute the package, we need to decide what's *in* it.
 
 **Option A — Plugin assembly (the conventional approach)**:
 
-`@lossless/lfm` is a preset that installs and configures ~12 remark/rehype plugins from the unified ecosystem. Our package is thin glue code — it pulls in `remark-gfm`, `remark-directive`, `@shikijs/rehype`, `unist-util-visit`, etc., wires them together with opinionated defaults, and adds our custom plugins (citations, auto-unfurl, polyglot parsers) on top.
+`@lossless-group/lfm` is a preset that installs and configures ~12 remark/rehype plugins from the unified ecosystem. Our package is thin glue code — it pulls in `remark-gfm`, `remark-directive`, `@shikijs/rehype`, `unist-util-visit`, etc., wires them together with opinionated defaults, and adds our custom plugins (citations, auto-unfurl, polyglot parsers) on top.
 
 ```
-@lossless/lfm
+@lossless-group/lfm
 ├── depends on remark-parse (CommonMark parser)
 ├── depends on remark-gfm (tables, task lists, strikethrough)
 ├── depends on remark-directive (:::directive syntax)
@@ -1329,10 +1329,10 @@ Before deciding how to distribute the package, we need to decide what's *in* it.
 
 **Option B — Own the extension parser, minimize dependencies (our preference)**:
 
-`@lossless/lfm` depends on a CommonMark parser for the genuinely hard base-level parsing, and then does **everything else ourselves** in a single, readable codebase with no additional dependencies.
+`@lossless-group/lfm` depends on a CommonMark parser for the genuinely hard base-level parsing, and then does **everything else ourselves** in a single, readable codebase with no additional dependencies.
 
 ```
-@lossless/lfm
+@lossless-group/lfm
 ├── peer dependency: remark-parse OR markdown-it (CommonMark + GFM baseline)
 ├── peer dependency: shiki (syntax highlighting — genuinely complex, worth the dep)
 └── our code: EVERYTHING ELSE
@@ -1369,11 +1369,11 @@ The convenience that justified these plugins no longer outweighs the dependency 
 
 **The recommendation**: Start with Option B. Use `remark-parse` + `remark-gfm` for the base CommonMark/GFM layer (that parsing is legitimately hard and well-tested). Use Shiki for syntax highlighting (same reasoning). Write everything else ourselves. If we later discover that some specific unified plugin does something we need that would be painful to replicate, we can add it as a targeted dependency — but the default posture is to own the code rather than depend on a package.
 
-This also means `@lossless/lfm` is a *lightweight* package. It doesn't pull in 50 transitive dependencies. It installs fast, builds fast, and has a dependency footprint comparable to `remark-gfm` itself rather than a bloated preset.
+This also means `@lossless-group/lfm` is a *lightweight* package. It doesn't pull in 50 transitive dependencies. It installs fast, builds fast, and has a dependency footprint comparable to `remark-gfm` itself rather than a bloated preset.
 
 ### 6.3 The Core Mechanism: A Trigger Map
 
-Strip away all the architecture and the answer to "what is `@lossless/lfm`?" is embarrassingly simple:
+Strip away all the architecture and the answer to "what is `@lossless-group/lfm`?" is embarrassingly simple:
 
 **It's a config file that maps syntax patterns to behaviors. The developer-user defines the behaviors. Done.**
 
@@ -1499,7 +1499,7 @@ And because it's a YAML file, not code, a content author or project manager can 
 **Configuration layering:**
 
 ```
-@lossless/lfm built-in triggers (the defaults — callouts, embeds, citations, etc.)
+@lossless-group/lfm built-in triggers (the defaults — callouts, embeds, citations, etc.)
         ↓ merged with
 Site-level lfm.triggers.yaml (custom components, overrides)
         ↓ merged with
@@ -1509,14 +1509,14 @@ Collection-level overrides (optional — e.g., slide content enables slide trigg
 A site that just wants the defaults:
 
 ```javascript
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 // Uses built-in triggers. Done. That's the whole setup.
 ```
 
 A site that adds custom triggers:
 
 ```javascript
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 
 remarkLfm({
   triggers: './lfm.triggers.yaml',  // extends built-in triggers with site-specific ones
@@ -1526,7 +1526,7 @@ remarkLfm({
 A site that wants to start from scratch:
 
 ```javascript
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 
 remarkLfm({
   triggers: './lfm.triggers.yaml',
@@ -1534,67 +1534,64 @@ remarkLfm({
 });
 ```
 
-### 6.4 Distribution Strategy: Internal First, Public When Ready
+### 6.4 Distribution Strategy: Published Package, Not Workspace Dependency
 
-The package should work for us *today* across our 5-7 sites, and be structured so it *can* be published to npm for the world *later* — but publishing is not a prerequisite for internal use.
+> **UPDATE (2026-03-30):** This section has been revised to reflect actual implementation. The workspace-only phase was skipped — the package is published to both GitHub Packages and JSR. Sites install it as a real dependency, not via `workspace:*`.
 
-**Stage 1 — Workspace package (immediate)**
+**Critical constraint**: Each site must be independently deployable from its own repository. Sites are git submodules — they cannot depend on the monorepo's `packages/` directory at deploy time. Therefore, `@lossless-group/lfm` is a **published package** that sites install like any other dependency.
 
-The package lives in the astro-knots monorepo as a workspace member. Sites consume it via pnpm workspace protocol:
+**Why `@lossless-group` and not `@lossless`?** GitHub Packages requires the npm scope to match the GitHub org name. Our org is `lossless-group`, so the scope is `@lossless-group`. This applies to both GitHub Packages and JSR.
 
-```
-astro-knots/
-├── packages/
-│   └── lfm/                  # The shared package
-│       ├── src/
-│       ├── package.json      # name: "@lossless/lfm"
-│       └── tsconfig.json
-├── sites/
-│   ├── hypernova-site/       # depends on @lossless/lfm via workspace:*
-│   ├── dark-matter/          # depends on @lossless/lfm via workspace:*
-│   ├── mpstaton-site/        # depends on @lossless/lfm via workspace:*
-│   ├── cilantro-site/        # depends on @lossless/lfm via workspace:*
-│   └── twf_site/             # depends on @lossless/lfm via workspace:*
-└── pnpm-workspace.yaml       # includes packages/lfm
-```
+**Current state (as of 2026-03-30):**
+
+The package is published to two registries:
+
+| Registry | URL | Auth Required to Install |
+|----------|-----|------------------------|
+| **GitHub Packages** | `npm.pkg.github.com` | Yes (`GITHUB_TOKEN`) |
+| **JSR** | [jsr.io/@lossless-group/lfm](https://jsr.io/@lossless-group/lfm) | No |
+
+**Source code** lives in the astro-knots monorepo at `packages/lfm/`. Development happens there.
+
+**How sites consume the package:**
 
 Each site's `package.json`:
 
 ```json
 {
   "dependencies": {
-    "@lossless/lfm": "workspace:*"
+    "@lossless-group/lfm": "^0.1.0"
   }
 }
 ```
 
-This means: every site in the monorepo always uses the latest version of `@lossless/lfm` from source. No publishing, no version numbers, no registry. When you fix a bug in `packages/lfm/`, every site picks it up on the next `pnpm install` or build.
+Each site's `.npmrc` (tells pnpm where to find `@lossless-group` packages):
 
-**But wait — sites must deploy independently.** Each site deploys from its own repo via Vercel. The site repos are git submodules of astro-knots. When a site deploys from its own repo, `@lossless/lfm` is not available as a workspace sibling. We need a fallback.
-
-**Stage 2 — GitHub Packages (for independent deployment)**
-
-Publish `@lossless/lfm` to **GitHub Packages** (npm registry scoped to your GitHub org). This is free for private packages, trivial to set up, and lets each site install the package from a real registry when building outside the monorepo:
-
-```json
-{
-  "dependencies": {
-    "@lossless/lfm": "^0.1.0"
-  }
-}
+```
+@lossless-group:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
-The workflow:
-1. Develop in the monorepo (workspace protocol, instant feedback)
-2. When the package is ready for a release, bump the version and publish to GitHub Packages
-3. Each site's standalone repo (the one Vercel deploys from) depends on the published version
-4. Vercel builds pull from GitHub Packages just like any npm dependency
+**Publishing workflow** (from `packages/lfm/`):
 
-**Stage 3 — npm public registry (when ready for the world)**
+```bash
+# Bump version in package.json and deno.json
 
-When the package is stable enough that other people might find it useful, publish to the public npm registry. The package name `@lossless/lfm` requires an npm org — create the `@lossless` org on npmjs.com (free for public packages).
+# Build and publish to GitHub Packages
+pnpm build
+pnpm publish
 
-Nothing changes for our sites — they just switch from GitHub Packages to npm. The import paths, the API, the everything stays the same.
+# Publish to JSR (TypeScript source directly, no build step needed)
+pnpx jsr publish --allow-dirty
+```
+
+**Why two registries?**
+- **GitHub Packages** is the primary distribution channel — works with pnpm, ties into our existing GitHub infrastructure, supports private packages if needed.
+- **JSR** (jsr.io) is the modern, TypeScript-first registry — publishes source directly (no build step), auto-generates documentation, works with Deno and Bun natively. As JSR matures, it may become the primary channel.
+
+**Future: npm public registry**
+
+When the package is stable enough for external users, we can additionally publish to the public npm registry. Nothing changes for our sites — just an additional publish target.
 
 ### 6.3 Package Structure
 
@@ -1647,7 +1644,7 @@ packages/lfm/
 
 ```json
 {
-  "name": "@lossless/lfm",
+  "name": "@lossless-group/lfm",
   "version": "0.1.0",
   "description": "Lossless Flavored Markdown — a polyglot extended markdown pipeline for remark/rehype",
   "type": "module",
@@ -1773,7 +1770,7 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
-import { remarkLfm, rehypeLfm } from '@lossless/lfm';
+import { remarkLfm, rehypeLfm } from '@lossless-group/lfm';
 
 const processor = unified()
   .use(remarkParse)
@@ -1805,17 +1802,17 @@ const processor = unified()
 **Cherry-picking** (for sites that want surgical control):
 
 ```typescript
-import { remarkCitations } from '@lossless/lfm/remark/citations';
-import { remarkCallouts } from '@lossless/lfm/remark/callouts';
-import { remarkAutoUnfurl } from '@lossless/lfm/remark/auto-unfurl';
-import { rehypeMermaidPre } from '@lossless/lfm/rehype/mermaid-pre';
+import { remarkCitations } from '@lossless-group/lfm/remark/citations';
+import { remarkCallouts } from '@lossless-group/lfm/remark/callouts';
+import { remarkAutoUnfurl } from '@lossless-group/lfm/remark/auto-unfurl';
+import { rehypeMermaidPre } from '@lossless-group/lfm/rehype/mermaid-pre';
 ```
 
 **In Astro config** (the most common integration point):
 
 ```javascript
 // astro.config.mjs
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 
 export default defineConfig({
   markdown: {
@@ -1874,7 +1871,7 @@ The `ComponentNode` type is the key — it's the unified representation that all
 ### 6.8 Validation Mode
 
 ```typescript
-import { validateLfm } from '@lossless/lfm/validate';
+import { validateLfm } from '@lossless-group/lfm/validate';
 
 const warnings = validateLfm(markdownString, {
   strictDirectives: true,   // Warn on unrecognized directive names
@@ -1936,7 +1933,7 @@ A GitHub Action on the `packages/lfm` path triggers on push to main:
 
 **Option A — Monorepo package (recommended for now)**:
 
-`@lossless/lfm` lives at `astro-knots/packages/lfm/`. This keeps it close to the sites that consume it, makes development trivial (edit package → reload site), and avoids managing another repo.
+`@lossless-group/lfm` lives at `astro-knots/packages/lfm/`. This keeps it close to the sites that consume it, makes development trivial (edit package → reload site), and avoids managing another repo.
 
 **Option B — Standalone repo (recommended for public release)**:
 
@@ -1952,7 +1949,7 @@ The migration from A to B is straightforward: `git subtree split` or just copy t
 
 ### 6.12 How Sites Consume the Package (Summary)
 
-| Context | How the Site Gets `@lossless/lfm` | Version |
+| Context | How the Site Gets `@lossless-group/lfm` | Version |
 |---------|----------------------------------|---------|
 | **Local dev in monorepo** | pnpm workspace protocol (`workspace:*`) | Always latest from source |
 | **Site deploying from its own repo (Vercel)** | npm install from GitHub Packages or npm | Pinned semver (e.g., `^0.3.0`) |
@@ -2039,7 +2036,7 @@ The recursive `AstroMarkdown.astro` component maps MDAST nodes to Astro componen
 | Block with `{style="..."}` | — | Adds inline styles to rendered element | Built-in |
 
 The **Source** column distinguishes between:
-- **Built-in**: Ships with `@lossless/lfm`, always available
+- **Built-in**: Ships with `@lossless-group/lfm`, always available
 - **Auto-unfurl**: Bare URLs on their own line are automatically converted to the corresponding embed directive
 - **Auto-component**: Directive names not in the built-in list are looked up in the site's component registry (see 4.31)
 
@@ -2162,54 +2159,64 @@ How our flavor interacts with common tools:
 
 ## 10. Implementation Phases
 
-### Phase 1: Codify and Extract (Current)
+### Phase 1: Codify and Extract — DONE (2026-03-26)
 
-- Write this spec (you're reading it)
-- Audit all existing remark plugins across the monorepo (the Explore agent already found them — `site/src/utils/markdown/`, `packages/astro-big-doc/`, per-site copies)
-- Identify the canonical version of each plugin (most complete, most tested)
-- Create `packages/lfm/` in the astro-knots monorepo with the extracted plugins
-- Get `pnpm build` and `pnpm test` passing with at least the Stable tier features
+- ~~Write this spec~~
+- ~~Create `packages/lfm/` in the astro-knots monorepo~~
+- ~~Implement first plugin: `remarkCallouts` (Obsidian `> [!type]` → directive normalization)~~
+- ~~Create `remarkLfm` preset wrapping remarkGfm + remarkDirective + remarkCallouts~~
+- ~~Export `parseMarkdown()` convenience function~~
+- ~~Get `pnpm build` passing~~
+- Still TODO: Extract remaining plugins from `site/src/utils/markdown/` (citations, backlinks, images, toc, code-components)
+- Still TODO: Add tests
 
-### Phase 2: Internal Package — Wire Into Our Sites
+### Phase 2: Publish and Wire Into First Site — DONE (2026-03-26)
 
-- Add `@lossless/lfm` to `pnpm-workspace.yaml`
-- Wire into Hypernova, Dark-Matter, and mpstaton-site via `workspace:*`
+- ~~Publish `@lossless-group/lfm@0.1.0` to GitHub Packages~~
+- ~~Publish `@lossless-group/lfm@0.1.1` to JSR (jsr.io)~~
+- ~~Wire into mpstaton-site as a real published dependency (not workspace:*)~~
+- ~~Implement context-v detail page rendering using the package~~
+- ~~Copy AstroMarkdown renderer into mpstaton-site (site-owned rendering layer)~~
+- Still TODO: Wire into remaining sites (hypernova, cilantro, twf, dark-matter, cogs)
+
+**Key decision made:** Skipped the workspace-only phase. Sites install the published package, not `workspace:*`. This preserves independent deployability.
+
+### Phase 3: Wire Into All Sites (Current)
+
+- Add `@lossless-group/lfm` to each site's `package.json`
+- Copy the AstroMarkdown renderer (or a site-appropriate variant) into each site
 - Replace per-site remark plugin copies with imports from the shared package
-- Verify rendering parity (no regressions) — build each site, diff the HTML output
+- Verify rendering parity — build each site, check for regressions
 - Delete the per-site plugin copies once parity is confirmed
 
-At the end of this phase, the package works and our sites use it. Nothing is published anywhere — it's just a workspace sibling.
+### Phase 4: Extract Remaining Plugins
 
-### Phase 3: Publish to GitHub Packages
+- Port `remark-citations.ts` from `site/src/utils/markdown/` into the package
+- Port `remark-backlinks.ts` (wikilink resolution)
+- Port `remark-images.ts` (wiki-style image path normalization)
+- Port `remark-toc.ts` (table of contents generation)
+- Port `remark-code-components.ts` (code fence → component routing)
+- Port `remark-directives.ts` (directive → component mapping with registry)
+- Each plugin: extract → add to preset → test → bump version → publish
 
-- Set up the `@lossless` scope on GitHub Packages
-- Add a publish script and a basic GitHub Action for CI
-- Publish `@lossless/lfm@0.1.0`
-- Update each site's standalone repo (the one Vercel deploys from) to depend on the published version
-- Verify that Vercel builds succeed with the published package
-
-At the end of this phase, `@lossless/lfm` is installable with `pnpm add @lossless/lfm` (from GitHub Packages). This is the "works like installing Mermaid or GFM" milestone — any project can add it to their pipeline the same way they'd add `remark-gfm` or `@shikijs/rehype`.
-
-### Phase 4: Wish List Features and Stabilization
+### Phase 5: Wish List Features and Stabilization
 
 - Implement Wish List features based on author demand, one at a time
 - Each feature goes through: remark plugin → MDAST type → AstroMarkdown branch → Astro component
 - Each new feature starts as Beta, graduates to Stable after use across 2+ sites
 - Build out the polyglot parsers (Markdoc, MDX-lite) as authors encounter those syntaxes
 
-### Phase 5: Public npm Release
+### Phase 6: Public npm Release (Optional)
 
-- Move the package to its own repo (`github.com/lossless-group/lfm`) if external interest justifies it
-- Create the `@lossless` org on npmjs.com
-- Publish to public npm: `pnpm add @lossless/lfm` works for anyone in the world
+- Additionally publish to the public npm registry if external interest justifies it
 - Write a proper README with quick-start guide, feature gallery, and link to this spec
-- Announce wherever markdown nerds congregate
+- Consider moving to its own repo (`github.com/lossless-group/lfm`) for independent issue tracking
 
 ---
 
 ## 11. Open Questions
 
-1. **Naming**: Settled — **Lossless Flavored Markdown (LFM)**. Echoes the "GitHub Flavored Markdown (GFM)" convention. Package: `@lossless/lfm`. The Lossless brand is the umbrella across both Astro Knots (site patterns) and Content Farm (Obsidian plugins), so the flavor belongs at the Lossless level, not scoped to one sub-project.
+1. **Naming**: Settled — **Lossless Flavored Markdown (LFM)**. Echoes the "GitHub Flavored Markdown (GFM)" convention. Package: `@lossless-group/lfm` (scoped to the GitHub org `lossless-group`). Published to both GitHub Packages and JSR.
 
 2. **Obsidian callout parity**: Should we support ALL Obsidian callout types (there are ~13) or just our curated set? Obsidian has types like `abstract`, `todo`, `bug`, `failure` that we haven't needed.
 
@@ -2217,7 +2224,7 @@ At the end of this phase, `@lossless/lfm` is installable with `pnpm add @lossles
 
 4. **Math rendering**: KaTeX (faster, smaller) or MathJax (more complete, heavier)? For our use case (occasional formulas in investment memos), KaTeX is probably sufficient.
 
-5. **Package distribution**: Settled — workspace package first (Phase 2), GitHub Packages for independent deployment (Phase 3), public npm when ready (Phase 5). Copy-pattern remains an option but is no longer the recommendation. See Section 6 for the full distribution strategy.
+5. **Package distribution**: Settled — published to GitHub Packages and JSR from day one. No workspace:* phase — sites install the published package as a real dependency. See Section 6.4 for the full distribution strategy.
 
 6. **Custom directive registration**: Should sites be able to register custom directive names that the shared package doesn't know about? If so, how does validation work?
 
@@ -2328,7 +2335,7 @@ interface DirectiveRegistryEntry {
 }
 ```
 
-**Built-in registry** (ships with `@lossless/lfm`):
+**Built-in registry** (ships with `@lossless-group/lfm`):
 
 ```typescript
 const builtinDirectives: DirectiveRegistryEntry[] = [
@@ -2383,7 +2390,7 @@ const builtinDirectives: DirectiveRegistryEntry[] = [
 **Custom directive registration** (per-site):
 
 ```typescript
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 
 // Site registers domain-specific directives
 const processor = unified()
@@ -2559,7 +2566,7 @@ ERROR:   Embed at line 80 has no accessible label
 All callout types, badges, and themed elements must meet 4.5:1 contrast ratio in both light and dark modes. The shared package ships a contrast check utility:
 
 ```typescript
-import { checkCalloutContrast } from '@lossless/lfm/a11y';
+import { checkCalloutContrast } from '@lossless-group/lfm/a11y';
 
 // Returns warnings for any callout type that fails contrast
 const issues = checkCalloutContrast(siteThemeTokens);
@@ -3110,9 +3117,9 @@ For each plugin found:
 
 | Your Plugin | Shared Package Equivalent | Action |
 |------------|--------------------------|--------|
-| `src/utils/remark-directives.ts` | `@lossless/lfm/remark/directives` | Replace, migrate custom directive names to `customDirectives` config |
-| `src/utils/remark-citations.ts` | `@lossless/lfm/remark/citations` | Replace |
-| `src/utils/remark-toc.ts` | `@lossless/lfm/remark/toc` | Replace |
+| `src/utils/remark-directives.ts` | `@lossless-group/lfm/remark/directives` | Replace, migrate custom directive names to `customDirectives` config |
+| `src/utils/remark-citations.ts` | `@lossless-group/lfm/remark/citations` | Replace |
+| `src/utils/remark-toc.ts` | `@lossless-group/lfm/remark/toc` | Replace |
 | `src/utils/remark-custom-feature.ts` | (none) | Keep as site-specific plugin, load after the preset |
 
 ### 24.3 Wire Up the Preset
@@ -3138,7 +3145,7 @@ const processor = unified()
 **After** (shared package):
 
 ```typescript
-import { remarkLfm } from '@lossless/lfm';
+import { remarkLfm } from '@lossless-group/lfm';
 
 const processor = unified()
   .use(remarkParse)

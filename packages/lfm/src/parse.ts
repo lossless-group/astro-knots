@@ -33,7 +33,7 @@ export async function parseMarkdown(content: string, options?: RemarkLfmOptions)
  * Create a configured unified processor with the LFM pipeline.
  * Useful when you need more control (e.g., for streaming or custom transforms).
  */
-export function createLfmProcessor(options?: RemarkLfmOptions) {
+export function createLfmProcessor(options?: RemarkLfmOptions): ReturnType<typeof unified> {
   return unified()
     .use(remarkParse)
     .use(remarkLfm, options);

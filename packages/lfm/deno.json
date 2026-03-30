@@ -1,0 +1,21 @@
+{
+  "name": "@lossless-group/lfm",
+  "version": "0.1.1",
+  "description": "Lossless Flavored Markdown — a polyglot extended markdown pipeline for remark/rehype",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "publish": {
+    "include": ["src/**/*.ts", "deno.json", "LICENSE"]
+  },
+  "imports": {
+    "unified": "npm:unified@^11.0.0",
+    "remark-parse": "npm:remark-parse@^11.0.0",
+    "remark-gfm": "npm:remark-gfm@^4.0.0",
+    "remark-directive": "npm:remark-directive@^3.0.0",
+    "mdast": "npm:@types/mdast@^4.0.0"
+  },
+  "nodeModulesDir": "auto"
+}
