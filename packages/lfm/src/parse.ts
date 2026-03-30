@@ -9,7 +9,7 @@
  *   const tree = await parseMarkdown(content);
  */
 
-import { unified } from 'unified';
+import { unified, type Processor } from 'unified';
 import remarkParse from 'remark-parse';
 import { remarkLfm } from './preset.js';
 import type { Root } from 'mdast';
@@ -33,8 +33,8 @@ export async function parseMarkdown(content: string, options?: RemarkLfmOptions)
  * Create a configured unified processor with the LFM pipeline.
  * Useful when you need more control (e.g., for streaming or custom transforms).
  */
-export function createLfmProcessor(options?: RemarkLfmOptions): ReturnType<typeof unified> {
+export function createLfmProcessor(options?: RemarkLfmOptions): Processor {
   return unified()
     .use(remarkParse)
-    .use(remarkLfm, options);
+    .use(remarkLfm, options) as unknown as Processor;
 }
