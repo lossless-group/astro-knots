@@ -1,20 +1,44 @@
-// @lossless/lfm — Lossless Flavored Markdown
-// A polyglot extended markdown pipeline for remark/rehype
-//
-// One package, one import. Everything you need to parse extended markdown.
+/**
+ * @module
+ *
+ * **Lossless Flavored Markdown** — a polyglot extended markdown pipeline for remark/rehype.
+ *
+ * One package, one import. Bundles unified, remark-parse, remark-gfm, remark-directive,
+ * and custom plugins into a single `parseMarkdown()` call.
+ *
+ * @example Basic usage
+ * ```ts
+ * import { parseMarkdown } from '@lossless-group/lfm';
+ *
+ * const tree = await parseMarkdown('# Hello\n\nSome **markdown** content.');
+ * // tree is an MDAST — pass to your renderer
+ * ```
+ *
+ * @example As a remark preset
+ * ```ts
+ * import { unified } from 'unified';
+ * import remarkParse from 'remark-parse';
+ * import { remarkLfm } from '@lossless-group/lfm';
+ *
+ * const processor = unified().use(remarkParse).use(remarkLfm);
+ * const tree = await processor.run(processor.parse(content));
+ * ```
+ */
 
-// High-level API (recommended)
+/** Parse a markdown string into an MDAST tree with all LFM extensions applied. */
 export { parseMarkdown, createLfmProcessor } from './parse.js';
 
-// Preset (for manual unified pipeline assembly)
+/** The remarkLfm preset — chains remarkGfm + remarkDirective + remarkCallouts. */
 export { remarkLfm } from './preset.js';
 
-// Individual plugins (for cherry-picking)
+/** Obsidian callout normalizer — transforms `> [!type]` into directive nodes. */
 export { remarkCallouts } from './plugins/remark-callouts.js';
 
-// Types
 export type {
+  /** Normalized component node produced by all trigger syntaxes. */
   LfmComponentNode,
+  /** Callout node produced by remarkCallouts. */
   LfmCalloutNode,
+  /** Options for the remarkLfm preset. */
   RemarkLfmOptions,
 } from './types/index.js';
