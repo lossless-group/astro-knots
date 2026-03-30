@@ -4,24 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Astro Knots is an **experimental, loosely-coupled monorepo** serving as a pattern library and development workspace for multiple client websites. This is NOT a traditional monorepo with shared dependencies - it's a pattern development and extraction workspace where sites remain fully independent and deployable from their own repositories.
+Astro Knots is a **pseudo-monorepo evolving toward selective package sharing**. It started as a pattern library experiment, and is gradually discovering which shared code genuinely benefits from being a published package vs. which is better copied and adapted per-site.
 
-**Core Philosophy:**
-- `@knots/*` packages are **copyable pattern references**, not shared dependencies
+**The Evolving Philosophy:**
+- This is **not a true monorepo** with shared packages everywhere — and it's **not purely a pattern library** either
+- `@knots/*` packages are workspace-local pattern references you copy from (not published, not imported at runtime)
+- `@lossless-group/*` packages (like `@lossless-group/lfm`) ARE real published packages that sites install as dependencies
+- The distinction: publish a package when multiple sites need identical processing logic; copy a pattern when each site customizes it
 - Each client site must deploy independently from its own repo (typically via Vercel)
-- Patterns are developed in real client sites, then extracted to packages when time permits
-- The workspace enables pattern comparison across sites and co-located development
-- Sites contain their own copies of patterns, adapted to their specific needs
+- Development happens in client sites first — extraction to shared packages happens when genuine need is proven
 
-**The Reality:**
-- This is aspirational and experimental - patterns are extracted when resources allow
-- Development happens in client sites first, extraction to `@knots/*` happens later (when remembered)
-- The monorepo is a "pattern museum" and "shared sketchbook" for cross-site learning
-- We're underresourced, so this is about making the best patterns reusable when possible
+**How we got here:**
+- Initially intended as a true monorepo with shared component packages
+- Quickly learned that maintaining abstracted, style-free components across sites was impractical with a small team
+- Settled into a "pattern library" approach where `@knots/*` are reference implementations you copy from
+- As content rendering matured, discovered that markdown processing pipelines genuinely need to be shared (not copied) — leading to `@lossless-group/lfm` as the first real published package
+- The design-system-viewer aspiration (shared component explorer per site) remains an initiative waiting for bandwidth
+
+**Do not assume** either "everything is a shared package" or "everything is copy-paste." Ask which approach fits the specific code.
 
 ## Critical Constraint
 
-**Each site MUST be independently deployable from its own repository with zero dependency on the astro-knots monorepo.** Clients deploy their sites directly from their site repos (e.g., `cilantro-site`, `twf_site`) without needing access to this umbrella project.
+**Each site MUST be independently deployable from its own repository.** Sites install published packages (like `@lossless-group/lfm`) as real dependencies from GitHub Packages or JSR. Sites do NOT use `workspace:*` links — those break independent deployment. Clients deploy their sites directly from their site repos without needing access to this umbrella project.
 
 ## Workspace Commands
 
@@ -57,21 +61,26 @@ pnpm --filter hypernova-site test:run
 
 ```
 astro-knots/
-├── packages/              # Pattern reference library (copyable, not dependencies)
-│   ├── tokens/           # Design token patterns and examples
-│   ├── icons/            # SVG icon patterns
-│   ├── astro/            # Astro component patterns (Button.astro, etc.)
-│   ├── svelte/           # Svelte component patterns (Button.svelte, etc.)
-│   ├── brand-config/     # Brand configuration pattern examples
-│   └── tailwind/         # Tailwind preset/plugin pattern
+├── packages/
+│   ├── lfm/              # @lossless-group/lfm — PUBLISHED package (GitHub Packages + JSR)
+│   ├── tokens/           # @knots/tokens — pattern reference (not published)
+│   ├── icons/            # @knots/icons — pattern reference (not published)
+│   ├── astro/            # @knots/astro — Astro component patterns (AstroMarkdown, CodeBlock, Callout)
+│   ├── svelte/           # @knots/svelte — Svelte component patterns
+│   ├── brand-config/     # @knots/brand-config — Brand config type + CSS var helper
+│   └── tailwind/         # @knots/tailwind — Tailwind 3 preset/plugin (needs TW4 migration)
 ├── sites/                # Client sites as git submodules
-│   ├── hypernova-site/   # Independent deployable site
-│   ├── cilantro-site/    # Independent deployable site
-│   ├── coglet-shuffle/   # Independent deployable site
-│   ├── cogs-site/        # Independent deployable site
-│   └── twf_site/         # Independent deployable site (The Water Foundation)
-├── design-system-viewer/ # Internal tool (can use workspace deps)
-└── pnpm-workspace.yaml   # Workspace config for dev convenience
+│   ├── mpstaton-site/    # Personal portfolio — actively maintained, first LFM consumer
+│   ├── hypernova-site/   # Client site
+│   ├── cilantro-site/    # Client site — strong reference implementation
+│   ├── twf_site/         # The Water Foundation
+│   ├── dark-matter/      # Client site
+│   ├── banner-site/      # Client site
+│   ├── cogs-site/        # In progress
+│   └── coglet-shuffle/   # In progress (nested astro-site)
+├── context-v/            # Project documentation (specs, blueprints, prompts, reminders, explorations)
+├── design-system-viewer/ # Internal tool — minimal scaffolding (Astro 6 + TW4)
+└── pnpm-workspace.yaml   # Workspace config
 ```
 
 ### Pattern Development Workflow
@@ -101,9 +110,35 @@ Each site in `sites/*`:
 - Extract common patterns to `@knots/*` packages
 - Development convenience (not deployment requirement)
 
+## Published Packages (`@lossless-group/*`)
+
+These are real packages published to registries that sites install as dependencies.
+
+### @lossless-group/lfm
+- **What it is:** Lossless Flavored Markdown — shared remark/rehype pipeline for extended markdown
+- **Registries:** GitHub Packages (`npm.pkg.github.com`) and JSR (`jsr.io/@lossless-group/lfm`)
+- **Source:** `packages/lfm/`
+- **Spec:** `context-v/specs/Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Package.md`
+- **Usage:** Sites install with `pnpm add @lossless-group/lfm` and import `parseMarkdown()` or `remarkLfm`
+- **Includes:** unified, remark-parse, remark-gfm, remark-directive, remark-callouts (Obsidian callout normalization)
+- **Currently used by:** mpstaton-site for context-v document rendering
+
+**Example usage in a site:**
+```ts
+import { parseMarkdown } from '@lossless-group/lfm';
+const tree = await parseMarkdown(markdownContent);
+// tree is an MDAST — pass to your site's AstroMarkdown renderer
+```
+
+Sites need an `.npmrc` to find `@lossless-group` packages:
+```
+@lossless-group:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
 ## Pattern Packages (`@knots/*`)
 
-These are reference implementations that you copy from, NOT packages you import as dependencies.
+These are workspace-local reference implementations that you copy from and adapt. They are NOT published and NOT imported as runtime dependencies.
 
 ### @knots/tokens
 - **Purpose:** Design token pattern examples (colors, scales, typography, spacing)
@@ -285,21 +320,20 @@ git commit -m "Update cilantro-site submodule reference"
 
 ### ✅ Do
 
-- **Copy patterns from packages into sites** - This is the primary workflow
-- **Keep sites fully self-contained** - They must deploy independently
-- **Extract reusable patterns to packages** - When you remember/have time
-- **Adapt copied patterns to each site** - Don't force one-size-fits-all
-- **Use workspace for development convenience** - See all sites together
-- **Use pnpm** - Required for workspace functionality
+- **Import from `@lossless-group/*` published packages** when sites need identical processing logic (e.g., `@lossless-group/lfm` for markdown)
+- **Copy and adapt from `@knots/*` pattern packages** for components, styles, and layouts that each site customizes
+- **Keep sites independently deployable** - They install published packages from registries, not from the workspace
+- **Use pnpm exclusively** - Never npm, npx, or yarn. Use pnpx instead of npx.
 - **Commit submodule changes separately** - Each site has its own git history
+- **Adapt copied patterns to each site** - Don't force one-size-fits-all
 
 ### ❌ Avoid
 
-- **Don't make sites depend on `@knots/*` packages at runtime** - Sites must be independent
-- **Don't expect packages to auto-update in sites** - Patterns are copied, not linked
-- **Don't use npm or yarn** - Breaks workspace protocol
-- **Don't make packages that sites must import** - They're copyable patterns, not dependencies
-- **Don't expect perfect consistency across sites** - Patterns are adapted per site
+- **Don't use `workspace:*` in site package.json** - Sites must deploy from their own repos without the monorepo
+- **Don't import from `@knots/*` at runtime** - Those are pattern references, not published packages
+- **Don't use npm or yarn** - Breaks workspace protocol. Always pnpm/pnpx.
+- **Don't assume everything should be a shared package** - Most things are better copied and adapted
+- **Don't assume everything should be copied** - Processing pipelines (like LFM) genuinely benefit from a shared package
 - **Don't commit inside submodule from parent** - Work in submodule's own git context
 
 ## Environment-Driven Configuration Pattern
@@ -319,18 +353,18 @@ FEATURE_FLAGS=search,blog    # Feature toggles
 - `features.ts` - Feature flag evaluation
 - `seo.ts` - SEO defaults
 
-## Future Possibilities
+## Package Publishing Status
 
-**Package Publishing (Not Implemented Yet):**
-- We could publish `@knots/*` to npm/private registry
-- Sites could then use standard npm dependencies: `pnpm add @knots/tokens`
-- This would require maintaining published versions and semver
-- For now: copy/paste is simpler and works for our scale
+**Already published:**
+- `@lossless-group/lfm` — published to GitHub Packages and JSR. The first real shared package.
+- Publishing workflow: edit in `packages/lfm/`, bump version, `pnpm build && pnpm publish` for GitHub Packages, `pnpx jsr publish --allow-dirty` for JSR.
 
-**When/if we publish:**
-- Sites could choose: import from npm OR copy code
-- We'd need versioning, changelog, breaking change management
-- Build/deploy process stays the same (sites still independent)
+**Not published (pattern references only):**
+- `@knots/*` packages remain workspace-local. Publishing them is theoretically possible but not currently justified — the copy-pattern approach works for UI components.
+
+**Future candidates for publishing:**
+- The design-system-viewer could become a shared micro-frontend
+- Additional remark/rehype plugins will be added to `@lossless-group/lfm` as the LFM spec matures (citations, backlinks, auto-unfurl, etc.)
 
 ## Testing
 
@@ -399,61 +433,46 @@ git checkout main
 - No vendor lock-in to our monorepo infrastructure
 - Sites must work from their own repos (Vercel auto-deploy)
 
-### Recent Progress (Nov 2025)
+### Recent Progress (Mar 2026)
 
-- Hypernova (`sites/hypernova-site`)
-  - Fixed portfolio page blank render by normalizing grid props (`LogoGrid--LogoOnly.astro`).
-  - Corrected Class5 logo asset paths and extensions in `src/content/page-content/portfolio.json`.
-  - Replaced inline brand mark with public SVG asset; removed header background block.
-  - Resolved TypeScript plugin mismatch in `astro.config.mjs` with a JSDoc cast.
-  - Removed missing `facts` content collection to fix build.
+- **@lossless-group/lfm** — First published package. Shared markdown pipeline with remarkGfm, remarkDirective, remarkCallouts. Published to GitHub Packages and JSR.
 
-- The Water Foundation (`sites/twf_site`)
-  - Ensured brand mark wrapper supports light/dark assets from `public/trademarks` referenced by absolute paths.
-  - Continues to follow copy-pattern workflow; site remains fully independent.
+- **mpstaton-site** (`sites/mpstaton-site`)
+  - Context-V document rendering — DocCard index + detail pages with full markdown rendering via `@lossless-group/lfm`
+  - AstroMarkdown renderer copied from `@knots/astro` and extended (tables, strikethrough, HTML nodes)
+  - Portfolio, CV, OG image generation complete
+  - First site consuming `@lossless-group/lfm` as a published dependency
 
-Guidance:
-- Use public assets via absolute paths for logos when they live in `public/`.
-- Only import assets (e.g., `?url`, `?raw`) from `src/` when you need bundling or inlining.
+- **design-system-viewer** — Migrated from Astro 4 + Tailwind 3 to Astro 6 + Tailwind 4 to clear Dependabot vulnerabilities
 
-**Development Benefits:**
-- See all sites together for pattern inspiration
-- Extract common solutions to avoid reinventing
-- Cross-pollinate ideas between projects
-- Maintain pattern quality in central reference
+### Previous Progress (Nov 2025)
 
-**Resource Reality:**
-- Underfunded pattern extraction work
-- Client work drives development, not package development
-- Extract patterns when time/budget allows
-- Aspirational system that improves incrementally
+- Hypernova — portfolio page, brand mark, TypeScript fixes, content collection cleanup
+- TWF — brand mark light/dark support, copy-pattern workflow
 
 ### Sites as Reference
 
-**Cilantro-site** serves as a strong reference implementation:
-- Environment-driven configuration pattern
-- SEO/OG meta utilities
-- Content collections architecture
-- Shows the full pattern in context
+**mpstaton-site** is the current primary reference for content rendering — it's the first site using `@lossless-group/lfm` and has the most complete AstroMarkdown renderer.
+
+**Cilantro-site** remains a strong reference for environment-driven configuration, SEO/OG meta utilities, and content collections architecture.
 
 ## Notes for AI Assistants
 
-1. **Sites are independent** - Never create dependencies on `@knots/*` in site code
-2. **Copy, don't import** - When asked to use a pattern, copy the code into the site
-3. **Check deployability** - Can this site deploy from its own repo alone?
-4. **Respect submodules** - Each site has separate git history
-5. **Packages are references** - Think "cookbook" not "library"
-6. **Workspace is dev tool** - Not a deployment requirement
-7. **Be realistic** - This is experimental and evolving
+1. **This project is in between states** - It's not a true monorepo and not purely a pattern library. The right approach depends on the specific code.
+2. **Published packages (`@lossless-group/*`) are real dependencies** - Sites install them from GitHub Packages or JSR. Import them normally.
+3. **Pattern packages (`@knots/*`) are references** - Copy the code into the site, adapt it. Never import at runtime.
+4. **Sites are independently deployable** - No `workspace:*` links. Published packages only.
+5. **Respect submodules** - Each site has separate git history. Commit inside the submodule, not from the parent.
+6. **Use pnpm/pnpx exclusively** - Never npm, npx, yarn, or node directly.
+7. **Check `context-v/`** - Specs, blueprints, and prompts contain valuable context about design decisions.
+
+**When deciding import vs. copy:**
+1. Is this processing logic that should be identical across sites? → **Published package** (like `@lossless-group/lfm`)
+2. Is this a component/layout/style that each site customizes? → **Copy and adapt** (like AstroMarkdown.astro)
+3. Is this something new that only one site needs right now? → **Build in the site**. Extract later if other sites need it.
 
 **When troubleshooting:**
 1. Can the site build/run from its own directory alone?
-2. Are there any cross-repo dependencies that would break deployment?
+2. Are there any `workspace:*` dependencies that would break deployment?
 3. Is the submodule initialized and on the right branch?
-4. Does the pattern need to be copied into the site?
-
-**When adding features:**
-1. Build it in the site first (where it's needed)
-2. Ask: "Would other sites benefit from this pattern?"
-3. If yes and time permits: extract to packages
-4. Document the pattern for future copying
+4. Does `.npmrc` have the `@lossless-group` registry configured?
