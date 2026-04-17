@@ -2,11 +2,11 @@
 title: Portfolio-Wide Job Aggregator
 lede: A specification for scraping, aggregating, and displaying job openings across a venture capital firm's portfolio companies — built as a reusable pattern for any VC client site.
 date_authored_initial_draft: 2026-04-16
-date_authored_current_draft: 2026-04-16
+date_authored_current_draft: 2026-04-17
 date_authored_final_draft:
 date_first_published:
-date_last_updated: 2026-04-16
-at_semantic_version: 0.0.0.1
+date_last_updated: 2026-04-17
+at_semantic_version: 0.0.0.2
 status: Draft
 augmented_with: Claude Code (Opus 4.6)
 category: Specification
@@ -139,7 +139,7 @@ Extends the existing Hypernova pattern (`src/content/portfolio/directs-portfolio
 | `careersUrl` | `string` | URL to the company's careers/jobs page. Manually curated. |
 | `careersUrlValidated` | `boolean` | Set by build-time validator. `false` if last HEAD request failed. |
 | `careersUrlLastChecked` | `string` (ISO date) | Timestamp of last validation check. |
-| `jobBoardProvider` | `string \| null` | Detected or manually set: `lever`, `greenhouse`, `ashby`, `workable`, `bamboohr`, `custom`, `null`. Informs scrape strategy. |
+| `jobBoardProvider` | `string \| null` | Detected or manually set: `greenhouse`, `ashby`, `pinpoint`, `lever`, `workable`, `bamboohr`, `custom`, `null`. Informs scrape strategy. |
 | `scrapeStrategy` | `string` | `auto` (AI-assisted), `api` (known provider API), `manual` (hand-maintained), `skip`. |
 
 ### 3.2 Job Listing Record
@@ -205,14 +205,15 @@ interface JobsAggregationMeta {
 
 Many startups use hosted job boards with predictable DOM structures or public APIs:
 
-| Provider | Detection Signal | Strategy |
-|----------|-----------------|----------|
-| **Lever** | `jobs.lever.co/{company}` or embedded Lever iframe | JSON API at `https://api.lever.co/v0/postings/{company}` |
-| **Greenhouse** | `boards.greenhouse.io/{company}` | JSON API at `https://boards-api.greenhouse.io/v1/boards/{company}/jobs` |
-| **Ashby** | `jobs.ashbyhq.com/{company}` | JSON API at `https://api.ashbyhq.com/posting-api/job-board/{company}` |
-| **Workable** | `apply.workable.com/{company}` | JSON at page `__NEXT_DATA__` or API |
-| **BambooHR** | `{company}.bamboohr.com/careers` | Structured HTML with consistent classes |
-| **Rippling** | `{company}.rippling.com/careers` | Structured HTML |
+| Provider | Detection Signal | Strategy | Status |
+|----------|-----------------|----------|--------|
+| **Greenhouse** | `boards.greenhouse.io/{company}` | JSON API at `https://boards-api.greenhouse.io/v1/boards/{company}/jobs` | **Implemented** |
+| **Ashby** | `jobs.ashbyhq.com/{company}` | JSON API at `https://api.ashbyhq.com/posting-api/job-board/{company}` | **Implemented** |
+| **Pinpoint** | `{company}.pinpointhq.com` | JSON API at `https://{company}.pinpointhq.com/en/postings.json` — includes structured salary data | **Implemented** |
+| **Lever** | `jobs.lever.co/{company}` or embedded Lever iframe | JSON API at `https://api.lever.co/v0/postings/{company}` | Planned |
+| **Workable** | `apply.workable.com/{company}` | JSON at page `__NEXT_DATA__` or API | Planned |
+| **BambooHR** | `{company}.bamboohr.com/careers` | Structured HTML with consistent classes | Planned |
+| **Rippling** | `{company}.rippling.com/careers` | Structured HTML | Planned |
 | **Custom** | Anything else | AI-assisted HTML extraction |
 
 ### 4.2 Provider Detection
@@ -797,15 +798,17 @@ On the portfolio detail page (`/portfolio/[slug]`), include a "Current Openings"
 - [ ] Responsive layout across breakpoints
 
 ### Phase 3: Automated Scraping
-- [ ] Build `scrape-portfolio-jobs.ts` with known-provider API integrations (Lever, Greenhouse, Ashby)
-- [ ] Add AI-assisted extraction for custom careers pages
-- [ ] Implement deduplication and stale-listing cleanup logic
-- [ ] Write `jobs-meta.json` with per-company status
+- [x] Build `scrape-portfolio-jobs.ts` with known-provider API integrations (Greenhouse, Ashby, Pinpoint)
+- [x] Implement deduplication and stale-listing cleanup logic
+- [x] Write `jobs-meta.json` with per-company status
+- [x] Universal snippet sanitization (decode entities, preserve HTML, skip boilerplate)
+- [x] Structured salary data from Pinpoint API
+- [ ] Add Lever API integration
 - [ ] Set up Vercel Cron (or Railway container) for daily scrape + deploy trigger
 
 ### Phase 4: Polish and Hardening
+- [x] Build provider auto-detection during validation (Greenhouse, Ashby, Pinpoint)
 - [ ] Add `robots.txt` respect check
-- [ ] Build provider auto-detection during validation
 - [ ] Add monitoring/alerting for scrape failures (>50% companies failing)
 - [ ] Performance: paginate or virtualize if job count exceeds ~200
 - [ ] SEO: structured data (JobPosting schema.org) on individual listings
@@ -833,26 +836,31 @@ For other VC client sites that want this feature:
 ## 14. Acceptance Criteria
 
 ### Data Model
-- [ ] Portfolio JSON includes `careersUrl`, `jobBoardProvider`, `scrapeStrategy` fields
-- [ ] `JobListing` type is defined with all specified fields
-- [ ] `jobs.json` and `jobs-meta.json` are valid, schema-conformant files
+- [x] Portfolio JSON includes `careersUrl`, `jobBoardProvider`, `scrapeStrategy` fields
+- [x] `JobListing` type is defined with all specified fields
+- [x] `jobs.json` and `jobs-meta.json` are valid, schema-conformant files
 
 ### Build-Time Validation
-- [ ] `validate-careers-urls.ts` runs as prebuild step
-- [ ] HEAD requests have 5s timeout and follow up to 3 redirects
-- [ ] Invalid URLs are logged as warnings, not build failures
-- [ ] Provider auto-detection works for Lever, Greenhouse, and Ashby URLs
+- [x] `validate-careers-urls.ts` runs as prebuild step
+- [x] HEAD requests have 5s timeout and follow up to 3 redirects
+- [x] Invalid URLs are logged as warnings, not build failures
+- [x] Provider auto-detection works for Greenhouse, Ashby, and Pinpoint URLs
 
 ### Scraping Pipeline
-- [ ] Known provider APIs return structured data for Lever, Greenhouse, Ashby
-- [ ] AI-assisted extraction handles at least 3 custom careers page formats
-- [ ] Deduplication prevents duplicate listings
-- [ ] Listings not seen in 7+ days are removed
+- [x] Known provider APIs return structured data for Greenhouse, Ashby, Pinpoint
+- [x] Deduplication prevents duplicate listings
+- [x] Listings not seen in 7+ days are removed
+- [x] HTML snippets decoded and preserved with `set:html` rendering
+- [x] Smart boilerplate detection skips repeated company intros
+- [x] Structured salary data extracted from Pinpoint
+- [ ] Lever API integration
 - [ ] Scraper respects `robots.txt` and rate limits (1 req/sec)
 
 ### Pages and Components
-- [ ] `/jobs` page renders all listings grouped by company
-- [ ] `JobCard` displays title, company, location, remote badge, type, department, and apply CTA
+- [x] `/jobs` page renders all listings grouped by company
+- [x] `JobCard` displays title, company, location, remote badge, type, department, and apply CTA
+- [x] Company tabs with mode-aware logos and job count badges
+- [x] HTML-rich snippets render formatted descriptions
 - [ ] `JobFilterBar` filters by search text, company, location, department, and type
 - [ ] Filtering is client-side with no page reload
 - [ ] `/portfolio/[slug]` shows company's current openings
@@ -860,9 +868,9 @@ For other VC client sites that want this feature:
 - [ ] Responsive across mobile, tablet, and desktop breakpoints
 
 ### Operations
-- [ ] GitHub Actions workflow runs daily and triggers rebuild on changes
-- [ ] Stale data gracefully degrades with "last updated" notice
-- [ ] Empty state displays "Job listings coming soon" when no data exists
+- [ ] Vercel Cron or Railway container runs daily and triggers rebuild
+- [x] Stale data gracefully preserved when a scrape fails
+- [x] Empty state displays "Job listings coming soon" when no data exists
 
 ## 15. Future Plans
 

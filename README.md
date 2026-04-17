@@ -71,6 +71,20 @@ These are **not published packages**. They're workspace-local pattern references
 
 The `@knots/astro` markdown components (AstroMarkdown, CodeBlock, Callout) are particularly useful as a starting point — mpstaton-site copied and adapted these for its content rendering.
 
+## Portfolio-Wide Job Aggregator
+
+A reusable pattern for VC client sites to aggregate and display job openings across their portfolio companies. Scrapes careers pages daily via free public JSON APIs, then renders them as a filterable jobs board.
+
+- **Spec:** `context-v/specs/Portfolio-Wide-Job-Aggregator.md`
+- **First implementation:** banner-site (Banner.vc) — 3 portfolio companies, 194 live jobs
+- **Supported providers:** Greenhouse, Ashby, Pinpoint (all free, unauthenticated JSON APIs)
+- **Runtime:** Node 22 native TypeScript (`--experimental-strip-types`), zero extra dependencies
+- **Pipeline:** `pnpm validate:careers` (build-time URL validation + provider detection) → `pnpm scrape:jobs` (daily fetch from provider APIs) → static Astro pages
+- **Features:** Smart boilerplate skipping, HTML-rich snippets with `set:html` rendering, structured salary data (Pinpoint), mode-aware logo switching, configurable card variants
+- **Future:** "Put Your Name in the Arena" — candidates connect via LinkedIn, VC curates and forwards warm intros to portfolio hiring managers
+
+Designed as a copy-and-adapt pattern per site. If 3+ clients adopt it, the scraping logic becomes a candidate for `@lossless-group/portfolio-jobs`.
+
 ## Context-V
 
 The `context-v/` directory contains project documentation organized by type:
