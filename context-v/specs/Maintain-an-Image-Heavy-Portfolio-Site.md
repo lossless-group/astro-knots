@@ -6,7 +6,7 @@ date_authored_current_draft: 2026-04-21
 date_authored_final_draft:
 date_first_published:
 date_last_updated: 2026-04-21
-at_semantic_version: 0.0.0.2
+at_semantic_version: 0.0.0.3
 status: Draft
 augmented_with: Claude Code (Opus 4.6)
 category: Specification
@@ -21,7 +21,7 @@ date_modified: 2026-04-21
 
 # Create an Image-Heavy Portfolio Website for Boutique E-Commerce
 
-**Status**: Draft (v0.0.0.2)
+**Status**: Draft (v0.0.0.3)
 **Date**: 2026-04-21
 **Site Codename**: `arthouse-site`
 
@@ -132,7 +132,7 @@ pnpm install    # resolves from registries, not workspace
 pnpm build      # produces a complete static/hybrid site
 ```
 
-### 3.3 Stack Versions
+### 3.4 Stack Versions
 
 | Dependency | Version | Notes |
 |-----------|---------|-------|
@@ -945,7 +945,7 @@ The CMS itself never touches the live site directly. It commits to the GitHub re
 
 ## 7. Component Catalog
 
-### 6.1 Component Tree Overview
+### 7.1 Component Tree Overview
 
 ```mermaid
 graph TD
@@ -991,7 +991,7 @@ graph TD
     end
 ```
 
-### 6.2 Navigation & Layout Components
+### 7.2 Navigation & Layout Components
 
 #### `BaseLayout.astro`
 - Wraps all pages
@@ -1013,7 +1013,7 @@ graph TD
 - Minimal: copyright, social links, `/design-system/` link
 - WhatsApp icon link (uses secure redirect, not raw number)
 
-### 6.3 Gallery & Carousel Components
+### 7.3 Gallery & Carousel Components
 
 These are **Svelte components** for touch/swipe interactivity. Each accepts a common `items` prop shape.
 
@@ -1159,7 +1159,7 @@ Full-screen overlay for viewing a single image at high resolution.
 - Keyboard: arrows, escape
 - URL does NOT change (lightbox is an overlay, not a route)
 
-### 6.4 Card Components
+### 7.4 Card Components
 
 #### `PricingCard.astro`
 
@@ -1207,7 +1207,7 @@ Used in carousels and grids. Shows image thumbnail + title + category badge.
 
 Generic card for presenting choices (e.g., "Choose your style", "Select a package"). Used on services page or as an upsell component.
 
-### 6.5 WhatsApp CTA Components
+### 7.5 WhatsApp CTA Components
 
 #### `WhatsAppButton.svelte`
 
@@ -1260,7 +1260,7 @@ export const GET: APIRoute = ({ url }) => {
 
 **Trade-off**: This requires `output: 'hybrid'` or `output: 'server'` in Astro config for the API route. If pure static is preferred, the alternative is a client-side Svelte component that fetches the number from a serverless function at click time — but the redirect approach is simpler and works with Vercel's serverless.
 
-### 6.6 Utility Components
+### 7.6 Utility Components
 
 #### `ImageWithTransparency.astro`
 
@@ -1295,117 +1295,324 @@ Renders `<title>`, `<meta description>`, `<meta og:*>`, `<link rel="canonical">`
 
 ## 8. Theme & Mode System
 
-### 7.1 Architecture
+### 8.1 Architecture
 
 Following the Astro-Knots color hierarchy (see `context-v/reminders/Improvising-within-Design-System-Color-Palettes.md`):
 
 ```
-:root                          Named colors (hex values ONLY here)
+src/content/theme/colors.md    Client-editable named colors (via CMS color picker)
+src/content/theme/modes.md     Client-editable mode assignments (via CMS dropdowns)
+           │
+           ▼
+    Build-time CSS generation
+           │
+           ▼
+:root                          Named colors as CSS custom properties
     │
     ▼
-[data-theme="arthouse"]        Theme-level defaults
-[data-mode="dark"]             Semantic tokens reference named colors
-[data-mode="vibrant"]          Semantic tokens reference named colors
-[data-mode="light"]            Semantic tokens reference named colors
+[data-theme="arthouse"]
+[data-mode="dark"]             Semantic tokens → var(--color-{named-color})
+[data-mode="vibrant"]          Semantic tokens → var(--color-{named-color})
+[data-mode="light"]            Semantic tokens → var(--color-{named-color})
     │
     ▼
 Components                     Use ONLY semantic tokens (var(--color-*))
 ```
 
-### 7.2 Named Colors (`:root`)
+### 8.2 Client-Managed Color System
 
-These are the only place hex values appear. The actual palette will be developed with the client, but the structure is:
+The client is a visual artist — opinionated about color, not technical. Rather than going back and forth over hex values in CSS files, **the entire color palette and mode assignments are data-driven through the CMS**.
 
-```css
-:root {
-  /* Neutrals */
-  --color-ink: #0A0A0A;
-  --color-charcoal: #1A1A2E;
-  --color-slate: #2D2D44;
-  --color-ash: #6B7280;
-  --color-silver: #D1D5DB;
-  --color-cloud: #F3F4F6;
-  --color-snow: #FFFFFF;
+The client sees color pickers and dropdowns. The build generates CSS. She never touches code.
 
-  /* Brand — TBD with client */
-  --color-brand-primary: #???;
-  --color-brand-accent: #???;
-  --color-brand-warm: #???;
+```
+WHAT THE CLIENT SEES IN CMS              WHAT THE BUILD GENERATES
+===============================          =========================
 
-  /* Functional */
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-}
+"My Colors" collection:
+
+  ink         [■ #0A0A0A]                :root {
+  deep-night  [■ #141531]                  --color-ink: #0A0A0A;
+  slate       [■ #2D2D44]                  --color-deep-night: #141531;
+  ash         [■ #6B7280]                  --color-slate: #2D2D44;
+  silver      [■ #D1D5DB]                  --color-ash: #6B7280;
+  cloud       [■ #F3F4F6]                  --color-silver: #D1D5DB;
+  snow        [■ #FFFFFF]                  --color-cloud: #F3F4F6;
+  brand-blue  [■ #0052E6]                  --color-snow: #FFFFFF;
+  electric    [■ #60A5FA]                  --color-brand-blue: #0052E6;
+  warm-coral  [■ #F97066]                  --color-electric: #60A5FA;
+                                           --color-warm-coral: #F97066;
+         ▼ color picker widget             }
+
+"Dark Mode" assignments:
+
+  Surface:     deep-night  ▼             [data-mode="dark"] {
+  Surface Alt: slate       ▼               --color-surface: var(--color-deep-night);
+  Text:        snow        ▼               --color-surface-raised: var(--color-slate);
+  Text Muted:  ash         ▼               --color-text: var(--color-snow);
+  Primary:     brand-blue  ▼               --color-text-muted: var(--color-ash);
+  Accent:      electric    ▼               --color-primary: var(--color-brand-blue);
+  Border %:    10          ▼               --color-accent: var(--color-electric);
+                                           --color-border: color-mix(in srgb,
+         ▼ dropdown of her named colors        var(--color-snow) 10%, transparent);
+                                         }
 ```
 
-### 7.3 Mode Definitions
+#### 8.2.1 Color Palette Data File
 
-#### Dark Mode (Default)
+**`src/content/theme/colors.md`**:
+```yaml
+---
+colors:
+  # Neutrals
+  - name: ink
+    hex: "#0A0A0A"
+    description: "Deepest black"
+  - name: deep-night
+    hex: "#141531"
+    description: "Dark blue-black, main dark background"
+  - name: slate
+    hex: "#2D2D44"
+    description: "Raised surfaces in dark mode"
+  - name: ash
+    hex: "#6B7280"
+    description: "Muted text, subtle elements"
+  - name: silver
+    hex: "#D1D5DB"
+    description: "Light borders, muted text in dark modes"
+  - name: cloud
+    hex: "#F3F4F6"
+    description: "Light mode surfaces"
+  - name: snow
+    hex: "#FFFFFF"
+    description: "Pure white — text on dark, backgrounds in light"
 
-```css
-[data-theme="arthouse"][data-mode="dark"] {
-  --color-surface: var(--color-ink);
-  --color-surface-raised: var(--color-charcoal);
-  --color-text: var(--color-snow);
-  --color-text-muted: var(--color-ash);
-  --color-primary: var(--color-brand-primary);
-  --color-accent: var(--color-brand-accent);
-  --color-border: color-mix(in srgb, var(--color-snow) 10%, transparent);
+  # Brand — the client picks these
+  - name: brand-blue
+    hex: "#0052E6"
+    description: "Primary brand color"
+  - name: electric
+    hex: "#60A5FA"
+    description: "Bright accent, links, highlights"
+  - name: warm-coral
+    hex: "#F97066"
+    description: "Warm accent for vibrant mode"
 
-  /* Transparent image backdrop */
-  --color-transparent-bg: var(--color-charcoal);
-  --color-transparent-checker: var(--color-slate);
-}
+  # Functional (client can change but probably shouldn't)
+  - name: success
+    hex: "#10B981"
+    description: "Success states"
+  - name: warning
+    hex: "#F59E0B"
+    description: "Warning states"
+  - name: error
+    hex: "#EF4444"
+    description: "Error states"
+---
 ```
 
-#### Vibrant Mode
+The client can:
+- **Change any hex value** via the color picker — instant palette update across all modes
+- **Add new named colors** — they become available in mode assignment dropdowns
+- **Remove colors** — but only if no mode references them (build warns if orphaned)
+- **Rename colors** — the `name` is the key; the `description` is just a hint for the CMS
 
-```css
-[data-theme="arthouse"][data-mode="vibrant"] {
-  --color-surface: var(--color-charcoal);
-  --color-surface-raised: var(--color-slate);
-  --color-text: var(--color-snow);
-  --color-text-muted: var(--color-silver);
-  --color-primary: var(--color-brand-primary);    /* brighter variant */
-  --color-accent: var(--color-brand-warm);
-  --color-border: color-mix(in srgb, var(--color-brand-accent) 30%, transparent);
+#### 8.2.2 Mode Assignment Data File
 
-  /* Vibrant mode gets gradient or saturated backdrop for transparent images */
-  --color-transparent-bg: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-brand-primary) 20%, var(--color-charcoal)),
-    color-mix(in srgb, var(--color-brand-accent) 15%, var(--color-charcoal))
-  );
-  --color-transparent-checker: none;
-}
+**`src/content/theme/modes.md`**:
+```yaml
+---
+dark:
+  surface: deep-night
+  surface_raised: slate
+  text: snow
+  text_muted: ash
+  primary: brand-blue
+  accent: electric
+  border_color: snow
+  border_opacity: 10
+  transparent_bg: slate
+  transparent_checker: ash
+
+vibrant:
+  surface: deep-night
+  surface_raised: slate
+  text: snow
+  text_muted: silver
+  primary: brand-blue
+  accent: warm-coral
+  border_color: electric
+  border_opacity: 30
+  transparent_bg: deep-night
+  transparent_checker: none
+
+light:
+  surface: snow
+  surface_raised: cloud
+  text: ink
+  text_muted: ash
+  primary: brand-blue
+  accent: warm-coral
+  border_color: ink
+  border_opacity: 10
+  transparent_bg: cloud
+  transparent_checker: silver
+---
 ```
 
-#### Light Mode (Simple)
+Each value is a **named color reference** (matching a `name` from `colors.md`), not a hex value. The client assigns colors to roles using dropdown menus populated from her named color list.
 
-```css
-[data-theme="arthouse"][data-mode="light"] {
-  --color-surface: var(--color-snow);
-  --color-surface-raised: var(--color-cloud);
-  --color-text: var(--color-ink);
-  --color-text-muted: var(--color-ash);
-  --color-primary: var(--color-brand-primary);
-  --color-accent: var(--color-brand-accent);
-  --color-border: color-mix(in srgb, var(--color-ink) 10%, transparent);
+#### 8.2.3 Semantic Roles (Fixed by Developer)
 
-  /* Light mode: subtle gray for transparent images */
-  --color-transparent-bg: var(--color-cloud);
-  --color-transparent-checker: color-mix(in srgb, var(--color-silver) 50%, transparent);
-}
+The client can change *which color fills each role*, but the roles themselves are fixed. This is the developer boundary — adding a new semantic role requires a code change.
+
+| Role | CSS Variable | Description |
+|------|-------------|-------------|
+| `surface` | `--color-surface` | Page background |
+| `surface_raised` | `--color-surface-raised` | Cards, nav, elevated surfaces |
+| `text` | `--color-text` | Primary text |
+| `text_muted` | `--color-text-muted` | Secondary text, captions |
+| `primary` | `--color-primary` | Primary brand color, CTA buttons |
+| `accent` | `--color-accent` | Links, highlights, hover states |
+| `border_color` | `--color-border` | Border base color (combined with `border_opacity`) |
+| `border_opacity` | (percentage) | How opaque borders are (via `color-mix()`) |
+| `transparent_bg` | `--color-transparent-bg` | Backdrop for transparent images |
+| `transparent_checker` | `--color-transparent-checker` | Secondary backdrop pattern (or `none`) |
+
+#### 8.2.4 Build-Time CSS Generation
+
+An Astro component (or a build-time utility) reads both data files and generates the CSS:
+
+```
+src/content/theme/colors.md  ─┐
+                               ├──▶  ThemeGenerator (build time)  ──▶  <style> in BaseLayout
+src/content/theme/modes.md   ─┘
+
+ThemeGenerator pseudo-logic:
+
+1. Read colors.md → for each color, emit:
+     :root { --color-{name}: {hex}; }
+
+2. Read modes.md → for each mode, for each role, emit:
+     [data-theme="arthouse"][data-mode="{mode}"] {
+       --color-{role}: var(--color-{referenced-name});
+     }
+
+3. For border: emit color-mix():
+     --color-border: color-mix(in srgb,
+       var(--color-{border_color}) {border_opacity}%, transparent);
+
+4. For transparent_checker = "none": emit --color-transparent-checker: none;
+   Otherwise: emit as var(--color-{name})
 ```
 
-### 7.4 Transparent Image Rendering
+The generated CSS follows the same hierarchy as hardcoded CSS would — the only difference is the values come from data files instead of being written by hand.
+
+#### 8.2.5 CMS Configuration for Theme
+
+Added to `public/admin/config.yml`:
+
+```yaml
+  # ── Theme: Named Colors ──────────────────────────────────
+  - name: theme-colors
+    label: "My Colors"
+    file: src/content/theme/colors.md
+    fields:
+      - name: colors
+        label: "Color Palette"
+        widget: list
+        fields:
+          - { name: name, label: "Color Name", widget: string,
+              hint: "Lowercase with dashes: brand-blue, warm-coral" }
+          - { name: hex, label: "Color", widget: color }
+          - { name: description, label: "Description", widget: string,
+              required: false,
+              hint: "What is this color for? Helps you remember." }
+
+  # ── Theme: Mode Assignments ──────────────────────────────
+  - name: theme-modes
+    label: "Color Modes"
+    file: src/content/theme/modes.md
+    fields:
+      - name: dark
+        label: "Dark Mode"
+        widget: object
+        fields:
+          - { name: surface, label: "Background", widget: string,
+              hint: "Named color for page background" }
+          - { name: surface_raised, label: "Card / Nav Background",
+              widget: string }
+          - { name: text, label: "Text", widget: string }
+          - { name: text_muted, label: "Muted Text", widget: string }
+          - { name: primary, label: "Primary / CTA", widget: string }
+          - { name: accent, label: "Accent / Links", widget: string }
+          - { name: border_color, label: "Border Color", widget: string }
+          - { name: border_opacity, label: "Border Opacity %",
+              widget: number, min: 0, max: 100, default: 10 }
+          - { name: transparent_bg, label: "Transparent Image Backdrop",
+              widget: string }
+          - { name: transparent_checker, label: "Transparent Checker",
+              widget: string,
+              hint: "Named color, or 'none' to disable" }
+      - name: vibrant
+        label: "Vibrant Mode"
+        widget: object
+        fields:
+          - { name: surface, label: "Background", widget: string }
+          - { name: surface_raised, label: "Card / Nav Background",
+              widget: string }
+          - { name: text, label: "Text", widget: string }
+          - { name: text_muted, label: "Muted Text", widget: string }
+          - { name: primary, label: "Primary / CTA", widget: string }
+          - { name: accent, label: "Accent / Links", widget: string }
+          - { name: border_color, label: "Border Color", widget: string }
+          - { name: border_opacity, label: "Border Opacity %",
+              widget: number, min: 0, max: 100, default: 30 }
+          - { name: transparent_bg, label: "Transparent Image Backdrop",
+              widget: string }
+          - { name: transparent_checker, label: "Transparent Checker",
+              widget: string }
+      - name: light
+        label: "Light Mode"
+        widget: object
+        fields:
+          - { name: surface, label: "Background", widget: string }
+          - { name: surface_raised, label: "Card / Nav Background",
+              widget: string }
+          - { name: text, label: "Text", widget: string }
+          - { name: text_muted, label: "Muted Text", widget: string }
+          - { name: primary, label: "Primary / CTA", widget: string }
+          - { name: accent, label: "Accent / Links", widget: string }
+          - { name: border_color, label: "Border Color", widget: string }
+          - { name: border_opacity, label: "Border Opacity %",
+              widget: number, min: 0, max: 100, default: 10 }
+          - { name: transparent_bg, label: "Transparent Image Backdrop",
+              widget: string }
+          - { name: transparent_checker, label: "Transparent Checker",
+              widget: string }
+```
+
+> **Future improvement**: The mode assignment fields currently use `string` widgets where the client types a named color. Ideally these would be `select` widgets dynamically populated from the color palette. Sveltia CMS may support this via variable references or a custom widget — worth investigating at implementation time. Even without dynamic dropdowns, the client can reference her color names listed in the "My Colors" section next door in the CMS sidebar.
+
+### 8.3 What the Client Can and Cannot Change
+
+| Can Change (via CMS) | Cannot Change (requires developer) |
+|----------------------|-----------------------------------|
+| Any hex value in the palette | Adding new semantic roles |
+| Add / remove / rename colors | The CSS generation logic |
+| Which color fills each role per mode | Component-level color usage |
+| Border opacity per mode | How `color-mix()` is applied |
+| Transparent image backdrop per mode | New modes beyond dark/vibrant/light |
+
+This gives the client full creative control over the visual palette while keeping the structural integrity of the theme system. She can experiment with colors endlessly — every save triggers a Vercel deploy and she sees the result in about a minute.
+
+### 8.4 Transparent Image Rendering
 
 This is a critical feature — the client frequently uses images with transparent backgrounds (logos, portraits with removed backgrounds, graphic shapes).
 
 **The problem**: A transparent PNG on a dark background looks different than on a light background. A portrait cutout that looks dramatic on dark can look muddy on vibrant. A logo designed for white backgrounds becomes invisible on light mode.
 
-**The solution**: `ImageWithTransparency` applies a mode-aware backdrop behind transparent images:
+**The solution**: `ImageWithTransparency` applies a mode-aware backdrop behind transparent images. The backdrop colors are **client-configurable** via the `transparent_bg` and `transparent_checker` mode assignments (see Section 8.2.2).
 
 ```
 ┌─ ImageWithTransparency ─────────────────────┐
@@ -1423,18 +1630,18 @@ This is a critical feature — the client frequently uses images with transparen
 └──────────────────────────────────────────────┘
 ```
 
-**Rendering rules per mode**:
+**Default rendering rules per mode** (client can change these via CMS):
 
-| Mode | Background | Effect |
-|------|-----------|--------|
-| Dark | Solid `--color-charcoal` | Clean contrast, no distraction |
-| Vibrant | Subtle brand-tinted gradient | Visually rich, matches vibrant energy |
-| Light | Solid `--color-cloud` | Neutral, clean |
+| Mode | Background | Checker | Effect |
+|------|-----------|---------|--------|
+| Dark | `slate` | `ash` | Clean contrast, subtle depth |
+| Vibrant | `deep-night` | `none` | Clean, lets vibrant accent colors shine |
+| Light | `cloud` | `silver` | Neutral, soft |
 
 **For non-transparent images**: The backdrop container is not rendered. The image displays normally edge-to-edge.
 
 **How `transparent` is determined**:
-1. Explicitly: `transparent: true` in frontmatter
+1. Explicitly: `transparent: true` in image frontmatter
 2. By file extension heuristic: `.png` files get a subtle fallback treatment; `.jpg`/`.webp` do not
 3. The author can always override with `transparent: false` on a PNG that doesn't need it
 
@@ -1442,7 +1649,7 @@ This is a critical feature — the client frequently uses images with transparen
 
 ## 9. Image Pipeline
 
-### 8.1 Source Formats
+### 9.1 Source Formats
 
 | Format | Use Case | Notes |
 |--------|----------|-------|
@@ -1451,7 +1658,7 @@ This is a critical feature — the client frequently uses images with transparen
 | WebP | Build-time optimization target | Astro generates WebP from JPEG/PNG |
 | AVIF | Progressive enhancement | Serve where browser supports |
 
-### 8.2 Build-Time Optimization
+### 9.2 Build-Time Optimization
 
 Using Astro's built-in `<Image>` component (backed by Sharp):
 
@@ -1471,7 +1678,7 @@ Astro <Image> at build time
 <picture> element with srcset + sizes
 ```
 
-### 8.3 Loading Strategy
+### 9.3 Loading Strategy
 
 | Context | Strategy | Details |
 |---------|----------|---------|
@@ -1481,7 +1688,7 @@ Astro <Image> at build time
 | Lightbox images | On-demand | Fetch full-res only when lightbox opens |
 | Thumbnails | Lazy + tiny placeholder | 20px blurred placeholder inline, swap on load |
 
-### 8.4 Image Storage
+### 9.4 Image Storage
 
 Portfolio images live in `public/images/portfolio/[category]/` for simplicity. For larger collections in the future, a CDN (Cloudinary, Vercel Image Optimization) could replace local storage without changing the component API — just swap `src` paths.
 
@@ -1489,7 +1696,7 @@ Portfolio images live in `public/images/portfolio/[category]/` for simplicity. F
 
 ## 10. Mobile-First Responsive Strategy
 
-### 9.1 Breakpoints
+### 10.1 Breakpoints
 
 ```
 Mobile:   0 — 639px    (default / base styles)
@@ -1497,7 +1704,7 @@ Tablet:   640 — 1023px
 Desktop:  1024px+
 ```
 
-### 9.2 Layout Behavior by Breakpoint
+### 10.2 Layout Behavior by Breakpoint
 
 | Component | Mobile | Tablet | Desktop |
 |-----------|--------|--------|---------|
@@ -1510,7 +1717,7 @@ Desktop:  1024px+
 | VerticalSwipe | Full viewport scroll | Not used | Not used |
 | Footer | Stacked | 2-column | 3-column |
 
-### 9.3 Touch Interactions
+### 10.3 Touch Interactions
 
 | Gesture | Component | Action |
 |---------|-----------|--------|
@@ -1524,11 +1731,11 @@ Desktop:  1024px+
 
 ## 11. SEO Strategy
 
-### 10.1 Sitemap Generation
+### 11.1 Sitemap Generation
 
 Using Astro's `@astrojs/sitemap` integration. All pages included except `/design-system/`.
 
-### 10.2 Structured Data (JSON-LD)
+### 11.2 Structured Data (JSON-LD)
 
 Portfolio items emit `ImageObject` or `Product` schema depending on whether they have pricing info:
 
@@ -1547,7 +1754,7 @@ Portfolio items emit `ImageObject` or `Product` schema depending on whether they
 }
 ```
 
-### 10.3 SEO Landing Pages
+### 11.3 SEO Landing Pages
 
 - Authored as markdown in `src/content/seo-pages/`
 - `in_nav: false` excludes from navigation component
@@ -1559,7 +1766,7 @@ Portfolio items emit `ImageObject` or `Product` schema depending on whether they
 
 ## 12. Deployment & Client Management
 
-### 11.1 Deployment
+### 12.1 Deployment
 
 ```
 arthouse-site repo (GitHub)
@@ -1583,7 +1790,7 @@ export default defineConfig({
 });
 ```
 
-### 11.2 AI-Managed Content Updates
+### 12.2 AI-Managed Content Updates
 
 Routine client requests that a Code Assistant can handle without developer involvement:
 
@@ -1628,6 +1835,13 @@ This would make the site fully self-service for the client without them ever tou
 ## Appendix A: Component File Map
 
 ```
+public/
+  admin/
+    index.html                    # Sveltia CMS loader
+    config.yml                    # CMS content model definition
+  images/
+    portfolio/                    # Portfolio images (uploaded via CMS or manually)
+    marketing/                    # Marketing page backgrounds and heroes
 src/
   components/
     flare/                        # Design-oriented coded visuals
@@ -1667,9 +1881,7 @@ src/
     index.astro
     portfolio/
       index.astro
-      [category]/
-        index.astro
-        [slug].astro
+      [slug].astro
     services/
       index.astro
     contact/
@@ -1694,8 +1906,16 @@ src/
       standard.md
       premium.md
     seo-pages/
+    pages/                            # Marketing page content (home, contact, about, etc.)
+      home.md
+      contact.md
+      about.md
+      services.md
+    theme/                            # Client-managed color system
+      colors.md                       # Named color palette (CMS color picker)
+      modes.md                        # Mode assignments (CMS dropdowns)
   styles/
-    theme.css                     # Named colors + mode definitions
+    theme.css                     # GENERATED from theme/colors.md + modes.md at build time
     global.css                    # Base styles, typography, resets
 ```
 
