@@ -2,7 +2,9 @@
 title: "Maintain Themes and Modes Across CSS and Tailwind"
 lede: "Implementation blueprint for dual-axis theme and mode control using Tailwind CSS v4 custom properties, with runtime utilities and Vitest verification."
 date_created: 2025-11-15
-date_modified: 2025-12-15
+date_modified: 2026-04-20
+use_index: 2
+date_last_updated: 2026-04-20
 status: Published
 category: Blueprints
 tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens]
@@ -313,7 +315,266 @@ When porting or extending this system, keep these conventions:
 
 ---
 
-## 8. Next-Step Considerations
+## 8. Mode-Aware Brand Mark Component
+
+### 8.1 Why It's Needed
+
+Brand marks (logos, wordmarks, trademarks) are typically designed for a specific background contrast. A white wordmark disappears on a white background; a dark wordmark disappears on a dark background. When a site supports multiple modes (light, dark, vibrant), the brand mark in the header, footer, or hero must swap automatically to remain legible.
+
+This cannot be solved with CSS `filter` or `mix-blend-mode` alone — brand marks often have specific color treatments per mode (e.g., a blue-on-white version for light mode vs. a white-on-transparent version for dark mode). The solution is a wrapper component that renders both image variants and uses CSS to toggle visibility based on the active `data-mode` attribute.
+
+### 8.2 SiteBrandMarkModeWrapper Component
+
+**File (per site):** `src/components/ui/SiteBrandMarkModeWrapper.astro`
+
+**Reference implementations:**
+- **Banner VC (emblem theme):** Handles three modes (light, dark, vibrant). Accepts logo paths as props.
+- **The Water Foundation (water theme):** Handles two modes (light, dark). Hardcodes logo paths internally.
+
+The Banner VC version is the more portable pattern — it accepts image paths as props so the same component works for any brand mark placement (header, footer, OG images, etc.).
+
+**Props interface:**
+
+```ts
+interface Props {
+  lightSrc: string;   // Image path shown in light mode
+  darkSrc: string;    // Image path shown in dark & vibrant modes
+  alt?: string;
+  class?: string;
+  width?: number | string;
+  height?: number | string;
+}
+```
+
+**Component template:**
+
+```astro
+<div class:list={['brand-mark-wrapper relative', className]}>
+  <img
+    src={lightSrc}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="eager"
+    decoding="async"
+    fetchpriority="high"
+    class="brand-mark-light w-full h-full object-contain"
+  />
+  <img
+    src={darkSrc}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="eager"
+    decoding="async"
+    fetchpriority="high"
+    class="brand-mark-dark w-full h-full object-contain"
+  />
+</div>
+```
+
+**CSS toggle rules (global scope):**
+
+```css
+/* Default (light mode): show light mark */
+.brand-mark-wrapper .brand-mark-light { display: block; }
+.brand-mark-wrapper .brand-mark-dark  { display: none; }
+
+/* Dark + Vibrant: show dark mark */
+html[data-mode="dark"] .brand-mark-wrapper .brand-mark-light,
+html[data-mode="vibrant"] .brand-mark-wrapper .brand-mark-light { display: none; }
+
+html[data-mode="dark"] .brand-mark-wrapper .brand-mark-dark,
+html[data-mode="vibrant"] .brand-mark-wrapper .brand-mark-dark { display: block; }
+```
+
+### 8.3 Usage in Header
+
+```astro
+---
+import SiteBrandMarkModeWrapper from '../ui/SiteBrandMarkModeWrapper.astro';
+---
+
+<a href="/" aria-label="Home">
+  <SiteBrandMarkModeWrapper
+    lightSrc="/brand/trademarks__MyBrand--Dark.webp"
+    darkSrc="/brand/trademarks__MyBrand--Light.webp"
+    alt="My Brand"
+    height={40}
+  />
+</a>
+```
+
+### 8.4 How It Works with the Mode System
+
+The component relies entirely on the `data-mode` attribute that the **ModeToggle** (§4) sets on `<html>`. The flow:
+
+1. User clicks mode toggle → `document.documentElement.dataset.mode` updates (e.g., `"vibrant"`).
+2. CSS selector `html[data-mode="vibrant"] .brand-mark-wrapper .brand-mark-light` matches → hides light image.
+3. CSS selector `html[data-mode="vibrant"] .brand-mark-wrapper .brand-mark-dark` matches → shows dark image.
+4. The `transition-theme` timing (75ms) from `global.css` applies, so the swap feels instant.
+
+No JavaScript is needed inside the component — it's pure CSS driven by the same `data-mode` contract that powers all theme tokens.
+
+### 8.5 Design Decisions & Conventions
+
+- **Props over hardcoding:** Accept `lightSrc` / `darkSrc` as props so the component is reusable across header, footer, and any other brand placement.
+- **No `!important`:** The `html[data-mode="..."]` ancestor selector provides sufficient specificity without needing `!important` overrides.
+- **No `.dark` class fallback:** Sites using the `data-mode` system (§4) should rely on `data-mode` exclusively. The Tailwind `.dark` class is a separate concern for Tailwind utility dark variants, not for component-level toggling.
+- **Vibrant groups with dark:** Both dark and vibrant modes typically use dark backgrounds, so they share the same brand mark variant. If a future mode needs a third variant, add a `vibrantSrc` prop and a third CSS rule.
+- **`loading="eager"` + `fetchpriority="high"`:** Brand marks are above the fold and should not be lazy-loaded. Both images are loaded eagerly; only one is visible at a time via `display: none/block`.
+- **`is:global` styles:** Required because the CSS selectors reference `html[data-mode]`, which is outside the component's scoped style boundary.
+
+### 8.6 Porting Checklist
+
+When adding this component to a new Astro-Knots site:
+
+1. Copy `SiteBrandMarkModeWrapper.astro` into `src/components/ui/`.
+2. Ensure your site's layout sets `data-mode` on `<html>` (via `BaseThemeLayout` or equivalent).
+3. Prepare two brand mark images — one for light backgrounds, one for dark.
+4. Place images in `public/brand/` following the naming convention: `trademarks__BrandName--Variant.webp`.
+5. Update your Header (or other consumer) to import and use the component with the correct paths.
+6. If your site only has two modes (light/dark), remove the `html[data-mode="vibrant"]` selectors.
+
+---
+
+## 9. Effect Tokens (`--fx-*`) and Mode-Adaptive Visual Intensity
+
+### 9.1 The Problem
+
+Semantic color tokens (`--color-primary`, `--color-surface`, etc.) handle text, backgrounds, and borders well. But visual effects — glows, shadows, gradients, animated elements — need their own tokens because their intensity should **scale with the mode**:
+
+- **Light mode**: Minimal effects. Subtle shadows, no glows, clean surfaces.
+- **Dark mode**: Moderate effects. Soft glows, gradient backgrounds, gentle text shadows.
+- **Vibrant mode**: Maximum impact. Dramatic glows, multi-layer gradients, animated elements in high-contrast colors.
+
+Without dedicated effect tokens, developers hardcode `box-shadow: 0 0 40px rgba(0, 82, 230, 0.3)` in one mode and it looks wrong in the other two.
+
+### 9.2 The `--fx-*` Token Convention
+
+Effect tokens use the `--fx-` prefix to distinguish them from semantic color tokens (`--color-*`). They are defined per mode alongside the color tokens:
+
+```css
+/* Each mode sets these — same names, different intensities */
+[data-theme="emblem"][data-mode="light"] {
+  --fx-glow-opacity: 0.08;
+  --fx-glow-spread: 10px;
+  --fx-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --fx-flare-color: var(--color-brand-blue-deep);
+}
+
+[data-theme="emblem"][data-mode="dark"] {
+  --fx-glow-opacity: 0.25;
+  --fx-glow-spread: 25px;
+  --fx-card-shadow: 0 0 0 1px color-mix(in srgb, var(--color-background) 60%, black);
+  --fx-flare-color: var(--color-brand-blue-bright);
+}
+
+[data-theme="emblem"][data-mode="vibrant"] {
+  --fx-glow-opacity: 0.5;
+  --fx-glow-spread: 50px;
+  --fx-card-shadow: 0 2px 12px color-mix(in srgb, var(--color-graphite-950) 30%, transparent);
+  --fx-flare-color: var(--color-electric);
+}
+```
+
+### 9.3 Canonical Effect Token Names
+
+These token names are the contract between the theme and components. A component author uses these tokens; a theme author sets their values per mode. When porting to a new site, you only change the values — the component code stays the same.
+
+**Glow & shadow intensity:**
+| Token | Purpose |
+|-------|---------|
+| `--fx-glow-opacity` | Base glow opacity (0–1) |
+| `--fx-glow-spread` | Glow spread radius |
+| `--fx-glow-color` | Glow color (use `color-mix()` with named colors) |
+| `--fx-text-shadow` | Text shadow for headlines |
+| `--fx-text-glow` | Text glow (multi-layer for vibrant) |
+
+**Card effects:**
+| Token | Purpose |
+|-------|---------|
+| `--fx-card-bg` | Card background (translucent surface) |
+| `--fx-card-border` | Card border color |
+| `--fx-card-border-hover` | Card border on hover |
+| `--fx-card-shadow` | Card shadow at rest |
+| `--fx-card-shadow-hover` | Card shadow on hover |
+
+**Hero & gradient backgrounds:**
+| Token | Purpose |
+|-------|---------|
+| `--fx-hero-gradient` | Gradient overlay for hero sections |
+| `--fx-hero-bg` | Hero background color |
+| `--fx-headline-gradient` | Text gradient for headlines |
+
+**Decorative elements:**
+| Token | Purpose |
+|-------|---------|
+| `--fx-orb-color` | Decorative orb/blob color |
+| `--fx-flare-color` | Color for animated flare components (Three.js flags, etc.) |
+
+### 9.4 Why `--fx-flare-color` Exists
+
+Interactive canvas elements (Three.js, WebGL, Canvas 2D) resolve CSS variables once at construction time and bake the value into their rendering pipeline. Unlike CSS-styled elements, they don't automatically re-read variables when the mode changes.
+
+`--fx-flare-color` solves the contrast problem: each mode picks a color that's guaranteed to be visible against that mode's background. The flare component resolves this token via `getComputedStyle()` and observes `data-mode` changes via `MutationObserver` to update the rendered color live.
+
+**Per-mode contrast mapping:**
+
+| Mode | Background | `--fx-flare-color` | Why |
+|------|-----------|-------------------|-----|
+| Light | Light/ivory | Deep brand color | Dark on light |
+| Dark | Dark navy | Bright brand color | Bright on dark |
+| Vibrant | Saturated brand color | Lighter accent | Must differ from bg hue/lightness |
+
+### 9.5 How Components Use Effect Tokens
+
+**CSS components** reference `--fx-*` tokens directly:
+
+```css
+.card {
+  background: var(--fx-card-bg, var(--color-surface));
+  border: 1px solid var(--fx-card-border, var(--color-border));
+  box-shadow: var(--fx-card-shadow);
+}
+
+.card:hover {
+  border-color: var(--fx-card-border-hover, var(--color-border));
+  box-shadow: var(--fx-card-shadow-hover);
+}
+```
+
+**Canvas/Three.js components** resolve tokens at init and watch for mode changes:
+
+```ts
+// Resolve CSS variable at construction
+const raw = container.dataset.pixelColor || '#ffffff'; // e.g. "var(--fx-flare-color)"
+const resolved = resolveColor(raw);
+
+// Watch for mode changes
+new MutationObserver(() => {
+  const newColor = resolveColor(raw);
+  material.color.set(newColor);
+}).observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ['data-mode'],
+});
+```
+
+### 9.6 Porting to a New Site
+
+The beauty of canonical token names: when setting up a new site's theme, you copy the token names and set new values. Components that reference `--fx-flare-color` or `--fx-card-shadow` work immediately — no component code changes needed.
+
+1. Copy the `--fx-*` token block from a reference site's theme CSS.
+2. Update the values to match the new brand's named colors.
+3. Ensure each mode provides sufficient contrast for its background.
+4. Components that use `--fx-*` tokens work out of the box.
+
+The same principle applies across all Astro-Knots sites: the token names are the stable API, the values are brand-specific configuration.
+
+---
+
+## 10. Next-Step Considerations
 
 For future refinement and for alignment with the original spec’s ambitions:
 
