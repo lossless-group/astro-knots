@@ -48,6 +48,18 @@ For instance, we could set up OpenClaw, Hermes, or even basic MCP servers to hel
 - **Our stack** — Astro (SSG), Svelte (interactivity), Tailwind (styling), no React
 - **Content managed through markdown** — portfolio items, galleries, SEO pages, pricing, and site copy are markdown files with YAML frontmatter
 
+### 1.3 Referenced Blueprints
+
+This specification describes *what* arthouse-site needs and how the content model works. For the *how* of recurring technical patterns — theming, styling architecture, Open Graph — we maintain shared **Blueprints** that are iterated across all Astro-Knots sites. Blueprints go into more detail on conventions and practices than a site specification should. Where this spec touches on a blueprinted topic, it references the blueprint rather than re-explaining the full pattern.
+
+| Blueprint | Path | Relevance to This Spec |
+|-----------|------|----------------------|
+| **Maintain Themes & Modes Across CSS and Tailwind** | `context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md` | The dual-axis theme/mode system (Section 8) follows this blueprint's conventions: `data-theme` and `data-mode` attributes on `<html>`, named colors as the single source of truth, semantic tokens referencing named colors via `var()`, Tailwind v4 `@theme` integration, and `localStorage` persistence for mode toggle. The client-managed color system (Section 8.2) is an extension of this blueprint — it makes the named colors and mode assignments data-driven via CMS rather than hardcoded in CSS. |
+| **Styles Architecture Blueprint** | `context-v/blueprints/Styles-Architecture-Blueprint.md` | Defines the CSS architecture pattern: named brand colors → derived scales → semantic tokens → three display modes (light, dark, vibrant). arthouse-site follows this same layered architecture. The Styles Architecture Blueprint also establishes how Tailwind config stays light while CSS custom properties do the heavy lifting — important for keeping the client-managed color system simple. |
+| **Maintain an Elegant Open Graph System** | `context-v/blueprints/Maintain-an-Elegant-Open-Graph-System.md` | The OG/SEO system (Section 11) follows this blueprint's approach to platform-optimized link previews. Especially relevant for arthouse-site because the client's primary distribution channel is WhatsApp — link previews in messaging apps are the first impression. The blueprint covers image sizing, fallback strategies, and per-page metadata structure. |
+
+Implementors should read the referenced blueprints before building the corresponding features. The blueprints are the authoritative source for pattern details; this spec only covers arthouse-site-specific decisions and deviations.
+
 ---
 
 ## 2. Goal
@@ -1295,9 +1307,15 @@ Renders `<title>`, `<meta description>`, `<meta og:*>`, `<link rel="canonical">`
 
 ## 8. Theme & Mode System
 
+> **Blueprints**: This section implements the patterns defined in two shared blueprints. Read these before implementation:
+> - `context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md` — dual-axis theme/mode control, `data-theme`/`data-mode` attributes, localStorage persistence, Tailwind v4 integration
+> - `context-v/blueprints/Styles-Architecture-Blueprint.md` — named brand colors → derived scales → semantic tokens → three display modes
+>
+> What's **specific to arthouse-site** is the client-managed color system (Section 8.2) — the color hierarchy and mode architecture come from the blueprints; the CMS-driven data layer is this site's extension.
+
 ### 8.1 Architecture
 
-Following the Astro-Knots color hierarchy (see `context-v/reminders/Improvising-within-Design-System-Color-Palettes.md`):
+Following the Astro-Knots color hierarchy (see `context-v/reminders/Improvising-within-Design-System-Color-Palettes.md` and the blueprints above):
 
 ```
 src/content/theme/colors.md    Client-editable named colors (via CMS color picker)
@@ -1730,6 +1748,8 @@ Desktop:  1024px+
 ---
 
 ## 11. SEO Strategy
+
+> **Blueprint**: The Open Graph and social sharing system follows `context-v/blueprints/Maintain-an-Elegant-Open-Graph-System.md`. That blueprint covers platform-optimized link previews, image sizing, fallback strategies, and per-page metadata structure. Especially important for arthouse-site because the client's primary distribution channel is **WhatsApp** — link previews in messaging apps are the brand's first impression.
 
 ### 11.1 Sitemap Generation
 
