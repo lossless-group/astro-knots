@@ -23,3 +23,7 @@
 [submodule "sites/mpstaton-site"]
 	path = sites/mpstaton-site
 	url = https://github.com/lossless-group/mpstaton-site.git
+[submodule "sites/arthouse-site"]
+	path = sites/arthouse-site
+	url = https://github.com/lossless-group/arthouse-site.git
+	branch = main

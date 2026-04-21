@@ -8,6 +8,7 @@ packages:
   - sites/banner-site
   - sites/dark-matter
   - sites/mpstaton-site
+  - sites/arthouse-site
   - design-system-viewer
 
 onlyBuiltDependencies:
