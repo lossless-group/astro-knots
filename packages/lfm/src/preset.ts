@@ -22,6 +22,22 @@ import type { RemarkLfmOptions } from './types/index.js';
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
+/**
+ * The Lossless Flavored Markdown preset for unified/remark.
+ *
+ * Chains together GFM, directives, callouts, and citations into a single
+ * `.use(remarkLfm)` call. Each sub-plugin can be toggled via options.
+ *
+ * @example
+ * ```ts
+ * import { unified } from 'unified';
+ * import remarkParse from 'remark-parse';
+ * import { remarkLfm } from '@lossless-group/lfm';
+ *
+ * const processor = unified().use(remarkParse).use(remarkLfm);
+ * const tree = await processor.run(processor.parse(markdown));
+ * ```
+ */
 export const remarkLfm: Plugin<[RemarkLfmOptions?], Root> = function (options?: RemarkLfmOptions) {
   const opts: Required<RemarkLfmOptions> = {
     gfm: true,

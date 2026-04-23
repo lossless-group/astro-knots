@@ -14,6 +14,22 @@ import type { Plugin } from 'unified';
 
 const CALLOUT_REGEX = /^\[!(\w+)\]\s*(.*)?$/;
 
+/**
+ * Remark plugin that transforms Obsidian-style callouts (`> [!type] Title`)
+ * into `containerDirective` nodes with `name: 'callout'`.
+ *
+ * This normalizes Obsidian callout syntax so that downstream renderers handle
+ * both `> [!warning]` and `:::callout{type="warning"}` identically.
+ *
+ * @example
+ * ```ts
+ * import { unified } from 'unified';
+ * import remarkParse from 'remark-parse';
+ * import { remarkCallouts } from '@lossless-group/lfm';
+ *
+ * const processor = unified().use(remarkParse).use(remarkCallouts);
+ * ```
+ */
 export const remarkCallouts: Plugin<[], Root> = function () {
   return (tree: Root) => {
     visitBlockquotes(tree);

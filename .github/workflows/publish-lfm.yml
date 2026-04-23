@@ -1,0 +1,62 @@
+name: Publish LFM
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to publish'
+        required: true
+        type: choice
+        options:
+          - jsr
+          - github-packages
+          - both
+
+jobs:
+  publish-jsr:
+    if: inputs.target == 'jsr' || inputs.target == 'both'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+
+      - name: Publish to JSR
+        run: cd packages/lfm && deno publish
+
+  publish-npm:
+    if: inputs.target == 'github-packages' || inputs.target == 'both'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: cd packages/lfm && pnpm install
+
+      - name: Build
+        run: cd packages/lfm && pnpm build
+
+      - name: Publish to GitHub Packages
+        run: cd packages/lfm && pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

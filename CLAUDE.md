@@ -136,6 +136,136 @@ Sites need an `.npmrc` to find `@lossless-group` packages:
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
+### Implementing @lossless-group/lfm in a New Site
+
+This is the step-by-step guide for adding LFM markdown rendering to any site in the monorepo. The reference implementation is `mpstaton-site`.
+
+#### Step 1: Install the package
+
+For **deployed sites** (production), install from the registry:
+```bash
+pnpm add @lossless-group/lfm
+```
+
+The site needs an `.npmrc` to find the package:
+```
+@lossless-group:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+For **local development only**, you can link the workspace version to get unreleased changes:
+```bash
+pnpm add @lossless-group/lfm --workspace
+```
+This sets the dependency to `workspace:^` — **you must change it back to a version range before deploying**, or the site won't build outside the monorepo.
+
+#### Step 2: Parse markdown in your page
+
+In any Astro page that renders markdown content:
+
+```astro
+---
+import { parseMarkdown } from '@lossless-group/lfm';
+
+// Get your markdown content however your site loads it
+const tree = await parseMarkdown(entry.body);
+
+// Citations are attached to the tree after parsing
+const citations = (tree as any).data?.citations?.ordered ?? [];
+---
+```
+
+`parseMarkdown()` returns an MDAST tree with all LFM extensions applied:
+- GFM (tables, strikethrough, task lists, footnotes)
+- Directives (`:::name{attr="value"}`)
+- Obsidian callouts (`> [!type] Title` → directive nodes)
+- Citations (hex-code footnote renumbering, structured definition parsing)
+
+#### Step 3: Copy the AstroMarkdown renderer
+
+Copy the recursive MDAST-to-JSX renderer from `mpstaton-site`:
+
+```bash
+# From the astro-knots root:
+cp sites/mpstaton-site/src/components/markdown/AstroMarkdown.astro sites/YOUR_SITE/src/components/markdown/
+```
+
+This component walks the MDAST tree and renders each node type (paragraph, heading, list, link, code, table, footnoteReference, directives, etc.) as Astro/JSX. It handles 20+ node types.
+
+**Key node types to know about:**
+- `footnoteReference` — renders as superscript `[n]` using `node.data.citationIndex`
+- `footnoteDefinition` — suppressed (rendered via Sources component instead)
+- `containerDirective` with `name === "callout"` — renders via a Callout component
+- `containerDirective` with `name === "image"` — renders via a MarkdownImage component
+
+**You will likely want to customize this component** for your site's design. That's expected — it's a copy-and-adapt pattern, not a shared dependency.
+
+#### Step 4: Copy the Sources component
+
+```bash
+cp sites/mpstaton-site/src/components/markdown/Sources.astro sites/YOUR_SITE/src/components/markdown/
+```
+
+This renders the citation list at the bottom of a page. It receives `citations` (an array of `Citation` objects) and renders a numbered list with linked titles, source domains, and published dates.
+
+#### Step 5: Wire it into your page template
+
+```astro
+---
+import { parseMarkdown } from '@lossless-group/lfm';
+import AstroMarkdown from '../components/markdown/AstroMarkdown.astro';
+import Sources from '../components/markdown/Sources.astro';
+
+const tree = await parseMarkdown(markdownContent);
+const citations = (tree as any).data?.citations?.ordered ?? [];
+---
+
+<article class="prose">
+  <AstroMarkdown node={tree} />
+</article>
+
+<Sources citations={citations} />
+```
+
+#### Step 6: Optional — Copy supporting components
+
+If your site needs callouts or image directives, copy those too:
+
+```bash
+cp sites/mpstaton-site/src/components/markdown/Callout.astro sites/YOUR_SITE/src/components/markdown/
+cp sites/mpstaton-site/src/components/markdown/CodeBlock.astro sites/YOUR_SITE/src/components/markdown/
+cp sites/mpstaton-site/src/components/markdown/MarkdownImage.astro sites/YOUR_SITE/src/components/markdown/
+```
+
+Then update the imports in your copied `AstroMarkdown.astro` to point to your local paths.
+
+#### What the LFM pipeline does to footnotes
+
+Authors write hex-code footnotes in markdown:
+```markdown
+Global aging is accelerating.[^a1b2c3]
+Healthcare costs are rising.[^d4e5f6]
+
+[^a1b2c3]: 2024. [Population Ageing](https://example.com). Published: 2024-07-11
+[^d4e5f6]: 2025. [Key Drivers of Cost](https://example.com). Published: 2024-11-22
+```
+
+The `remarkCitations` plugin (part of the LFM pipeline) transforms this:
+1. `[^a1b2c3]` → `footnoteReference` node with `data.citationIndex = 1`
+2. `[^d4e5f6]` → `footnoteReference` node with `data.citationIndex = 2`
+3. `footnoteDefinition` nodes are removed from the tree
+4. `tree.data.citations.ordered` contains parsed Citation objects with title, URL, source domain, dates
+
+The renderer then displays `[1]` and `[2]` inline, and the Sources component renders the full citation list at the bottom.
+
+#### Dependencies note
+
+`@lossless-group/lfm` bundles its own dependencies (unified, remark-parse, remark-gfm, remark-directive). You do **not** need to install those separately. The only dependency your site needs is `@lossless-group/lfm` itself, plus `mdast-util-to-string` if your AstroMarkdown component uses it for heading IDs.
+
+```bash
+pnpm add @lossless-group/lfm mdast-util-to-string
+```
+
 ## Pattern Packages (`@knots/*`)
 
 These are workspace-local reference implementations that you copy from and adapt. They are NOT published and NOT imported as runtime dependencies.

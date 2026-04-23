@@ -1,6 +1,6 @@
 {
   "name": "@lossless-group/lfm",
-  "version": "0.1.3",
+  "version": "0.2.1",
   "description": "Lossless Flavored Markdown — a polyglot extended markdown pipeline for remark/rehype",
   "license": "MIT",
   "exports": {
@@ -17,5 +17,9 @@
     "remark-directive": "npm:remark-directive@^3.0.0",
     "mdast": "npm:@types/mdast@^4.0.0"
   },
-  "nodeModulesDir": "auto"
+  "nodeModulesDir": "auto",
+  "unstable": ["sloppy-imports", "bare-node-builtins", "byonm"],
+  "compilerOptions": {
+    "strict": true
+  }
 }

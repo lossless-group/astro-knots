@@ -47,14 +47,23 @@ These are real packages that sites install as dependencies:
 - **Source:** `packages/lfm/`
 - **Spec:** `context-v/specs/Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Package.md`
 
-Bundles unified, remark-parse, remark-gfm, remark-directive, and custom plugins (remark-callouts). One import:
+Bundles unified, remark-parse, remark-gfm, remark-directive, and custom plugins into a single import:
+
+- **remark-callouts** — Normalizes Obsidian `> [!type] Title` callouts into directive nodes
+- **remark-citations** — Transforms hex-code/numeric footnote identifiers (`[^a1b2c3]`) into sequentially-numbered citations with structured metadata parsing (title, URL, source, dates)
 
 ```ts
 import { parseMarkdown } from '@lossless-group/lfm';
 const tree = await parseMarkdown(markdownContent);
+
+// Citations are attached to the tree after parsing
+const citations = tree.data?.citations?.ordered ?? [];
+// Each citation has: index, title, url, source, publishedDate, raw
 ```
 
-Currently used by mpstaton-site for context-v document rendering. Will be adopted by other sites as the content rendering pipeline matures.
+**What the citations plugin does:** Authors write stable hex-code footnotes that never need renumbering when inserting/reordering. The plugin assigns sequential display numbers by order of first appearance, parses structured definitions into typed metadata, and attaches the full citation dataset to `tree.data.citations` for renderers to consume.
+
+Currently used by mpstaton-site for content rendering. Being adopted by other sites (twf_site next).
 
 ## Pattern Packages (`@knots/*`)
 

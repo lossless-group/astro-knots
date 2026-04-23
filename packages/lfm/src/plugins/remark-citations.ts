@@ -12,6 +12,10 @@
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
 
+/**
+ * A single parsed citation with sequential index, structured metadata, and raw text.
+ * Built by `remarkCitations` from `footnoteReference` and `footnoteDefinition` MDAST nodes.
+ */
 export interface Citation {
   /** The original identifier from the markdown */
   identifier: string;
@@ -37,18 +41,36 @@ export interface Citation {
   parsed: boolean;
 }
 
+/**
+ * A validation warning emitted by `remarkCitations` during processing.
+ * Warnings are collected in `CitationsData.warnings` and logged to console.
+ */
 export interface CitationWarning {
+  /** The category of validation issue detected. */
   type: 'orphan-reference' | 'unused-definition' | 'duplicate-url';
+  /** The footnote identifier that triggered the warning. */
   identifier: string;
+  /** Human-readable description of the issue. */
   message: string;
 }
 
+/**
+ * The full citation dataset attached to `tree.data.citations` after processing.
+ * Contains the citation map, an ordered array for rendering, and any validation warnings.
+ */
 export interface CitationsData {
+  /** Lookup map from identifier to Citation object. */
   map: Map<string, Citation>;
+  /** Citations sorted by sequential index, ready for rendering a Sources section. */
   ordered: Citation[];
+  /** Validation warnings (orphan references, unused definitions, etc.). */
   warnings: CitationWarning[];
 }
 
+/**
+ * Configuration options for the `remarkCitations` plugin.
+ * All options are optional — sensible defaults are applied.
+ */
 export interface RemarkCitationsOptions {
   /** 'hex' | 'numeric' | 'mixed' — default: 'mixed' */
   identifiers?: 'hex' | 'numeric' | 'mixed';
@@ -201,6 +223,25 @@ function enrichReferences(node: any, indexMap: Map<string, number>): void {
   }
 }
 
+/**
+ * Remark plugin that transforms footnote identifiers into sequentially-numbered
+ * citations with structured metadata. Runs after `remark-gfm`.
+ *
+ * Enriches `footnoteReference` nodes with `data.citationIndex`, removes
+ * `footnoteDefinition` nodes, and attaches a `CitationsData` object to `tree.data.citations`.
+ *
+ * @example
+ * ```ts
+ * import { unified } from 'unified';
+ * import remarkParse from 'remark-parse';
+ * import remarkGfm from 'remark-gfm';
+ * import { remarkCitations } from '@lossless-group/lfm';
+ *
+ * const processor = unified().use(remarkParse).use(remarkGfm).use(remarkCitations);
+ * const tree = await processor.run(processor.parse(markdown));
+ * // tree.data.citations.ordered contains sequentially-numbered Citation objects
+ * ```
+ */
 export const remarkCitations: Plugin<[RemarkCitationsOptions?], Root> = function (
   options?: RemarkCitationsOptions
 ) {

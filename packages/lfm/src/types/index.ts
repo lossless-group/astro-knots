@@ -1,9 +1,16 @@
 /**
- * LFM custom MDAST node types.
+ * @module
+ *
+ * LFM custom MDAST node types and configuration options.
  *
  * These are standalone type definitions that describe the shape of nodes
  * produced by LFM plugins. They don't extend mdast types directly to
  * maintain compatibility with JSR and other TypeScript-first registries.
+ *
+ * @example Importing types
+ * ```ts
+ * import type { LfmComponentNode, RemarkLfmOptions } from '@lossless-group/lfm/types';
+ * ```
  */
 
 /**
@@ -13,11 +20,17 @@
  * layer sees them.
  */
 export interface LfmComponentNode {
+  /** MDAST node type identifier. Always `'componentNode'`. */
   type: 'componentNode';
+  /** The component name (e.g., `'callout'`, `'card-grid'`, `'image'`). */
   name: string;
+  /** Key-value attributes parsed from the trigger syntax. */
   attributes: Record<string, string>;
+  /** Which syntax was used to trigger this component in the source markdown. */
   triggerSyntax: 'directive' | 'markdoc' | 'mdx-lite' | 'code-fence' | 'obsidian-callout' | 'auto-unfurl';
+  /** Raw inner content before child parsing, if applicable. */
   rawContent?: string;
+  /** Parsed child nodes. */
   children?: unknown[];
 }
 
@@ -27,12 +40,18 @@ export interface LfmComponentNode {
  * produce this same node shape.
  */
 export interface LfmCalloutNode {
+  /** MDAST node type. Always `'containerDirective'`. */
   type: 'containerDirective';
+  /** Directive name. Always `'callout'`. */
   name: 'callout';
+  /** Callout attributes parsed from the source syntax. */
   attributes: {
+    /** The callout type (e.g., `'warning'`, `'tip'`, `'note'`). */
     type: string;
+    /** Optional title displayed in the callout header. */
     title?: string;
   };
+  /** Parsed child nodes forming the callout body. */
   children?: unknown[];
 }
 
