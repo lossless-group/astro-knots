@@ -7,6 +7,7 @@ export default defineConfig({
     'preset': 'src/preset.ts',
     'types/index': 'src/types/index.ts',
     'plugins/remark-callouts': 'src/plugins/remark-callouts.ts',
+    'plugins/remark-citations': 'src/plugins/remark-citations.ts',
   },
   format: ['esm'],
   dts: true,

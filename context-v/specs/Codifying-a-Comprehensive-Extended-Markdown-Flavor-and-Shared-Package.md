@@ -524,13 +524,114 @@ Features that are implemented in at least one site but may change in syntax or b
 
 #### 4.11 Image Directives
 
+The `::image` directive renders images as rich `<figure>` elements with optional captions, source attribution, and textbook-style float/wrap layouts. The design philosophy is **write the minimum, get something good** — most attributes are optional with sensible defaults, so authors only add attributes when something doesn't look right.
+
+**Simplest usage** (block figure, full width, caption below):
+
 ```markdown
-::image{src="/images/screenshot.png" alt="Dashboard" width="600" caption="The new dashboard design"}
+::image{src="/images/chart.png" alt="Market sizing" caption="GLP-1 projection through 2030"}
 ```
 
-**Rendering**: `<figure>` with `<img>` and `<figcaption>`. Supports responsive sizing, lazy loading, optional lightbox.
+**Floated with source attribution** (image anchors right, caption auto-positions left, text wraps):
 
-Standard markdown images (`![alt](src)`) also work but don't support captions or advanced sizing.
+```markdown
+::image{src="/images/chart.png" alt="Market sizing" float="right" caption="GLP-1 projection" source="Goldman Sachs Research" source-url="https://gs.com/research/glp1"}
+```
+
+**Full control** (rarely needed — only when defaults don't look right):
+
+```markdown
+::image{src="/images/mobile-app.png" alt="Onboarding flow" float="left" width="50%" min-width="400px" max-height="500px" caption="Onboarding flow v2" caption-width="40%" source="Internal design team"}
+```
+
+Standard markdown images (`![alt](src)`) also work but don't support captions, floating, or source attribution.
+
+##### Attribute Reference
+
+| Attribute | Required | Type | Default |
+|-----------|----------|------|---------|
+| `src` | yes | path or URL | — |
+| `alt` | yes | text | — |
+| `float` | no | `left`, `right` | none (block figure) |
+| `width` | no | percentage | `100%` for block, `40%` for floated |
+| `min-width` | no | pixels | component default breakpoint |
+| `max-height` | no | pixels | none |
+| `caption` | no | plain text | none |
+| `caption-position` | no | `bottom`, `top`, `side` | `bottom` for block; auto-side for floated |
+| `caption-width` | no | percentage of figure | `33%` (applies only when caption is on the side) |
+| `source` | no | text | none |
+| `source-url` | no | URL | none (source renders as plain text) |
+| `source-position` | no | `top`, `bottom` | `bottom`; auto-flips to `top` if caption is also at bottom |
+
+##### Sizing Model
+
+- **`width`** is always a percentage of the content column, never pixels. The image scales proportionally.
+- **`min-width`** is in pixels and acts as a **breakpoint**: when the computed width of the figure falls below this value, floated images automatically unfloat and render as full-width block figures. If omitted, the component uses a sensible default breakpoint. This ensures images with fine detail or embedded text remain legible on smaller viewports.
+- **`max-height`** constrains tall/narrow images (mobile screenshots, vertical infographics) from dominating the page. The image scales down to fit within the constraint while maintaining its aspect ratio.
+
+##### Auto-Layout Rules
+
+The image directive uses automatic layout logic so authors don't need to think about positioning unless they want to override:
+
+**Caption positioning:**
+- `float="left"` → caption automatically goes to the **right** of the image
+- `float="right"` → caption automatically goes to the **left** of the image
+- No float (block) → caption goes to the **bottom** (standard figure behavior)
+- The `caption-position` attribute overrides any of these defaults when explicitly set.
+
+**Caption sizing:**
+- When caption is on the side, it takes **1/3 of the figure container** by default (image takes 2/3). Set `caption-width` to override.
+- When caption is on top or bottom, it spans the full figure width.
+- Caption font size uses `clamp(8pt, 2cqi, 14pt)` — scales with the figure container, minimum 8pt, maximum 14pt. No author-facing attribute; baked into the component.
+
+**Source attribution positioning:**
+- Defaults to **bottom** of the figure.
+- Automatically flips to **top** if caption is also at bottom, so they never compete for the same position.
+- Renders as "Source: {text}" in small type. If `source-url` is provided, the source name becomes a link.
+
+**Responsive behavior:**
+- Floated images automatically unfloat to full-width block layout when the viewport is too narrow for the float to work (controlled by `min-width` or the component's default breakpoint).
+- When an image unfloats, side captions move to bottom and the figure behaves like a standard block figure.
+
+##### Layout Examples
+
+**Floated right with side caption (desktop):**
+
+```
+Wrapping text continues here on the    ┌─────────────────────────┐
+left side of the content column,       │ ┌───────────┬──────────┐│
+flowing naturally around the figure.   │ │           │ Caption  ││
+The figure anchors to the right edge   │ │  [IMAGE]  │ text on  ││
+of the content column.                 │ │           │ the left ││
+                                       │ ├───────────┴──────────┤│
+                                       │ │ Source: Goldman Sachs ││
+                                       │ └──────────────────────┘│
+                                       └─────────────────────────┘
+```
+
+**Block figure with bottom caption (source flips to top):**
+
+```
+┌──────────────────────────────────────────┐
+│ Source: Goldman Sachs Research            │
+├──────────────────────────────────────────┤
+│                                          │
+│                [IMAGE]                   │
+│                                          │
+├──────────────────────────────────────────┤
+│ GLP-1 market projection showing $130B    │
+│ addressable market by 2030.              │
+└──────────────────────────────────────────┘
+```
+
+##### Rendering
+
+The `::image` directive renders as a `<figure>` element containing:
+- The `<img>` with `alt`, lazy loading, and responsive sizing
+- A `<figcaption>` for the caption (when present)
+- A source attribution element (when present)
+- CSS layout using flexbox for side-caption arrangements and CSS `float` for text wrapping
+- Container query-based font sizing for captions
 
 #### 4.12 Zero-Friction Media Embeds
 
@@ -1592,6 +1693,70 @@ pnpx jsr publish --allow-dirty
 **Future: npm public registry**
 
 When the package is stable enough for external users, we can additionally publish to the public npm registry. Nothing changes for our sites — just an additional publish target.
+
+### 6.2.1 Rendering Layer Distribution: Parser vs. Renderer Boundary
+
+**The architectural split**: `@lossless-group/lfm` is a *parser* — it takes markdown and produces an MDAST tree. Turning that tree into HTML requires a *renderer*, which is framework-specific (Astro components, Svelte components, React components, etc.) and inherently site-customizable (every site wants different styling, layout, and component choices).
+
+This creates a distribution question: how do sites get the rendering layer?
+
+**Current state (as of 2026-04):** Each site owns its own `AstroMarkdown.astro` renderer and directive-specific components (`MarkdownImage.astro`, `Callout.astro`, `CodeBlock.astro`, etc.). These are copied from reference implementations in `packages/astro/` and adapted per-site.
+
+**Three options under consideration:**
+
+#### Option A: CLI Scaffolding
+
+A `pnpx @lossless-group/lfm init` command that copies starter `.astro` files into the site's `src/components/markdown/` directory. The site then owns the files and can customize freely.
+
+```bash
+pnpx @lossless-group/lfm init --framework astro
+# Creates:
+#   src/components/markdown/AstroMarkdown.astro
+#   src/components/markdown/MarkdownImage.astro
+#   src/components/markdown/Callout.astro
+#   src/components/markdown/CodeBlock.astro
+```
+
+*Pros*: Aligned with copy-and-adapt philosophy. Site owns the code. No runtime dependency on a component package. Authors can see and modify everything.
+
+*Cons*: No automatic updates when new features are added to LFM. Sites diverge over time (which may be desirable or not). Requires maintaining a CLI tool.
+
+#### Option B: Published Astro Integration Package
+
+A separate `@lossless-group/lfm-astro` package that exports `.astro` components as importable dependencies. Sites import components rather than copying them.
+
+```typescript
+import { AstroMarkdown } from '@lossless-group/lfm-astro';
+import { MarkdownImage, Callout, CodeBlock } from '@lossless-group/lfm-astro/components';
+```
+
+*Pros*: Sites automatically get new features and bug fixes via version bumps. Single source of truth for rendering behavior. Less per-site maintenance.
+
+*Cons*: Harder to customize per-site — every styling override requires the component to support it via props or CSS custom properties. Creates a second published package to maintain. Fights the principle that rendering is inherently site-specific. Astro component packages have some ecosystem friction (not all bundlers handle `.astro` imports from `node_modules` cleanly).
+
+#### Option C: Pattern Package (`@knots/astro`)
+
+Keep rendering components in the existing `packages/astro/` workspace package as reference implementations. Sites copy from there when setting up markdown rendering. This is the current `@knots/*` copy-pattern approach.
+
+```bash
+# Copy the reference implementation into your site
+cp packages/astro/src/components/markdown/*.astro sites/my-site/src/components/markdown/
+# Adapt to your site's needs
+```
+
+*Pros*: Already how the project works. No new tooling or packages needed. Reference implementations are always visible in the monorepo for comparison.
+
+*Cons*: "Copy when you remember" tends toward "never copy." No mechanism for notifying sites when reference implementations improve. Only works for developers working within the astro-knots monorepo — external users can't access `packages/astro/`.
+
+#### Which Option When?
+
+These options are not mutually exclusive:
+
+- **For internal sites (astro-knots monorepo)**: Option C works fine — developers can see and copy from `packages/astro/`.
+- **For external adopters**: Option A (CLI scaffolding) is the friendliest onboarding experience.
+- **For teams that want managed updates**: Option B provides the tightest integration, at the cost of customizability.
+
+The recommendation is to start with **Option C** (which already works) and add **Option A** when external adoption becomes a goal. Option B should only be pursued if demand from external users justifies the maintenance cost of a second published package.
 
 ### 6.3 Package Structure
 

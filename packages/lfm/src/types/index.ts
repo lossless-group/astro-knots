@@ -46,4 +46,6 @@ export interface RemarkLfmOptions {
   gfm?: boolean;
   /** Enable directive syntax parsing. Default: true */
   directives?: boolean;
+  /** Enable citation processing (hex-code renumbering, structured definitions). Default: true */
+  citations?: boolean;
 }

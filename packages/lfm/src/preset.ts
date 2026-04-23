@@ -17,6 +17,7 @@
 import remarkGfm from 'remark-gfm';
 import remarkDirective from 'remark-directive';
 import { remarkCallouts } from './plugins/remark-callouts.js';
+import { remarkCitations } from './plugins/remark-citations.js';
 import type { RemarkLfmOptions } from './types/index.js';
 import type { Root } from 'mdast';
 import type { Plugin } from 'unified';
@@ -26,6 +27,7 @@ export const remarkLfm: Plugin<[RemarkLfmOptions?], Root> = function (options?: 
     gfm: true,
     directives: true,
     callouts: true,
+    citations: true,
     ...options,
   };
 
@@ -42,6 +44,11 @@ export const remarkLfm: Plugin<[RemarkLfmOptions?], Root> = function (options?: 
 
   if (opts.callouts) {
     plugins.push(remarkCallouts as Plugin);
+  }
+
+  // Citations must come after gfm (which creates footnote nodes)
+  if (opts.citations) {
+    plugins.push(remarkCitations as Plugin);
   }
 
   // Attach each plugin to `this` (the unified processor)

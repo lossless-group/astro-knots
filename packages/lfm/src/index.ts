@@ -34,6 +34,9 @@ export { remarkLfm } from './preset.js';
 /** Obsidian callout normalizer — transforms `> [!type]` into directive nodes. */
 export { remarkCallouts } from './plugins/remark-callouts.js';
 
+/** Citation processor — hex-code renumbering, structured definition parsing. */
+export { remarkCitations } from './plugins/remark-citations.js';
+
 export type {
   /** Normalized component node produced by all trigger syntaxes. */
   LfmComponentNode,
@@ -42,3 +45,14 @@ export type {
   /** Options for the remarkLfm preset. */
   RemarkLfmOptions,
 } from './types/index.js';
+
+export type {
+  /** A single parsed citation with index, metadata, and raw text. */
+  Citation,
+  /** The full citation dataset attached to tree.data.citations. */
+  CitationsData,
+  /** A validation warning from the citation processor. */
+  CitationWarning,
+  /** Options for the remarkCitations plugin. */
+  RemarkCitationsOptions,
+} from './plugins/remark-citations.js';
