@@ -2,12 +2,12 @@
 title: "Maintain Themes and Modes Across CSS and Tailwind"
 lede: "Implementation blueprint for dual-axis theme and mode control using Tailwind CSS v4 custom properties, with runtime utilities and Vitest verification."
 date_created: 2025-11-15
-date_modified: 2026-04-20
+date_modified: 2026-04-25
 use_index: 2
-date_last_updated: 2026-04-20
+date_last_updated: 2026-04-25
 status: Published
 category: Blueprints
-tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens]
+tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens, Named-Tokens, BEM-Conventions, Two-Tier-Tokens]
 authors:
   - Michael Staton
 ---
@@ -30,12 +30,11 @@ This document is the **implementation-grounded** version of that idea.
   - **Theme**: brand palettes (`default`, `water`, etc.)
   - **Mode**: `light` / `dark` / `vibrant`
 - **Single source of truth for color scales** using Tailwind CSS v4 `@theme` + CSS custom properties.
+- **Two-tier token architecture** (full detail in §2.1): raw **named tokens** (`--color__blue-azure`, `--font__lato`) at the top of each theme file act as the brand's palette of "things we have"; **semantic tokens** (`--color-primary`, `--font-heading-1`) are the system layer Tailwind consumes and components reference. Clients iterate at the named-token tier without touching component code.
 - **Client-agnostic conventions**:
   - `theme-*` classes on `html` for brand themes.
   - `data-theme` and `data-mode` attributes for state and CSS hooks.
-  - Tailwind utilities always read from `--color-*` variables, not hardcoded hex/RGB.
-  - Important brand and theme colors will have a single source of truth and be named `--color-lavendar`, `--color-cobalt`, `--color-rose`, etc. rather than `--color-primary`, `--color-secondary`, etc. 
-  - Then, `--color-primary`, `--color-secondary`, etc. will reference named colors from the theme specific css file. 
+  - Tailwind utilities always read from `--color-*` semantic variables, not hardcoded hex/RGB.
 - **Robust runtime utilities** with:
   - LocalStorage persistence.
   - Safe SSR behavior (no crashes when `window` / `document` are absent).
@@ -48,9 +47,77 @@ This document is the **implementation-grounded** version of that idea.
 
 ---
 
-## 2. Theme & Color Architecture
+## 2. Token Architecture (Colors & Typography)
 
-### 2.1 Tailwind v4 Color Variables
+### 2.1 Two-Tier Token System: Named & Semantic Tokens
+
+We use **two tiers** of design tokens, distinguished by naming convention. This is the core motion that lets clients iterate quickly without invasive refactors.
+
+**Tier 1 — Named tokens** (raw values, private to the theme):
+
+- BEM-ish syntax: `--{category}__{name}`
+- Examples: `--color__blue-azure`, `--color__rose-quartz`, `--color__graphite-950`, `--font__lato`, `--font__playfair-display`
+- Live at the **top of each theme.css file** as the brand's palette of "things we have."
+- Components do **not** reference these directly — only the semantic tier does.
+- The `__` separator is a deliberate visual cue: this is a raw value, not a semantic role.
+
+**Tier 2 — Semantic tokens** (the system layer Tailwind consumes):
+
+- kebab-case: `--{category}-{role}` and `--{category}-{role}-{scale}`
+- Examples: `--color-primary`, `--color-primary-500`, `--color-surface`, `--color-border`, `--font-heading-1`, `--font-body`
+- Defined in the **system / theme block** of each theme.css file. Each semantic token references a named token via `var()`.
+- Tailwind v4's `@theme` directive only auto-generates utilities (`bg-primary-500`, `text-primary-500`) for kebab-case tokens — that's the practical constraint forcing this tier to stay kebab-case.
+- Effect tokens (`--fx-*`, see §9) are also semantic-tier — components consume them as a contract.
+
+**The visual rule:** see `__` → raw named token. See only `-` → semantic token (Tailwind-readable, what components use).
+
+### 2.1.1 Why Two Tiers? — The Client Iteration Motion
+
+Clients iterate by saying "I don't like the primary color" or "the border feels off" or "can we try a different display font?" The two-tier system reduces every such request to a one-line wiring change:
+
+1. Find a new color/font the client likes.
+2. Add it to the named tokens list at the top of `theme.css`: `--color__sky-cerulean: #2596be;`
+3. Re-point the affected semantic token: `--color-primary: var(--color__sky-cerulean);`
+
+Components don't change. Tailwind utilities don't change. Type-safe component contracts don't break. Only the wiring changes.
+
+The alternative — search-and-replacing hex values across the codebase, or renaming semantic tokens — is invasive and error-prone. The two-tier system absorbs all that churn at the wiring layer.
+
+### 2.1.2 Wiring Example
+
+```css
+/* Top of theme.css — Tier 1: named tokens */
+:root {
+  --color__blue-azure: #1f7ae0;
+  --color__rose-quartz: #f7cac9;
+  --color__graphite-950: #0d1117;
+  --color__ivory-warm: #faf6f1;
+
+  --font__lato: 'Lato', system-ui, sans-serif;
+  --font__playfair-display: 'Playfair Display', Georgia, serif;
+  --font__jetbrains-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* System / theme section — Tier 2: semantic tokens */
+.theme-default {
+  --color-primary: var(--color__blue-azure);
+  --color-primary-500: var(--color__blue-azure);
+  --color-surface: var(--color__graphite-950);
+  --color-background: var(--color__ivory-warm);
+
+  --font-heading-1: var(--font__playfair-display);
+  --font-body: var(--font__lato);
+  --font-code: var(--font__jetbrains-mono);
+}
+```
+
+Components and Tailwind utilities only ever read from Tier 2. Tier 1 is implementation detail.
+
+### 2.1.3 Notes on Identifier Syntax
+
+CSS allows `[a-zA-Z0-9_-]` (plus escaped Unicode) in identifiers, so `--color__blue-azure` is valid CSS — the underscore is fine. The `--` prefix is the CSS custom property requirement; the `__` after the category is the BEM element separator. Names within the element slot (`blue-azure`, `playfair-display`) may contain hyphens — this is a pragmatic relaxation of strict BEM, since CSS identifiers commonly hyphenate multi-word terms.
+
+### 2.2 Tailwind v4 Color Variables
 
 Hypernova uses Tailwind v4 with `@theme`-style color variables. For IDE support there is a dedicated helper file:
 
@@ -65,7 +132,7 @@ Key ideas:
 - These act as the **default theme** colors.
 - Tailwind utilities (e.g. `text-primary-600`) are wired to these variables via the Tailwind v4 `@theme` configuration (see original spec for the conceptual mapping).
 
-### 2.2 Brand Theme Overrides (Water, Nova, Matter)
+### 2.3 Brand Theme Overrides (Water, Nova, Matter)
 
 Hypernova defines a **`theme-nova`** class
 The Water foundation defines a **theme-water** class
@@ -73,15 +140,45 @@ Dark Matter will have a **theme-matter** class
 
 The theme settings will determine which theme style tokens, which overrides any generic or conflicting tokens in other style files.
 
-- `.theme-water { --color-primary-*; --color-secondary-*; --color-accent-*; }`
+- `.theme-water { --color-primary: var(--color__teal-deep); /* etc. */ }`
 - Applied to `html` via the theme switcher, e.g. `class="theme-water"`.
-- Because Tailwind utilities read from `--color-*`, **all components automatically adopt the active theme**.
+- Because Tailwind utilities read from semantic `--color-*` tokens, **all components automatically adopt the active theme**.
 
 This gives a clean layering:
 
-1. **Base palette**: `:root` `--color-*` values.
-2. **Theme overrides**: `.theme-default`, `.theme-matter`, etc.
+1. **Named palette**: `:root` `--color__*` and `--font__*` values (Tier 1, §2.1).
+2. **Theme bindings**: `.theme-default`, `.theme-matter`, etc. — wire semantic tokens (Tier 2) to named tokens.
 3. **Tailwind utilities**: semantic classes that are stable across themes.
+
+### 2.4 Typography Tokens
+
+The same two-tier system applies to fonts:
+
+**Named tokens (Tier 1)** — the typefaces the brand actually uses:
+
+```css
+:root {
+  --font__lato: 'Lato', system-ui, sans-serif;
+  --font__inter: 'Inter', system-ui, sans-serif;
+  --font__playfair-display: 'Playfair Display', Georgia, serif;
+  --font__jetbrains-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+```
+
+**Semantic tokens (Tier 2)** — the role each font plays:
+
+```css
+.theme-default {
+  --font-display: var(--font__playfair-display);
+  --font-heading-1: var(--font__playfair-display);
+  --font-body: var(--font__lato);
+  --font-code: var(--font__jetbrains-mono);
+}
+```
+
+**Naming guidance for semantic font roles:** prefer **descriptive role names** (`--font-display`, `--font-body`, `--font-legible-primary`) over **numeric scale roles** (`--font-heading-1`, `--font-subheading-3`) when the names will surface in client conversations or in the Brand Kit. "heading-1" is meaningless to a non-developer; "display" or "legible-primary" conveys intent. Both forms are acceptable — pick what fits the brand's vocabulary, and use them consistently within a site.
+
+The wiring motion is identical to colors: when a client wants to swap a font, you add the new typeface to the named tokens list and re-point the affected semantic role. No component code changes.
 
 ---
 
@@ -456,25 +553,26 @@ Effect tokens use the `--fx-` prefix to distinguish them from semantic color tok
 
 ```css
 /* Each mode sets these — same names, different intensities */
+/* `--fx-*` tokens are semantic (Tier 2). Their values reference named tokens (Tier 1) like --color__brand-blue-deep. */
 [data-theme="emblem"][data-mode="light"] {
   --fx-glow-opacity: 0.08;
   --fx-glow-spread: 10px;
   --fx-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --fx-flare-color: var(--color-brand-blue-deep);
+  --fx-flare-color: var(--color__brand-blue-deep);
 }
 
 [data-theme="emblem"][data-mode="dark"] {
   --fx-glow-opacity: 0.25;
   --fx-glow-spread: 25px;
   --fx-card-shadow: 0 0 0 1px color-mix(in srgb, var(--color-background) 60%, black);
-  --fx-flare-color: var(--color-brand-blue-bright);
+  --fx-flare-color: var(--color__brand-blue-bright);
 }
 
 [data-theme="emblem"][data-mode="vibrant"] {
   --fx-glow-opacity: 0.5;
   --fx-glow-spread: 50px;
-  --fx-card-shadow: 0 2px 12px color-mix(in srgb, var(--color-graphite-950) 30%, transparent);
-  --fx-flare-color: var(--color-electric);
+  --fx-card-shadow: 0 2px 12px color-mix(in srgb, var(--color__graphite-950) 30%, transparent);
+  --fx-flare-color: var(--color__electric);
 }
 ```
 
