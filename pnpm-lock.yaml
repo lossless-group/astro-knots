@@ -356,6 +356,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.8
         version: 0.9.8(prettier@3.7.4)(typescript@6.0.3)
+      '@lossless-group/lfm':
+        specifier: ^0.1.3
+        version: 0.1.3
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.2.4(vite@7.3.1(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
@@ -368,6 +371,9 @@ importers:
       masonry-layout:
         specifier: ^4.2.2
         version: 4.2.2
+      mdast-util-to-string:
+        specifier: ^4.0.0
+        version: 4.0.0
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.4
@@ -1437,6 +1443,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lossless-group/lfm@0.1.3':
+    resolution: {integrity: sha512-MSybpY46dqbYRtEi26T01JL5aLi8EB6g9WlycsaR0jlBrYMeXEu431jqLMp51+hudfLExX6HTP2QUG0Y/tftfA==, tarball: https://npm.pkg.github.com/download/@lossless-group/lfm/0.1.3/b4930f16c39dca2a74792d78b9b7ad062757f55e}
 
   '@mapbox/node-pre-gyp@2.0.3':
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
@@ -8005,6 +8014,15 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lossless-group/lfm@0.1.3':
+    dependencies:
+      remark-directive: 3.0.1
+      remark-gfm: 4.0.1
+      remark-parse: 11.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@mapbox/node-pre-gyp@2.0.3':
     dependencies:

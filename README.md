@@ -107,9 +107,61 @@ The `context-v/` directory contains project documentation organized by type:
 
 Sites can fetch context-v documents from multiple repos using the Context-V fetcher system. mpstaton-site displays these as browsable "Rabbit Holes."
 
+## In-Site Reference Pages: `/brand-kit` & `/design-system`
+
+Every Astro-Knots site ships with **two internal reference pages** that together replace what most teams use Storybook (or a separate Design System Manager) for. We tried those tools and found that AI assistants working inside the site's own codebase produce pages that are just as useful — often better — because components render in their real theme, mode, layout, and tokens. No drift, no parallel build.
+
+| | Brand Kit (`/brand-kit`) | Design System (`/design-system`) |
+|---|---|---|
+| **Audience** | Stakeholders, brand reviewers, marketing | Developers, AI assistants, contributors |
+| **Scope** | Brand experience essentials — colors, type, marks, signature layouts | Exhaustive component catalog with variants, props, CSS contracts |
+| **Update cadence** | Rarely — only when brand evolves | Continuously — every new component lands here |
+
+Both pages use the standard `BaseThemeLayout` and surface the theme + mode toggle so reviewers can verify all three modes (light / dark / vibrant) without leaving the page. Both emit `noindex, nofollow`.
+
+**Maintenance motion:** every new component is added to `/design-system` in the same PR that introduces it. Brand evolutions update `/brand-kit` first, before propagating elsewhere.
+
+**Full conventions:** [`context-v/blueprints/Maintain-Design-System-and-Brandkit-Motions.md`](context-v/blueprints/Maintain-Design-System-and-Brandkit-Motions.md).
+
+**Canonical references:**
+- Brand Kit: `sites/hypernova-site/src/pages/brand-kit/`, `sites/twf_site/src/pages/brand-kit/`
+- Design System: `sites/dark-matter/src/pages/design-system/`
+
 ## Design System Viewer
 
-`design-system-viewer/` — An internal tool (not deployed) for visualizing tokens, icons, and components across the workspace. Currently minimal scaffolding on Astro 6 + Tailwind 4. The aspiration is a shared micro-frontend that each site can embed, but this is an initiative waiting for bandwidth.
+`design-system-viewer/` — An older internal tool (not deployed) for visualizing tokens, icons, and components across the workspace. Currently minimal scaffolding on Astro 6 + Tailwind 4. The aspiration was a shared micro-frontend that each site could embed, but the in-site `/design-system` pattern (above) has largely superseded it. Kept around as a sandbox.
+
+## Starting a New Site
+
+See the full guide: **`context-v/prompts/New-Site-Quickstart-Guide.md`**
+
+The short version:
+1. Create a separate git repo for the site
+2. Add it as a submodule: `git submodule add <url> sites/new_site`
+3. Register in `pnpm-workspace.yaml`
+4. Install: `pnpm add astro@^6 tailwindcss@^4 @tailwindcss/vite@^4 typescript@^6`
+5. Wire up the **three-mode theme system** (light / dark / vibrant) — copy `theme-switcher.js` + `mode-switcher.js` from `sites/hypernova-site/src/utils/`. Use the **two-tier token convention**: BEM-ish named tokens (`--color__blue-azure`, `--font__lato`) at the top of `theme.css`, kebab-case semantic tokens (`--color-primary`, `--font-heading-1`) referencing them — Tailwind v4 only generates utilities for the kebab-case tier. See [Themes blueprint](context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md).
+6. Ship the **two reference pages**: `/brand-kit/index.astro` and `/design-system/index.astro`. See [Design System & Brand Kit blueprint](context-v/blueprints/Maintain-Design-System-and-Brandkit-Motions.md).
+7. (Optional) Copy markdown rendering components from `packages/lfm-astro/components/` and `parse-content.ts` from `sites/twf_site/` if the site needs LFM rendering.
+
+**Reference implementations by concern:**
+- **LFM + markdown rendering:** twf_site (cleanest, includes `parseContent` utility)
+- **Content rendering + DocCards:** mpstaton-site
+- **SEO/OG + environment config:** cilantro-site
+
+## Markdown Rendering Components (`packages/lfm-astro/`)
+
+The `packages/lfm-astro/components/` directory is the **canonical copy source** for markdown rendering components. It contains five Astro components designed to render MDAST trees produced by `@lossless-group/lfm`:
+
+| Component | Purpose |
+|-----------|---------|
+| `AstroMarkdown.astro` | Recursive MDAST renderer (20+ node types, scoped list styles for Tailwind) |
+| `Sources.astro` | Citation list with anchor links |
+| `Callout.astro` | Styled callout boxes (tip, warning, danger, etc.) |
+| `CodeBlock.astro` | Fenced code blocks with language label |
+| `MarkdownImage.astro` | Image directives with float/caption/source attribution |
+
+Copy these into your site's `src/components/markdown/` and adapt to your design. They are pattern references, not runtime imports.
 
 ## Quick Start
 

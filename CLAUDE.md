@@ -183,11 +183,12 @@ const citations = (tree as any).data?.citations?.ordered ?? [];
 
 #### Step 3: Copy the AstroMarkdown renderer
 
-Copy the recursive MDAST-to-JSX renderer from `mpstaton-site`:
+Copy the recursive MDAST-to-JSX renderer from the canonical pattern source:
 
 ```bash
 # From the astro-knots root:
-cp sites/mpstaton-site/src/components/markdown/AstroMarkdown.astro sites/YOUR_SITE/src/components/markdown/
+mkdir -p sites/YOUR_SITE/src/components/markdown
+cp packages/lfm-astro/components/AstroMarkdown.astro sites/YOUR_SITE/src/components/markdown/
 ```
 
 This component walks the MDAST tree and renders each node type (paragraph, heading, list, link, code, table, footnoteReference, directives, etc.) as Astro/JSX. It handles 20+ node types.
@@ -203,7 +204,7 @@ This component walks the MDAST tree and renders each node type (paragraph, headi
 #### Step 4: Copy the Sources component
 
 ```bash
-cp sites/mpstaton-site/src/components/markdown/Sources.astro sites/YOUR_SITE/src/components/markdown/
+cp packages/lfm-astro/components/Sources.astro sites/YOUR_SITE/src/components/markdown/
 ```
 
 This renders the citation list at the bottom of a page. It receives `citations` (an array of `Citation` objects) and renders a numbered list with linked titles, source domains, and published dates.
@@ -232,16 +233,101 @@ const citations = (tree as any).data?.citations?.ordered ?? [];
 If your site needs callouts or image directives, copy those too:
 
 ```bash
-cp sites/mpstaton-site/src/components/markdown/Callout.astro sites/YOUR_SITE/src/components/markdown/
-cp sites/mpstaton-site/src/components/markdown/CodeBlock.astro sites/YOUR_SITE/src/components/markdown/
-cp sites/mpstaton-site/src/components/markdown/MarkdownImage.astro sites/YOUR_SITE/src/components/markdown/
+cp packages/lfm-astro/components/Callout.astro sites/YOUR_SITE/src/components/markdown/
+cp packages/lfm-astro/components/CodeBlock.astro sites/YOUR_SITE/src/components/markdown/
+cp packages/lfm-astro/components/MarkdownImage.astro sites/YOUR_SITE/src/components/markdown/
 ```
 
 Then update the imports in your copied `AstroMarkdown.astro` to point to your local paths.
 
-#### What the LFM pipeline does to footnotes
+#### CRITICAL: How the citation rendering works
 
-Authors write hex-code footnotes in markdown:
+The `remarkCitations` plugin transforms the MDAST tree. Understanding this is essential for correct rendering.
+
+**What happens during `parseMarkdown()`:**
+
+1. `remark-gfm` parses `[^a1b2c3]` into `footnoteReference` nodes and `[^a1b2c3]: ...` into `footnoteDefinition` nodes
+2. `remark-citations` then:
+   - Walks the tree and collects all `footnoteReference` nodes in document order
+   - Assigns sequential indices (1, 2, 3...) by order of first appearance
+   - Enriches each `footnoteReference` node with `node.data.citationIndex` (the display number) and `node.data.citationHex` (the original identifier)
+   - Parses each `footnoteDefinition` into a structured `Citation` object (title, URL, source, dates)
+   - **REMOVES all `footnoteDefinition` nodes from the tree** — they no longer exist in the MDAST
+   - Attaches the full citation dataset to `tree.data.citations`
+
+**What this means for the renderer:**
+
+The renderer (AstroMarkdown.astro) MUST handle these two node types correctly:
+
+```astro
+{/* footnoteReference — render as superscript [n] using the ENRICHED data */}
+{type === "footnoteReference" && (() => {
+  const ref: any = node;
+  // IMPORTANT: Use data.citationIndex for the display number, NOT identifier or label
+  // identifier/label contain the raw hex code (e.g., "a1b2c3"), not the sequential number
+  const index = ref.data?.citationIndex ?? ref.identifier;
+  const hex = ref.data?.citationHex ?? ref.identifier;
+  return (
+    <sup class="citation-marker">
+      <a href={`#source-${hex}`} title={`Citation ${index}`}>[{index}]</a>
+    </sup>
+  );
+})()}
+
+{/* footnoteDefinition — MUST render as null/nothing */}
+{/* These nodes are removed by remark-citations, but if any survive, suppress them */}
+{/* The citation content is rendered separately via the Sources component */}
+{type === "footnoteDefinition" && null}
+```
+
+**Common mistakes that break citations:**
+- Using `node.identifier` or `node.label` for the display number — these contain the raw hex code, not the sequential number
+- Rendering `footnoteDefinition` nodes inline — they should be suppressed; the content lives in `tree.data.citations`
+- Not passing `tree.data.citations.ordered` to the Sources component — citations won't appear at the bottom
+- Writing a custom footnote renderer that doesn't read `node.data.citationIndex` — the whole point of the plugin is the enriched data on `node.data`
+
+**The Sources component renders the citation list at the bottom:**
+
+```astro
+---
+// Sources.astro receives the ordered citations array
+const { citations } = Astro.props;
+const sorted = [...citations].sort((a, b) => a.index - b.index);
+---
+{sorted.length > 0 && (
+  <section>
+    <h2>Sources</h2>
+    <ol>
+      {sorted.map(citation => (
+        <li id={`source-${citation.hex}`}>
+          [{citation.index}]
+          {citation.parsed && citation.url ? (
+            <a href={citation.url}>{citation.title}</a>
+          ) : (
+            <span>{citation.raw}</span>
+          )}
+          {citation.source && <span>{citation.source}</span>}
+          {citation.publishedDate && <span>Published: {citation.publishedDate}</span>}
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+```
+
+Each citation object in the `ordered` array has these fields:
+- `index` (number) — sequential display number (1, 2, 3...)
+- `hex` (string) — the original identifier for anchor linking
+- `identifier` (string) — same as hex for hex-mode
+- `title` (string?) — parsed from `[Title](URL)` in the definition
+- `url` (string?) — parsed from `[Title](URL)` in the definition
+- `source` (string?) — domain extracted from URL
+- `publishedDate` (string?) — parsed from `Published: YYYY-MM-DD`
+- `updatedDate` (string?) — parsed from `Updated: YYYY-MM-DD`
+- `raw` (string) — full raw definition text (fallback if parsing fails)
+- `parsed` (boolean) — whether structured parsing succeeded
+
+**Example markdown input:**
 ```markdown
 Global aging is accelerating.[^a1b2c3]
 Healthcare costs are rising.[^d4e5f6]
@@ -250,11 +336,10 @@ Healthcare costs are rising.[^d4e5f6]
 [^d4e5f6]: 2025. [Key Drivers of Cost](https://example.com). Published: 2024-11-22
 ```
 
-The `remarkCitations` plugin (part of the LFM pipeline) transforms this:
-1. `[^a1b2c3]` → `footnoteReference` node with `data.citationIndex = 1`
-2. `[^d4e5f6]` → `footnoteReference` node with `data.citationIndex = 2`
-3. `footnoteDefinition` nodes are removed from the tree
-4. `tree.data.citations.ordered` contains parsed Citation objects with title, URL, source domain, dates
+**Expected rendered output:**
+- Inline: `Global aging is accelerating.[1]` and `Healthcare costs are rising.[2]`
+- Sources section at page bottom: `[1] Population Ageing. example.com. Published: 2024-07-11` and `[2] Key Drivers of Cost...`
+- The `[1]` links to `#source-a1b2c3` and the Sources list item has `id="source-a1b2c3"`
 
 The renderer then displays `[1]` and `[2]` inline, and the Sources component renders the full citation list at the bottom.
 
@@ -392,6 +477,10 @@ When a site needs a pattern from packages:
 
 ### Adding a New Client Site
 
+For the full step-by-step guide covering configuration, directory structure, content collections, and LFM integration, see: **`context-v/prompts/New-Site-Quickstart-Guide.md`**
+
+The workspace setup steps:
+
 ```bash
 # 1. Create separate repo for the site
 # (done in GitHub/GitLab/etc.)
@@ -413,9 +502,78 @@ pnpm install
 cd sites/client_site
 pnpm dev  # Site works on its own
 
-# 7. Copy patterns as needed
-cp ../../packages/astro/src/components/Button.astro src/components/
+# 7. Copy markdown rendering components from the pattern reference
+mkdir -p src/components/markdown
+cp ../../packages/lfm-astro/components/*.astro src/components/markdown/
+
+# 8. Copy the parseContent utility for LFM polyfills (citations + callouts)
+mkdir -p src/lib
+cp ../twf_site/src/lib/parse-content.ts src/lib/
 ```
+
+**Reference implementations by concern:**
+- **LFM + markdown rendering:** `sites/twf_site` — cleanest implementation, includes `parseContent` utility with citation/callout polyfills
+- **Content rendering + DocCards + OG images:** `sites/mpstaton-site`
+- **SEO/OG meta + environment config + content collections architecture:** `sites/cilantro-site`
+- **Theme + Mode (3-mode: light/dark/vibrant) switcher:** `sites/hypernova-site` — canonical ThemeSwitcher + ModeSwitcher utilities and Brand Kit page
+- **Design System catalog:** `sites/dark-matter/src/pages/design-system/` — most expansive sub-page structure
+
+### CSS Token Convention (Two-Tier System)
+
+Every site uses a two-tier token architecture for colors and fonts (full spec: `context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md` §2.1):
+
+- **Named tokens** (Tier 1, raw values, private): BEM-ish syntax with `__` separator. Live at the top of `theme.css`.
+  - Examples: `--color__blue-azure`, `--color__rose-quartz`, `--font__lato`, `--font__playfair-display`
+- **Semantic tokens** (Tier 2, system layer): kebab-case. Reference named tokens via `var()`. **Tailwind v4 only generates utilities for kebab-case tokens** — this tier must stay kebab-case.
+  - Examples: `--color-primary`, `--color-primary-500`, `--font-heading-1`, `--font-body`, `--fx-glow-opacity`
+
+**Visual rule:** see `__` → raw named token. See only `-` → semantic token. Components and Tailwind utilities only ever read semantic tokens.
+
+**Client-iteration motion:** when a client wants a different color or font, add a new named token at the top and re-point one semantic token: `--color-primary: var(--color__new-name);`. Components don't change.
+
+```css
+:root {
+  --color__blue-azure: #1f7ae0;        /* Tier 1: named */
+  --font__lato: 'Lato', system-ui, sans-serif;
+}
+.theme-default {
+  --color-primary: var(--color__blue-azure);  /* Tier 2: semantic */
+  --font-body: var(--font__lato);
+}
+```
+
+When generating or modifying CSS in a site's theme files: put new raw values in the named tier, wire components through the semantic tier, never reference `--color__*` from a component.
+
+**Markdown component copy source:** Always copy from `packages/lfm-astro/components/`, not from a specific site. This is the canonical pattern reference for `AstroMarkdown.astro`, `Sources.astro`, `Callout.astro`, `CodeBlock.astro`, and `MarkdownImage.astro`. The components include scoped list styles that counter Tailwind's preflight reset — a recurring issue across all sites.
+
+## Reference Pages: `/brand-kit` & `/design-system` (Required Per Site)
+
+**Every Astro-Knots site ships two internal reference pages.** We do not use Storybook or a separate Design System Manager — AI assistants improvise pages inside the site's own theme/mode/runtime, eliminating drift.
+
+| | Brand Kit (`/brand-kit`) | Design System (`/design-system`) |
+|---|---|---|
+| **Audience** | Stakeholders, brand reviewers, client marketing | Developers, AI assistants, contributors |
+| **Scope** | Brand experience essentials (color tokens, typography, marks, signature layouts) | Exhaustive component catalog with variants, props, CSS contracts |
+| **Entry file** | `src/pages/brand-kit/index.astro` | `src/pages/design-system/index.astro` |
+| **Update cadence** | Rare — only when brand evolves | Continuous — every new component lands here |
+
+Both pages must use `BaseThemeLayout`, expose the theme + mode toggle at the top, render correctly in all three modes (light / dark / vibrant), and emit `<meta name="robots" content="noindex, nofollow" />`.
+
+**Full conventions:** `context-v/blueprints/Maintain-Design-System-and-Brandkit-Motions.md`.
+
+### Maintenance Motion (Important for AI Assistants)
+
+When you create or modify a component in any site:
+
+1. **Always update `/design-system`** (the relevant sub-page or the index) **in the same change** that introduces or modifies the component. Do not split this across PRs.
+2. If the change is a brand evolution (new token, new font, new mark) — **update `/brand-kit` first**, before propagating the change to other pages.
+3. If `/design-system/index.astro` does not yet exist for the site, create it as part of the work and add the component as the first entry. If only `component-library.astro` exists (legacy name), rename to `index.astro` while you're there.
+
+This discipline is what replaces Storybook in our workflow. Skip it and the catalog rots.
+
+**Canonical references:**
+- Brand Kit: `sites/hypernova-site/src/pages/brand-kit/`, `sites/twf_site/src/pages/brand-kit/`
+- Design System: `sites/dark-matter/src/pages/design-system/` (most expansive sub-page structure)
 
 ## Submodule Management
 
@@ -595,6 +753,7 @@ git checkout main
 5. **Respect submodules** - Each site has separate git history. Commit inside the submodule, not from the parent.
 6. **Use pnpm/pnpx exclusively** - Never npm, npx, yarn, or node directly.
 7. **Check `context-v/`** - Specs, blueprints, and prompts contain valuable context about design decisions.
+8. **Update `/design-system` when you change components** — every component introduction or variant lands in the site's `src/pages/design-system/` catalog in the same change. Update `/brand-kit` first when changing brand-level tokens. See the "Reference Pages" section above.
 
 **When deciding import vs. copy:**
 1. Is this processing logic that should be identical across sites? → **Published package** (like `@lossless-group/lfm`)

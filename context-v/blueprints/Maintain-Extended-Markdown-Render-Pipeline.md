@@ -213,6 +213,21 @@ Lossless design but with a smaller feature set.
     - Wrap with an anchor link (consistent with `rehypeAutolinkHeadings`).
   - `paragraph`, `text`, `strong`, `emphasis`: map to semantic HTML.
   - `list` / `listItem`: render UL/OL with consistent classes + spacing.
+    - **IMPORTANT — Tailwind preflight strips all list styles.** Every Astro-Knots
+      site using Tailwind will render `ul` and `ol` as flat, unstyled blocks unless
+      `AstroMarkdown.astro` explicitly restores them. The renderer MUST include
+      scoped styles for list elements:
+      - `ul`: `list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em;`
+      - `ol`: `list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em;`
+      - `li`: `margin-bottom: 0.25em;`
+      - Nested lists: `li ul` uses `circle`, `li li ul` uses `square`
+      - Nested `ol` and `ul` get reduced vertical margins (`0.25em`)
+    - These styles live in the `<style>` block of `AstroMarkdown.astro` itself —
+      not in a global stylesheet — so they travel with the component when copied
+      between sites. The canonical source is `packages/lfm-astro/components/AstroMarkdown.astro`.
+    - This is a recurring issue that has been solved ad-hoc on every site. If you
+      are setting up a new site or debugging unstyled lists in markdown content,
+      check the `AstroMarkdown.astro` `<style>` block first.
   - `link`: standard `<a>` for v1 (we can add smart embed detection later).
   - `image`: basic `<img>` with optional figure/figcaption pattern for v1.
   - `code` / `inlineCode`:

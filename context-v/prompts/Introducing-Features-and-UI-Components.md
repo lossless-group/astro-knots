@@ -7,7 +7,7 @@ date_authored_final_draft: "[]"
 date_first_published: "[]"
 date_last_updated: "[]"
 at_semantic_version: 0.0.1.0
-generated_with: Claude Code (Claude Sonnet 4.5)
+augmented_with: Claude Code (Claude Sonnet 4.5)
 category: Prompts
 date_created: 2025-11-15
 date_modified: 2025-11-16
