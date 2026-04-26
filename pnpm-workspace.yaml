@@ -9,6 +9,7 @@ packages:
   - sites/dark-matter
   - sites/mpstaton-site
   - sites/arthouse-site
+  - sites/fullstack-vc
   - design-system-viewer
 
 onlyBuiltDependencies:

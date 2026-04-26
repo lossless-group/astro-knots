@@ -27,3 +27,6 @@
 	path = sites/arthouse-site
 	url = https://github.com/lossless-group/arthouse-site.git
 	branch = main
+[submodule "sites/fullstack-vc"]
+	path = sites/fullstack-vc
+	url = https://github.com/lossless-group/fullstack-vc.git
