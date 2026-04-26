@@ -18,6 +18,12 @@ authors:
 image_prompt: "A clean architectural blueprint showing the skeleton of a website being assembled piece by piece"
 ---
 
+# Troublehsooting 2026-04-25
+
+First step should be astro init, not creating the directory?
+
+Should the mode-switcher.js be a package or in a package?  
+
 # New Site Quickstart Guide
 
 This guide walks through creating a new Astro SSG website in the astro-knots _pseudomonorepo_ from scratch. It covers workspace setup, minimal configuration, directory structure, and optionally wiring up LFM markdown rendering.
@@ -350,15 +356,23 @@ Layering:
 
 ## 6.3 Required Files to Copy
 
-From `sites/hypernova-site` (canonical reference):
+**Canonical source:** `packages/ui/theme-mode/` — the firm-wide pattern reference for the theme + mode subsystem (utilities + the chrome toggle UI).
 
 ```bash
-mkdir -p sites/new_site/src/utils
-cp sites/hypernova-site/src/utils/theme-switcher.js sites/new_site/src/utils/
-cp sites/hypernova-site/src/utils/mode-switcher.js  sites/new_site/src/utils/
+SITE=sites/new_site
+mkdir -p $SITE/src/utils $SITE/src/components/ui
+
+# Switcher utilities (both files — SSR-safe singletons, expose on window)
+cp packages/ui/theme-mode/utils/mode-switcher.js   $SITE/src/utils/
+cp packages/ui/theme-mode/utils/theme-switcher.js  $SITE/src/utils/
+
+# Site-chrome mode toggle UI (3-mode cycle button with inline SVGs)
+cp packages/ui/theme-mode/components/ModeToggle.astro $SITE/src/components/ui/
 ```
 
-Both utilities are SSR-safe (guard all `window` / `document` access), expose singleton instances, and can be imported from any client-side script.
+The 3-mode contract (`light` / `dark` / `vibrant`) is hard-coded in `mode-switcher.js`. The theme-switcher ships with `VALID_THEMES = ['default']` — edit that constant at the top of the file to add brand themes.
+
+> **Do NOT copy the older `mode-switcher.js` from `sites/hypernova-site/src/utils/`.** That version only handles light/dark and pre-dates the 3-mode firm-wide policy. The canonical reference is `packages/ui/theme-mode/`.
 
 ## 6.4 Wire Into the Base Layout
 
@@ -372,6 +386,42 @@ In `BaseThemeLayout.astro` (or equivalent), accept a `themeClass` prop and apply
 ```
 
 Importing the modules runs their `DOMContentLoaded` handlers, which read `localStorage` and apply the saved theme/mode before first paint. Add a `theme-transition` class on `<html>` to avoid FOUC.
+
+### 6.4.1 Mandatory: Render `<ModeToggle />` in Site Chrome
+
+> **Firm-wide policy.** The 3-mode toggle MUST appear in persistent site chrome (header or footer) on every public page — not only `/brand-kit` and `/design-system`. See [Themes blueprint §5.0](../blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md).
+
+Create a `Header.astro` (or `Footer.astro`) under `src/components/basics/` that renders `<ModeToggle />`, then have `BaseThemeLayout` render that header for every page:
+
+```astro
+---
+// src/components/basics/Header.astro
+import ModeToggle from '../ui/ModeToggle.astro';
+---
+<header class="site-header">
+  <a href="/" aria-label="Home">Brand</a>
+  <nav>...</nav>
+  <ModeToggle />
+</header>
+```
+
+```astro
+---
+// src/layouts/BaseThemeLayout.astro
+import Header from '../components/basics/Header.astro';
+// ...
+---
+<BoilerPlateHTML ...>
+  <Header />
+  <main><slot /></main>
+  <script>
+    import '../utils/theme-switcher.js';
+    import '../utils/mode-switcher.js';
+  </script>
+</BoilerPlateHTML>
+```
+
+The toggle reads `window.modeSwitcher` (booted by the `<script>` block above). It does not import the switcher itself, so the file can move between directory depths without breaking imports.
 
 ## 6.5 Plan for the Reference Pages
 

@@ -297,7 +297,32 @@ At the end of `mode-switcher.js`:
 
 ---
 
-## 5. UI Integration: Brand Kit Page
+## 5. UI Integration
+
+### 5.0 Mandatory: Mode Toggle in Site Chrome
+
+> **Firm-wide policy.** Every Astro-Knots site MUST expose the 3-mode toggle in **persistent site chrome** — header or footer, visible on every public page. The `/brand-kit` and `/design-system` toggles are for inspection; the chrome toggle is for end-users.
+
+**Canonical implementation:** [`packages/ui/theme-mode/components/ModeToggle.astro`](../../packages/ui/theme-mode/) — a single 3-mode cycle button (light → dark → vibrant) with inline sun/moon/star SVGs. CSS-driven icon visibility via `html[data-mode="..."]` selectors. Reads `window.modeSwitcher` (booted by `BaseThemeLayout`) so it never duplicates switcher logic.
+
+**Why this is codified now:** several existing sites (banner-site, twf_site, dark-matter, hypernova-site) shipped their own `ModeToggle.astro` with **inline parallel switcher logic** — different localStorage keys, partial mode coverage, drift between toggle state and the rest of the site. Extracting the canonical version forces UI and switcher to stay in sync.
+
+**Required wiring:**
+
+1. Copy `packages/ui/theme-mode/utils/{mode,theme}-switcher.js` into `src/utils/`.
+2. Copy `packages/ui/theme-mode/components/ModeToggle.astro` into `src/components/ui/`.
+3. Boot the switchers in `BaseThemeLayout.astro`:
+   ```astro
+   <script>
+     import '../utils/theme-switcher.js';
+     import '../utils/mode-switcher.js';
+   </script>
+   ```
+4. Render `<ModeToggle />` from a `Header` (or `Footer`) component that `BaseThemeLayout` renders for every page.
+
+**Migration motion:** sites with the legacy inline-switcher `ModeToggle.astro` (banner-site `STORAGE_KEY = 'emblem-mode'`, etc.) should be replaced with copies of the canonical version on next contact. Safe — the canonical version uses the standard `'mode'` localStorage key and the same `data-mode` attribute, so existing CSS keeps working.
+
+### 5.1 Brand Kit Page (Inspection Toggle)
 
 File:
 
