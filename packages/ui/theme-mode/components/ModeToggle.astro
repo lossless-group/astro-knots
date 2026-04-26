@@ -1,0 +1,132 @@
+---
+// ============================================================================
+// ModeToggle — canonical 3-mode site-chrome toggle.
+// Cycles light → dark → vibrant on each click.
+//
+// Pattern reference (copy into your site's src/components/ui/, do not import).
+// Source: packages/ui/theme-mode/components/ModeToggle.astro
+// Spec:   context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md
+//
+// Boot contract:
+// - Assumes BaseThemeLayout has imported mode-switcher.js, which exposes
+//   `window.modeSwitcher`. Do NOT duplicate switcher logic inside this
+//   component (older site-specific implementations did this and drifted).
+// - Visibility is CSS-driven by html[data-mode="..."] — no JS icon-swap.
+//
+// Tokens read: --color-text, --color-border, --color-primary, --color-surface.
+// Drop into your Header/Footer chrome.
+// ============================================================================
+---
+
+<button
+  type="button"
+  class="theme-mode-toggle"
+  data-theme-mode-toggle
+  aria-label="Cycle color mode"
+  title="Cycle: light → dark → vibrant"
+>
+  <svg
+    class="tm-icon tm-icon-sun"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+  <svg
+    class="tm-icon tm-icon-moon"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+  <svg
+    class="tm-icon tm-icon-star"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.39 6.26L21 9.27l-4.5 4.38L17.48 21 12 17.77 6.52 21 7.5 13.65 3 9.27l6.61-1.01L12 2z" />
+  </svg>
+</button>
+
+<script is:inline>
+  (function () {
+    const NEXT_LABEL = { light: 'dark', dark: 'vibrant', vibrant: 'light' };
+
+    function syncAria() {
+      if (typeof window.modeSwitcher === 'undefined') return;
+      const current = window.modeSwitcher.getCurrentMode();
+      const next = NEXT_LABEL[current] || 'dark';
+      document.querySelectorAll('[data-theme-mode-toggle]').forEach((btn) => {
+        btn.setAttribute('aria-label', `Color mode: ${current}. Click to switch to ${next}.`);
+        btn.setAttribute('title', `Mode: ${current} (click for ${next})`);
+      });
+    }
+
+    function bind() {
+      document.querySelectorAll('[data-theme-mode-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (typeof window.modeSwitcher !== 'undefined') {
+            window.modeSwitcher.toggleMode();
+          } else {
+            console.warn('[ModeToggle] window.modeSwitcher not loaded. Verify BaseThemeLayout imports mode-switcher.js.');
+          }
+        });
+      });
+      window.addEventListener('mode-change', syncAria);
+      syncAria();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bind);
+    } else {
+      bind();
+    }
+  })();
+</script>
+
+<style is:global>
+  .theme-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.375rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
+  }
+  .theme-mode-toggle:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .theme-mode-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .theme-mode-toggle .tm-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    display: none;
+  }
+
+  /* Icon visibility is driven by <html data-mode> — pure CSS, no JS swap. */
+  html[data-mode="light"] .theme-mode-toggle .tm-icon-sun  { display: block; }
+  html[data-mode="dark"] .theme-mode-toggle .tm-icon-moon  { display: block; }
+  html[data-mode="vibrant"] .theme-mode-toggle .tm-icon-star { display: block; }
+</style>
