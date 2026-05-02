@@ -2,13 +2,13 @@
 title: "Maintain an Interactive `Stack` Display"
 lede: "Professionals have a stack of tools and technologies they use to get their work done. This display should show the tools and technologies in a way that is easy to browse and understand, helping others learn about the tools and technologies used in the industry — built on markdown + JSON, no database, in the spirit of AI-friendliness."
 date_authored_initial_draft: 2025-04-26
-date_authored_current_draft: 2026-04-26
+date_authored_current_draft: 2026-04-28
 date_authored_final_draft: null
 date_first_published: null
-date_last_updated: 2026-04-26
-at_semantic_version: 0.0.2.0
+date_last_updated: 2026-04-28
+at_semantic_version: 0.0.5.0
 publish: false
-status: Proposed
+status: In-Progress
 augmented_with: "Claude Code with Opus 4.7"
 category: Information-Design
 date_created: 2025-04-26
@@ -29,6 +29,58 @@ tags:
   - Kauffman-Fellows
   - Agentic-VC-Dojo
   - FullStack-VC
+---
+
+# Implementation Status (2026-04-28)
+
+**v0.5 — Authed edit + direct-commit write path: SHIPPED.** A logged-in Kauffman Fellow can publish their stack at `/people/{handle}/stack/edit`. The Svelte StackBuilder buffers the draft in localStorage and commits to `lossless-group/fullstack-vc` `main` via a GitHub App bot token; Vercel auto-rebuilds and the public profile at `/people/{handle}` updates.
+
+| Tier | Status | Notes |
+|---|---|---|
+| **OAuth (GitHub + LinkedIn)** | ✅ Shipped | Hand-rolled per the original Phase 1; uses `jose` JWT in HttpOnly cookie. Email-fallback added so registrants without a known GitHub handle can match by verified email. |
+| **Read path (`/people/[handle]`, `/people`, `/stacks`)** | ✅ Shipped | Static pages from the `participants` + `tools` content collections. Tool schema is a strict superset of the Lossless Obsidian `Tooling/*` frontmatter so paste-import works with no field renaming. |
+| **Display components** | ✅ Shipped (3) | `ToolCard`, `ParticipantCard`, `ParticipantStackView`. Cataloged in `/design-system`. Visual ancestor: `lossless.group/toolkit`. |
+| **Authed edit + write path** | ✅ Shipped | StackBuilder.svelte (current_stack tier only) + `/api/stack/save` + GitHub App auth (App ID + Installation ID + Private Key via `jose` + Node `crypto`). |
+| **Aspirational + abandoned tier editing** | ⏳ Outstanding | StackBuilder v1 only edits `current_stack`. Other tiers can be hand-edited in the participant `.md` for now. |
+| **Free-text "add a tool not in registry"** | ⏳ Outstanding | Picker is registry-only today. Plan: allow free-text entry → save creates a minimal `tools/{slug}.md` placeholder + the participant file in the same submit. |
+| **AI-assisted tool metadata enrichment** | ⏳ Backlog | Browserless + LLM agent that auto-fills tool YAML from a URL. Future v0.6+. |
+| **PR-with-auto-merge write path** | ⏳ Backlog | Direct-commit was chosen for v0.5 to ship in the 36hr launch window. PR + auto-merge (the spec's original Phase 1) becomes a v0.6 hardening pass for audit-trail value. |
+| **Per-tool detail page (`/stacks/tools/[slug]`)** | ⏳ Outstanding | Tool body markdown isn't rendered anywhere yet — currently the tool entries are data-only. |
+| **Aggregate heatmap, leaderboards, cohorts** | ⏳ Outstanding | `/stacks` has basic adoption counts + member cards; full heatmap and `/stack/cohorts/kauffman-[year]` are not built. |
+| **Survey tool** | ⏳ Backlog | Tally + webhook-to-markdown pattern unimplemented. |
+| **Branded exports (CSV / PDF)** | ⏳ Backlog | Not built. |
+
+**Decisions encoded in the implementation that revise the original spec:**
+
+1. **URL structure:** the canonical per-person URL is `/people/[handle]` (not `/stack/people/[handle]`). The aggregate front door is `/stacks` (plural). The authed edit page lives at `/people/[handle]/stack/edit` — symmetric with the read URL, leaves room for sibling edit surfaces (`/people/[handle]/profile/edit`, etc.). `/stack/me` is preserved as a backward-compat redirector.
+2. **Tool schema:** strict superset of `/Users/mpstaton/content-md/lossless/Tooling/**/*.md` Obsidian frontmatter (Jina + OpenGraph fetch pipeline). Copy-paste is the import workflow; no schema translation needed.
+3. **Participant headshot:** new optional field on participants that takes priority over `github_avatar` when set.
+4. **Direct-commit + commit prefix:** all bot writes start with `data(stack):` (or `data(tool):`, etc.). `git log --invert-grep "^data"` filters the noise; volume concerns become a non-issue.
+5. **localStorage draft buffer:** every keystroke writes to `localStorage["stack-draft:{handle}"]`. Idle threshold 5 min triggers an auto-save. Visibility-loss also triggers a best-effort save. The user can refresh, navigate, or close the tab without losing work.
+6. **Auth fallback:** GitHub-logged-in users match the roster by **verified email** when their handle isn't in the roster. Most webinar registrants are roster'd by email, not GitHub handle.
+7. **Repo path:** `lossless-group/fullstack-vc` (own repo, not a path inside astro-knots). The site is a git submodule; the GitHub API operates on its own repo root.
+
+**Critical files (live):**
+- `src/lib/session.ts` — JWT helper.
+- `src/lib/oauth-roster.ts` — multi-provider roster matching.
+- `src/lib/github-commit.ts` — App-token mint via `jose` + Node `crypto.createPrivateKey()`; GET → PUT contents with retry-on-409. Lazy env reads so HMR picks up `.env` changes.
+- `src/pages/api/auth/{github,linkedin}/{login,callback}.ts`, `src/pages/api/auth/logout.ts` — auth flow.
+- `src/pages/api/stack/save.ts` — write endpoint with Zod validation + frontmatter merge that preserves UI-untouched fields.
+- `src/pages/api/tools.json.ts` — flat tools registry for the picker typeahead.
+- `src/components/stack/StackBuilder.svelte` — interactive island, current_stack only in v1.
+- `src/components/stack/{ToolCard,ParticipantCard,ParticipantStackView}.astro` — display components.
+- `src/pages/people/[handle].astro` — static read view.
+- `src/pages/people/[handle]/stack/edit.astro` — server-rendered, auth-gated, hosts the Svelte island.
+- `src/pages/people/index.astro`, `src/pages/stacks/index.astro` — directories.
+- `src/content.config.ts` — `tools` + `participants` collections.
+- `src/content/kauffman_roster.json` — allowlist (1 entry today; needs expansion for the launch).
+- `scripts/smoke-test-github-app.ts` — direct READ + WRITE auth check, no dev-server needed.
+
+**Open work blocking 25–50 launch attendees from publishing:**
+- Roster expansion: only 1 entry today. The 49-row registrant CSV needs to be converted into roster JSON (script-aided OK).
+- Tool registry seed: only 5 entries. Need ~20–30 hand-picked Lossless Tooling files copy-pasted in (or scripted import).
+- Vercel env vars: GitHub App credentials (`GITHUB_STACKS_APP_ID`, `GITHUB_STACKS_INSTALLATION_ID`, `GITHUB_STACKS_PRIVATE_KEY`) + `GITHUB_REPO_NAME=fullstack-vc` need to be set on the production project.
+
 ---
 
 # Context
@@ -236,14 +288,23 @@ The hand-rolled approach also aligns with the firm thesis: **AI assistants read 
 
 **Recommendation:** ship GitHub-only for v0.2 to validate the entire write path, then add LinkedIn for v0.3 alongside the survey hookup.
 
-### Phase 1: GitHub OAuth
+### Phase 1: GitHub OAuth | { completed: "2025-04-26" }
 
-- Login via the **"Login with GitHub"** button (single provider for v0.2, fits the technical-VC audience).
+- Login via the **"Login with GitHub"** button.
 - After OAuth callback, the GitHub handle is matched against `kauffman_roster.json`:
-  - Match → session cookie set; user is now authed and can edit `/stack/me` (which loads `participants/{their-handle}.md`).
-  - No match → friendly "you don't seem to be in the Kauffman roster — drop us a line if this is wrong" page.
+  - Match → session cookie set; user is now authed and is redirected to `/people/{handle}/stack/edit`.
+  - No match → friendly bounce page (`/login/not-on-roster`).
 - Session: signed JWT in an HttpOnly cookie. No server-side session store.
-- The participant's profile is created **on first successful login** if they have a roster match — pre-populated with their GitHub avatar, name, and `kauffman_class` from the roster.
+- **Email fallback (added 2026-04-28):** if the GitHub handle isn't in the roster, the matcher falls back to the user's verified email. Most webinar registrants are roster'd by email rather than handle.
+- The participant's profile is created **on first successful save** (no longer on first login) — pre-populated with the GitHub avatar, name from session, and `kauffman_class` from the roster.
+
+#### Iteration Tasks
+
+- [ ] Assign a uuid to each participant in the roster
+- [ ] Add "I'm going" button to the webinar component and page.
+- [x] Componentize various PersonCard components, add to Design System (`ParticipantCard.astro`, `Section__WebinarPresenters.astro`)
+- [ ] Explore data augmentation. [[specs/AI-Powered-Link-Aggregator-for-Product-Digital-Footprint|AI-Powered-Link-Aggregator-for-Product-Digital-Footprint]]
+- [ ] Explore data augmentation. [[/Users/mpstaton/content-md/lossless/specs/Search-and-Summarize-Obsidian-App.md|Search-and-Summarize-Obsidian-App]]
 
 #### OAuth App vs GitHub App (don't confuse these)
 
@@ -325,7 +386,7 @@ sites/fullstack-vc/src/lib/
   4. Implement the three endpoints + the session helper
   5. Test the login flow end-to-end (login → roster match → /stack/me → logout)
 
-### Phase 2: LinkedIn OAuth (v0.3)
+### Phase 2: LinkedIn OAuth | { completed: "2025-04-26" — early }
 
 LinkedIn is structurally identical to GitHub — same hand-rolled approach, OIDC instead of GitHub's custom OAuth response shape. Two real differences: a published privacy policy is a hard prerequisite, and LinkedIn's dev portal bureaucracy is heavier.
 
@@ -614,29 +675,52 @@ The site already lives at `sites/fullstack-vc/` as a submodule under astro-knots
 
 # Acceptance Criteria
 
-## v0.1 — Read-only, public
+## v0.1 — Read-only, public | { partially shipped 2026-04-28 }
 
-- [ ] `/stack` renders an aggregate heatmap from real `participants/*.md` data (seed with 5–10 hand-authored profiles)
-- [ ] `/stack/people/[handle]` renders for every participant with `public_profile: true`
-- [ ] `/stack/tools/[slug]` renders for every tool entry
-- [ ] All routes pass build with `pnpm --filter fullstack-vc build`
-- [ ] Mobile + desktop layouts both legible; theme + 3-mode toggle works on every page
-- [ ] Components cataloged in `/design-system`
+- [ ] `/stacks` renders an aggregate heatmap from real `participants/*.md` data (basic adoption counts shipped; full heatmap deferred)
+- [x] `/people/[handle]` renders for every participant with `public_profile: true` *(URL changed from `/stack/people/[handle]`)*
+- [ ] `/stacks/tools/[slug]` renders for every tool entry *(per-tool detail page not yet built)*
+- [x] All routes pass build with `pnpm --filter fullstack-vc build`
+- [x] Mobile + desktop layouts both legible; theme + 3-mode toggle works on every page
+- [x] Components cataloged in `/design-system` *(ToolCard, ParticipantCard, ParticipantStackView)*
 
-## v0.2 — Authenticated edit
+## v0.2 — Authenticated edit | { shipped 2026-04-28 as v0.5 — direct-commit instead of PR }
 
-- [ ] GitHub OAuth flow lands a logged-in user back at `/stack/me`
-- [ ] Allowlist match against `kauffman_roster.json` works; non-matched users see the friendly bounce page
-- [ ] `StackBuilder.svelte` lets a user add/remove tools across current/aspirational/abandoned tiers
-- [ ] Autocomplete accepts both tool name and URL forms; URL aliases resolve to the canonical slug
-- [ ] Submit creates a real GitHub PR via the bot token; user sees a confirmation linking to the PR
-- [ ] Manual merge of the PR updates the static site on next build
+- [x] GitHub OAuth flow lands a logged-in user back at `/people/{handle}/stack/edit` *(URL changed from `/stack/me`)*
+- [x] Allowlist match against `kauffman_roster.json` works; non-matched users see the friendly bounce page
+- [x] `StackBuilder.svelte` lets a user add/remove tools — **current_stack tier only** in v1; aspirational/abandoned editing is outstanding
+- [ ] Autocomplete accepts both tool name and URL forms; URL aliases resolve to the canonical slug *(v1 picker is text-search only over `site_name`/`title`/`zinger`/`tags`; URL-form input not yet supported)*
+- [x] Submit creates a real commit via the bot — **direct to `main` instead of PR** in v0.5; user sees inline "Published — rebuild in ~30s" with a "View live" link
+- [x] Static site updates on next build (~30s after commit; Vercel auto-rebuilds)
 
 ## v0.3 — Auto-merge + survey hookup
 
-- [ ] Self-scoped PRs auto-merge (Phase 2 of write path)
+- [ ] Self-scoped PRs auto-merge *(deferred — direct-commit covers the launch; PR + auto-merge revisits in v0.6 for audit-trail value)*
 - [ ] Tally webhook integration ships at least one live survey
 - [ ] AI-assisted tool metadata enrichment scaffolded (admin-only flow)
+
+## v0.5 — Write-path MVP | { shipped 2026-04-28 }
+
+This phase didn't exist in the original spec — it was inserted to ship a working publish flow in the 36hr window before the launch webinar.
+
+- [x] Svelte integration in `astro.config.mjs`
+- [x] StackBuilder Svelte island with localStorage drafts + 5-min idle auto-save + visibility-loss save
+- [x] `/api/stack/save` endpoint with Zod validation, frontmatter merge that preserves UI-untouched fields, retry-on-409
+- [x] GitHub App auth via App ID + Installation ID + Private Key (PKCS#1 or PKCS#8, handled via Node `crypto.createPrivateKey()` + `jose` SignJWT)
+- [x] Email-fallback roster matching for GitHub provider
+- [x] Commit-prefix convention `data(stack):` for filterable history
+- [x] Smoke-test script for verifying credentials independent of the dev server
+- [x] `.env.example` documenting required env vars
+
+## v0.6 — Production hardening (queued after launch)
+
+- [ ] Aspirational + abandoned tier editing in StackBuilder
+- [ ] Free-text "add tool not in registry" → save creates `tools/{slug}.md` placeholder + participant file in same submit
+- [ ] Per-tool detail page (`/stacks/tools/[slug]`) rendering tool body markdown
+- [ ] Full `/stacks` aggregate: heatmap (categories × tools, intensity = adoption count), leaderboards, sparklines from `added:` dates
+- [ ] PR-with-auto-merge write path (the original Phase 1) for audit-trail value
+- [ ] Cohort views (`/stack/cohorts/kauffman-[year]`)
+- [ ] AI-assisted tool metadata enrichment (browserless + LLM agent for tool YAML autogen from URL)
 
 ---
 
@@ -658,12 +742,12 @@ The single biggest open design question is **how aggressively to involve AI in t
 
 # Open Questions
 
-- [ ] **Tool registry curation:** who maintains it? If anyone with a logged-in session can add a new tool entry, the registry will sprawl. Likely answer: tool additions require a separate, manually-reviewed PR (no auto-merge), encouraging high signal. Confirm.
-- [ ] **Privacy default:** should new participants default to `public_profile: true` or `false`? Lean toward `false` — opt-in is the kinder default for a community of senior investors.
-- [ ] **Cohort views and PII:** Kauffman year + firm name are basically identifying. Cohort views must respect `public_profile` per row.
+- [x] **Tool registry curation:** ANSWERED 2026-04-28 — for v0.5 the StackBuilder picker is registry-only; participants can't add tools. v0.6 plan: free-text entry creates a minimal `tools/{slug}.md` placeholder via the same save flow, with the human-readable name preserved; maintainer hand-edits the placeholder later (or an AI agent enriches it per `[[specs/AI-Powered-Link-Aggregator-for-Product-Digital-Footprint]]`).
+- [x] **Privacy default:** ANSWERED 2026-04-28 — `public_profile: false` per the spec's recommendation. The schema's `default(false)` enforces this.
+- [ ] **Cohort views and PII:** Kauffman year + firm name are basically identifying. Cohort views must respect `public_profile` per row. *(Cohort views aren't built yet; lock this in when they ship.)*
 - [ ] **OSS-only filter:** worth it for the philosophical slice ("show me only tools my firm could self-host"), or feature creep?
 - [ ] **Lapsed members:** what happens when someone leaves the Kauffman network? Do their profile pages stay up? Probably yes (community continuity), but with a "no longer active" flag.
-- [ ] **At what point do we migrate to NocoDB or AstroDB / Turso?** This is the original open question from the v0.0 stub. **Tentative answer: never.** The thesis of this spec is that markdown + JSON scales to community size, and the engineering complexity of a database is not justified at 200 users / 1500 tools. Revisit if (a) the registry tops 5,000 tools, (b) sub-second autocomplete becomes a felt problem, or (c) we need true concurrent-edit semantics that PR-flow can't provide.
+- [x] **At what point do we migrate to NocoDB or AstroDB / Turso?** REAFFIRMED 2026-04-28 after the write path shipped — **never.** v0.5 proves the markdown-as-database thesis works at the write path, not just the read path. Single-user submits land as one commit each in well under a second, GitHub's REST API handles the SHA-conflict semantics for free, and the entire end-to-end flow is ~250 LOC. Revisit only if (a) the registry tops 5,000 tools, (b) sub-second autocomplete becomes a felt problem, or (c) we need true concurrent-edit semantics that retry-on-409 can't provide.
 - [ ] **How do we handle authentication and authorization for an upstream Obsidian "Base" file?** If we ever do consume a Base as a seed source, the Base file lives in someone's local vault — not on the network. The pattern is "export the Base to JSON, commit the JSON to this repo, treat the export as the authoritative seed." No live auth required.
 
 ---

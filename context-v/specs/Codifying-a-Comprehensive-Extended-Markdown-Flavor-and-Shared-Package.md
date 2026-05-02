@@ -1,12 +1,12 @@
 ---
 title: Codifying a Comprehensive Extended Markdown Flavor and Shared Package
 lede: A specification for a named, versioned extended markdown flavor that codifies our existing rendering capabilities, incorporates features from GFM, Obsidian, MDX, and directive-based systems, and defines a wish list for future development — all backed by a shared remark/rehype package.
-date_authored_initial_draft: 2026-03-25
-date_authored_current_draft: 2026-03-25
+date_authored_initial_draft: 2025-01-25
+date_authored_current_draft: 2026-04-26
 date_authored_final_draft:
 date_first_published:
-date_last_updated: 2026-03-30
-at_semantic_version: 0.0.0.1
+date_last_updated: 2026-04-26
+at_semantic_version: 0.0.1.1
 status: Draft
 augmented_with: Claude Code (Opus 4.6)
 category: Specification
@@ -21,11 +21,19 @@ date_modified: 2026-03-30
 
 # Codifying a Comprehensive Extended Markdown Flavor and Shared Package
 
-**Status**: Draft (v0.0.1)
+**Status**: Draft (v0.0.1.1)
 **Date**: 2026-03-25
 **Author**: Michael Staton
 
----
+***
+### Workflow Status
+#### Done
+- [ ] GitHub Flavor Markdown working
+- [ ] Citations reordering, including for unique hexCode based citation pairs, is working. 
+#### In Review
+- [ ] Image component with rich metadata including caption, source, and CSS styles. First iteration done.  Looks good but haven't thoroughly tested it. 
+
+***
 
 ## 1. Problem
 

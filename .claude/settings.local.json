@@ -11,7 +11,9 @@
       "Bash(pkill:*)",
       "Bash(pnpm build:*)",
       "Bash(git mv:*)",
-      "Bash(magick:*)"
+      "Bash(magick:*)",
+      "Bash(env -u GITHUB_TOKEN pnpm add @astrojs/vercel jose)",
+      "Bash(pnpm add *)"
     ],
     "deny": [],
     "ask": []

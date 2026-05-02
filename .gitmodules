@@ -30,3 +30,7 @@
 [submodule "sites/fullstack-vc"]
 	path = sites/fullstack-vc
 	url = https://github.com/lossless-group/fullstack-vc.git
+[submodule "sites/calmstorm-decks"]
+	path = sites/calmstorm-decks
+	url = https://github.com/lossless-group/calmstorm-decks.git
+	branch = main

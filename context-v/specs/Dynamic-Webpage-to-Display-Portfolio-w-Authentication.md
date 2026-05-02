@@ -31,7 +31,7 @@ We develop and maintain multiple sites for multiple clients.  Each site needs to
 3. [[Tooling/Software Development/Lego-Kit Engineering Tools/ImageKit|ImageKit]] for scalable image CDN.
 4. [[Tooling/Software Development/Frameworks/Frontend/UI Frameworks/Tailwind|Tailwind]] with tokens edited for the brand we are building for, using our [[lost-in-public/to-hero/Customizing Tailwind|Customizing Tailwind]] best practices.
 5. Preference for using documents in Markdown or in JSON in the repository over any database use.
-6. Avoidance of anything React or React patterns.  HTML, CSS, Astro, and Svelte only. 
+6. Avoidance of anything React/JSX or React patterns.  HTML, CSS, Astro, and Svelte only. 
 
 ## Responsive Design
 Most people will be viewing it initially from Mobile. However, analysts will usually want to "dive in" so we need laptop and large screen variants, and a clinically responsive layout.  

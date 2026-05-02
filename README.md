@@ -1,34 +1,48 @@
 # Astro Knots
 
-A workspace for developing and maintaining multiple Astro/Svelte content-driven websites. Started as a pattern library, evolving toward selective package sharing where it genuinely makes sense.
+A workspace for developing and maintaining multiple Astro/Svelte content-driven websites. Started as a pattern library, evolving toward selective package sharing where it genuinely makes sense. We call this a "pseudo-monorepo" because it's not a true monorepo but it does have some monorepo-like characteristics.
+
+Developed and maintained by [The Lossless Group](https://lossless.group)
+
+Built with love using Astro & dashes of Svelte, Reveal.js, and Tailwind CSS.
 
 ## What This Actually Is
 
-Astro Knots began as an experiment: could we codify shared patterns into a monorepo with `@knots/*` packages that sites copy from? The answer turned out to be "sort of." The monorepo is useful for co-locating sites and seeing patterns side by side, but maintaining abstracted, style-free component packages that every site copies from proved impractical with a small team. We gave up on `@knots/*` as true importable packages early on.
+Astro Knots allows for shared patterns and context documents to be shared across related projects. We sometimes attempt to create "psued-packages" (packages that exist only to be copied from) in a monorepo with `@knots/*` co-location. Developers actively working on a site copy from these packages, as well as pull from components and context documents from projects under the same umbrella that is openable in an IDE and referenceable by AI Code Assistants. 
+
+Do our packeages work? For most, "sort of." The pseudo-monorepo is useful for co-locating sites and seeing patterns side by side, but maintaining abstracted, style-free component packages that every site copies from proved impractical with a small team. We gave up on `@knots/*` as true importable packages early on. 
+
+> [!ALERT] We have one true package: `@lossless-group/lfm` (Lossless Flavored Markdown)
+>
+> This is the only package that is actually published and used across sites. It's a markdown processor framework that both extends standard markdown with custom syntax and processing, and makes it easy for developers and clients to implement their own custom syntax and processing.
 
 **What survived and works:**
 - Co-located development — all sites visible in one workspace for pattern comparison
 - Git submodules — each site is its own repo, independently deployable
 - Shared context — `context-v/` documents (specs, blueprints, prompts, reminders) that guide development across all sites
+- Context files can and do live in individual sites when they're specific to that site. When they become applicable to another site, we can cross-reference and load into context windows with `@context-v/*`. If it will become a pattern across multiple sites, we can move it to the shared "pseudo-monorepo" location with the same directory, file, and frontmatter conventions.
 - Selective package publishing — when something genuinely needs to be shared as a dependency (not just a pattern), we publish it. The first real example: `@lossless-group/lfm` (Lossless Flavored Markdown)
 
 **What didn't work as planned:**
 - `@knots/*` as imported dependencies — too much abstraction overhead for the value
 - "Copy when you remember" — we usually didn't remember
-- Style-free component patterns — sites diverge too much in design for generic components to be useful
+- Style-free component patterns, or "structure components" — sites diverge too much in design for generic components to be useful
 
-**The current stance:** This is a **pseudo-monorepo evolving toward real package sharing where it's justified**. Don't assume everything is a shared package. Don't assume everything is copy-paste. The right answer depends on the specific code: markdown processing pipelines genuinely benefit from a shared package; UI components don't.
+**The current stance:** This is a **pseudo-monorepo evolving toward more sharing, but only where it's justified**. Don't assume everything is a shared package. Don't hard-code the workspace. Yet, don't assume everything is copy-paste. The right answer depends on the specific code: markdown processing pipelines genuinely benefit from a shared package; UI components don't.
 
 ## Sites
 
+_Listted in the order of their recency and likely relevance to future projects_
+
 | Site | Repo | Status | Notes |
 |------|------|--------|-------|
+| fullstack-vc | [lossless-group/fullstack-vc](https://github.com/lossless-group/fullstack-vc) | Active | Team initiative  |
 | mpstaton-site | [lossless-group/mpstaton-site](https://github.com/lossless-group/mpstaton-site) | Active | Personal portfolio/CV, actively maintained without client constraints |
-| hypernova-site | [hypernova-labs/hypernova-site](https://github.com/hypernova-labs/hypernova-site) | Active | Client site |
-| cilantro-site | [lossless-group/cilantro-site](https://github.com/lossless-group/cilantro-site) | Active | Client site, strong reference implementation |
-| twf_site | [lossless-group/the-water-foundation-site](https://github.com/lossless-group/the-water-foundation-site) | Active | The Water Foundation |
-| dark-matter | [lossless-group/matter-site](https://github.com/lossless-group/matter-site) | Active | Client site |
 | banner-site | [lossless-group/emblem-site](https://github.com/lossless-group/emblem-site) | Active | Client site |
+| hypernova-site | [hypernova-labs/hypernova-site](https://github.com/hypernova-labs/hypernova-site) | Active | Client site |
+| dark-matter | [lossless-group/matter-site](https://github.com/lossless-group/matter-site) | Active | Client site |
+| twf_site | [lossless-group/the-water-foundation-site](https://github.com/lossless-group/the-water-foundation-site) | Active | The Water Foundation |
+| cilantro-site | [lossless-group/cilantro-site](https://github.com/lossless-group/cilantro-site) | Active | Client site, strong reference implementation |
 | cogs-site | | In progress | |
 | coglet-shuffle | | In progress | Nested astro-site |
 

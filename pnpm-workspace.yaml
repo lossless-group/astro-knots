@@ -10,6 +10,7 @@ packages:
   - sites/mpstaton-site
   - sites/arthouse-site
   - sites/fullstack-vc
+  - sites/calmstorm-decks
   - design-system-viewer
 
 onlyBuiltDependencies:

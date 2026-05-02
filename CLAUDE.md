@@ -77,7 +77,8 @@ astro-knots/
 │   ├── dark-matter/      # Client site
 │   ├── banner-site/      # Client site
 │   ├── cogs-site/        # In progress
-│   └── coglet-shuffle/   # In progress (nested astro-site)
+│   ├── coglet-shuffle/   # In progress (nested astro-site)
+│   └── calmstorm-decks/  # Slides-only Astro site for a fundraise process (Phase 1 — see spec)
 ├── context-v/            # Project documentation (specs, blueprints, prompts, reminders, explorations)
 ├── design-system-viewer/ # Internal tool — minimal scaffolding (Astro 6 + TW4)
 └── pnpm-workspace.yaml   # Workspace config
@@ -720,6 +721,10 @@ git checkout main
 - Clients need to own and deploy their sites independently
 - No vendor lock-in to our monorepo infrastructure
 - Sites must work from their own repos (Vercel auto-deploy)
+
+### Recent Progress (Apr 2026)
+
+- **calmstorm-decks** (`sites/calmstorm-decks`) — New slides-only Astro site for a client fundraise process. Phase 1 deliberately uses inline Tailwind utilities + scroll-snap (no Reveal.js, no GSAP) to avoid the iteration loops we hit on the prior deck. Spec: `context-v/specs/Develop-a-Slides-only-Astro-Site-for-a-Fundraise-Process.md`. Source PDFs live in `sites/calmstorm-decks/context-v/extra/private/` (gitignored from the parent — site-private). Slide 01 has two variants (`/` and `/v2`) for compositional comparison; slides 02–17 pending.
 
 ### Recent Progress (Mar 2026)
 
