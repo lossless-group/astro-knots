@@ -44,8 +44,8 @@ The pattern below keeps the convenience of local LFM development while making it
 
 Two valid JSR consumption shapes are already in the wild:
 
-- `"npm:@jsr/lossless-group__lfm@^0.2.1"` + explicit `@jsr:registry=https://npm.jsr.io` — see `sites/mpstaton-site` and `sites/fullstack-vc`.
-- `"jsr:^0.2.1"` (pnpm's native JSR protocol) — see `sites/calmstorm-decks`.
+- `"npm:@jsr/lossless-group__lfm@^0.2.2"` + explicit `@jsr:registry=https://npm.jsr.io` — see `sites/mpstaton-site` and `sites/fullstack-vc`.
+- `"jsr:^0.2.2"` (pnpm's native JSR protocol) — see `sites/calmstorm-decks`.
 
 This blueprint uses the first form because it's the most explicit and works on any pnpm version that supports npm aliases.
 
@@ -72,7 +72,7 @@ This blueprint uses the first form because it's the most explicit and works on a
 import { readFileSync, writeFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 
-const JSR_SPEC = 'npm:@jsr/lossless-group__lfm@^0.2.1';
+const JSR_SPEC = 'npm:@jsr/lossless-group__lfm@^0.2.2';
 const WORKSPACE_SPEC = 'workspace:^';
 const LOCAL_BRANCHES = new Set(['development', 'develop', 'dev']);
 
@@ -136,7 +136,7 @@ The `ignore-workspace` line will be flipped by the swap script; everything else 
 ```json
 {
   "dependencies": {
-    "@lossless-group/lfm": "npm:@jsr/lossless-group__lfm@^0.2.1"
+    "@lossless-group/lfm": "npm:@jsr/lossless-group__lfm@^0.2.2"
   }
 }
 ```
@@ -192,9 +192,9 @@ If this passes, Vercel will pass. If it fails, **do not push** — run `pnpm lfm
 Inspect the resolved tarball in `pnpm-lock.yaml` to confirm JSR origin:
 
 ```yaml
-'@jsr/lossless-group__lfm@0.2.1':
+'@jsr/lossless-group__lfm@0.2.2':
   resolution:
-    tarball: https://npm.jsr.io/~/11/@jsr/lossless-group__lfm/0.2.1.tgz
+    tarball: https://npm.jsr.io/~/11/@jsr/lossless-group__lfm/0.2.2.tgz
 ```
 
 A `link:` or `workspace:` resolution in the lockfile on `main` is the failure mode this whole pattern exists to prevent.

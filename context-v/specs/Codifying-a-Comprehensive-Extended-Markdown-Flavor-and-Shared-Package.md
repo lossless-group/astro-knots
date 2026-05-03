@@ -30,13 +30,24 @@ date_modified: 2026-05-03
 
 #### Next
 
-##### Basic to Advanced link support
+##### Basic to Advanced link support to external media
 
-- [ ] Add bare URL (auto-unfurl) support, conditional for video.
- - [ ] component for bare url to video share links (support YouTube and Vimeo out of the box): LinkPreview__Video--FullPlayer.astro
 - [ ] Add any URL not bare dynamic components: 
  - [ ] LinkPreview__Article--Row.astro, LinkPreview__Article--Card.astro, LinkPreview__Article--Thumb.astro, LinkPreview__Article--LiveSite.astro, 
-  - [ ] LinkPreview__Video--Row.astro, LinkPreview__Video--Card.astro, LinkPreview__Video--Thumb.astro, 
+  - [ ] LinkPreview__Video--Row.astro, LinkPreview__Video--Card.astro, LinkPreview__Video--Thumb.astro
+  - [ ] LinkPreview__Video--Rollup-Gallery.astro
+  - [ ] LinkRollup__Column.astro
+  - [ ] LinkRollup__Gallery.astro
+  - [ ] LinkRollup__Carousel.astro
+  - [ ] LinkRollup__ThumbRow--HorizontalScroll.astro
+ 
+##### Table of Contents
+
+- [ ] Table of Contents
+ - [ ] Side Navigation Left
+ - [ ] Table of Contents Right (Docs style)
+ - [ ] Table of Contents Preview Block / Inserted into Main above the content after the title / metadata.
+ - [ ] Table of Contents Mobile TopNav / Expand Left
 
 ##### Wikilinks / Backlinks
 -
@@ -47,6 +58,9 @@ date_modified: 2026-05-03
 - [x] GitHub Flavor Markdown working
 - [x] Citations reordering, including for unique hexCode based citation pairs, is working. 
 - [x] Support Mermaid through CDN (always updated)
+- [x] Add bare URL (auto-unfurl) support, conditional for video.
+ - [x] component for bare url to video share links (support YouTube and Vimeo out of the box): LinkPreview__Video--FullPlayer.astro
+
 #### In Review
 - [ ] Image component with rich metadata including caption, source, and CSS styles. First iteration done.  Looks good but haven't thoroughly tested it. 
 - [ ] Citations vs sources?
@@ -685,7 +699,7 @@ The renderer detects the platform from the URL and renders the appropriate embed
 | ✅ Stable | YouTube — full video | `youtu.be/{id}`, `youtube.com/watch?v={id}` | `::youtube-video` | `YouTubeEmbed` |
 | ✅ Stable | YouTube — Short | `youtube.com/shorts/{id}` | `::youtube-short` | `YouTubeShortsEmbed` |
 | ✅ Stable | YouTube — Playlist | `youtube.com/playlist?list={id}` | `::youtube-playlist` | `YouTubePlaylistEmbed` |
-| 🟡 Planned | Vimeo | `vimeo.com/{id}`, `player.vimeo.com/video/{id}` | `::vimeo` | `VimeoEmbed` |
+| ✅ Stable | Vimeo | `vimeo.com/{id}` (incl. `/{hash}`, `/channels/...`), `player.vimeo.com/video/{id}` | `::vimeo` | `VimeoEmbed` |
 | 🟡 Planned | Loom | `loom.com/share/{id}` | `::loom` | `LoomEmbed` |
 | 🟡 Planned | Spotify | `open.spotify.com/{type}/{id}` | `::spotify` | `SpotifyEmbed` |
 | 🟡 Planned | SoundCloud | `soundcloud.com/{user}/{track}` | `::soundcloud` | `SoundCloudEmbed` |

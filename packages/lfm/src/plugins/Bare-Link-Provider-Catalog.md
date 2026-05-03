@@ -74,19 +74,28 @@ providers:
         query:
           list: '^(?<id>[A-Za-z0-9_-]+)$'
 
-  # Planned providers (status: planned — skipped at parse time, kept here as docs).
-
   - id: vimeo
-    status: planned
+    status: stable
     label: "Vimeo"
     kind: video
     aspect: "16:9"
     directive: vimeo
     component: VimeoEmbed
-    description: "Vimeo video player. Numeric ID."
+    component_source: "sites/mpstaton-site/src/components/markdown/VimeoEmbed.astro"
+    description: >-
+      Vimeo video player. Captures the canonical `vimeo.com/{id}` shape, the
+      already-embed `player.vimeo.com/video/{id}` shape, channel-prefixed
+      shapes like `vimeo.com/channels/{name}/{id}`, and the optional unlisted
+      hash suffix `/{hash}` which the renderer forwards as `?h={hash}` on the
+      embed URL. The component re-parses the URL for the hash so the
+      classifier's job is just to confirm a numeric video ID is present.
     matchers:
-      - host: ["vimeo.com", "player.vimeo.com"]
-        path: '^/(?:video/)?(?<id>\d+)/?$'
+      - host: ["vimeo.com", "www.vimeo.com"]
+        path: '^/(?:[^/]+/)*?(?<id>\d+)(?:/[A-Za-z0-9]+)?/?$'
+      - host: ["player.vimeo.com"]
+        path: '^/video/(?<id>\d+)(?:/[A-Za-z0-9]+)?/?$'
+
+  # Planned providers (status: planned — skipped at parse time, kept here as docs).
 
   - id: loom
     status: planned
