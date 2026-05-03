@@ -722,9 +722,13 @@ git checkout main
 - No vendor lock-in to our monorepo infrastructure
 - Sites must work from their own repos (Vercel auto-deploy)
 
+### Recent Progress (May 2026)
+
+- **calmstorm-decks** (`sites/calmstorm-decks`) — Now the canonical reference for a **private, gated, two-surface fundraise/teaser deck workspace**. Three full-deck scroll variants (`/thesis`, `/thesis/version-2`, `/thesis/version-3`), a slide-by-slide variant chooser surface (`/{slug}` → `/drafts/{slug}/{slug}-vN`), polite access gate (`PUBLIC_DECK_CODE` + cover at `/`), comprehensive OpenGraph + SEO system (single `MetaTags` component, `lib/seo.ts` registry, shared OG image), changelog surface at `/changelog` rendered via `@lossless-group/lfm`, registry-driven navigation chrome (`DeckHeader`, `DeckNav`), and the audit trail in `sites/calmstorm-decks/context-v/changelogs/` (April 30 → May 3 build week). **Forward-looking playbook for replicating this pattern on a new client deck site**: `context-v/blueprints/Build-a-Fundraise-Deck-Workspace.md`.
+
 ### Recent Progress (Apr 2026)
 
-- **calmstorm-decks** (`sites/calmstorm-decks`) — New slides-only Astro site for a client fundraise process. Phase 1 deliberately uses inline Tailwind utilities + scroll-snap (no Reveal.js, no GSAP) to avoid the iteration loops we hit on the prior deck. Spec: `context-v/specs/Develop-a-Slides-only-Astro-Site-for-a-Fundraise-Process.md`. Source PDFs live in `sites/calmstorm-decks/context-v/extra/private/` (gitignored from the parent — site-private). Slide 01 has two variants (`/` and `/v2`) for compositional comparison; slides 02–17 pending.
+- **calmstorm-decks** Phase 1 — initial slides-only Astro scaffolding for the Calm/Storm Fund III teaser. See `Build-a-Fundraise-Deck-Workspace.md` (linked above) for the patterns that grew out of this work. Original spec: `context-v/specs/Develop-a-Slides-only-Astro-Site-for-a-Fundraise-Process.md`. Source PDFs live in `sites/calmstorm-decks/context-v/extra/private/` (gitignored from the parent — site-private).
 
 ### Recent Progress (Mar 2026)
 
@@ -748,6 +752,8 @@ git checkout main
 **mpstaton-site** is the current primary reference for content rendering — it's the first site using `@lossless-group/lfm` and has the most complete AstroMarkdown renderer.
 
 **Cilantro-site** remains a strong reference for environment-driven configuration, SEO/OG meta utilities, and content collections architecture.
+
+**calmstorm-decks** is the canonical reference for the **fundraise / teaser deck workspace** shape: two-surface architecture (slide-by-slide variant chooser + scroll-deck presentation), polite access gate, registry-driven navigation chrome, comprehensive OpenGraph + SEO system, and a changelog surface rendered through LFM. When initializing a new client deck site, read `context-v/blueprints/Build-a-Fundraise-Deck-Workspace.md` first — it's a step-by-step playbook with concrete file pointers for every pattern, written specifically for replication on the next site.
 
 ## Notes for AI Assistants
 
