@@ -28,19 +28,54 @@ date_modified: 2026-05-03
 ***
 ### Workflow Status
 
+#### Responses and Feedback
+
+> **Status:** all five items addressed in §4.23.6.
+
+- [x] **Map LinkPreviewData to Citation / Canonical Sources needs** — addressed in §4.23.6 *Shared data shape* + new sub-section *Field alignment with the canonical Sources schema* + new sub-section *Promote to Canonical (future flow, do not block on this)*. Strategy is **minimum-viable bridge now, full canonical mapping later**: aligned field names with the canonical schema's vocabulary, added `canonicalSource?: { uuid, hexcode?, slug? }` to LinkPreviewData so promotion is non-breaking, but explicitly deferred the full canonical pipeline (still being designed in `cite-wide`). Cross-references the `cite-wide/context-v/blueprints/Maximize-Data-Collection-on-Cannonical-Sources.md` blueprint.
+- [x] **Code-fence equivalents for Obsidian content** — addressed in §4.23.6 *Author syntax* with a new subsection. ` ```link-preview ` / ` ```link-rollup ` (lang = directive name) get converted to the same MDAST `containerDirective` node before Shiki's syntax-highlighting pass. Registry-driven (only fences whose lang collides with a registered LFM directive are converted; reserved language names stay code blocks). Lives in `remark-code-fence-as-directive` (forthcoming).
+- [x] **OG fetcher — OpenGraph.io + future proxy** — addressed in §4.23.6 *Build-time OG fetch* with a new "Fetch backend — pluggable" subsection. Backend is a config knob (`'direct' | 'opengraph-io' | 'proxy' | 'frontmatter-only'`); OpenGraph.io is the recommended production default; proxy support is structurally provisioned as a sibling backend module so adopting it later is a one-module add, not a plugin-API break.
+- [x] **Aside positioning (`<aside>` wrapping with float / escape-body attributes)** — addressed in §4.23.6 with two new subsections: *Aside positioning (the `aside` attribute)* and the conflict-resolution paragraph at the end of it. `aside` is an enum (`none | left | right | left-escape | right-escape`); `*-escape` aligns the card **outside** the main content column in the same track where a docs-style TOC / file navigator / page-outline would live (not "page margin bleed"). Stable class contract `lfm-aside lfm-aside--{value}`. Compatibility matrix per component family. Width defaults + `width=` override. Cross-cutting: any future container directive (callouts, image directives, data-points, citation blocks) can adopt the same attribute with a one-line read of `node.attributes.aside`. **Forward compatibility:** future track-occupying components (TOC, file-nav, in-page outline) and escape-cards share the track; resolution policy (`stack` | `inline-fallback` | `replace-on-section`) is per-site config with `stack` as the default. Any forthcoming track occupant MUST publish a `data-lfm-track-occupant` attribute and render with the same `lfm-aside--*-escape` class so the resolver can disambiguate without a breaking change to the `aside` attribute.
+- [x] **No-code extensibility scheme (custom classes / attributes without AI agent help)** — addressed in §4.23.6 with new subsection *Author-extensible classes and attributes (no-code escape hatches)*. Three layers, in order of friction: **(1)** per-instance markdown attributes (`class`, `style`, `id`, `data-*`, `aria-*`, `lang`) on any directive — always available, zero setup; **(2)** per-site variant registry at `src/config/lfm-variants.yaml` with `kind: <name>` resolving to a class+attrs bundle — same schema across all astro-knots sites, optionally inheriting from a shared `@lossless-group/lfm-variants-base` package; **(3)** CSS custom-property tokens (`--lfm-card-bg`, `--lfm-accent`, `--lfm-aside-track-width`, etc., shipped in `packages/lfm-astro/css/tokens.css`) for site-wide visual overrides with no markdown edits. Reserved attribute names (`format`, `type`, `aside`, `kind`, internal `data-lfm-*`) are component-managed and filtered from author overrides. Validation policy is a config knob: `strictAttributes: 'warn' | 'error' | 'silent'`. Each component's `/design-system` catalog page MUST list its managed attributes + the always-available escape hatches + links to the site variant registry and token file — that's the contract a non-developer author reads to know what they can change.
+
+
+
 #### Next
 
 ##### Basic to Advanced link support to external media
 
-- [ ] Add any URL not bare dynamic components: 
- - [ ] LinkPreview__Article--Row.astro, LinkPreview__Article--Card.astro, LinkPreview__Article--Thumb.astro, LinkPreview__Article--LiveSite.astro, 
-  - [ ] LinkPreview__Video--Row.astro, LinkPreview__Video--Card.astro, LinkPreview__Video--Thumb.astro
-  - [ ] LinkPreview__Video--Rollup-Gallery.astro
-  - [ ] LinkRollup__Column.astro
-  - [ ] LinkRollup__Gallery.astro
-  - [ ] LinkRollup__Carousel.astro
-  - [ ] LinkRollup__ThumbRow--HorizontalScroll.astro
- 
+**Design reference:** §4.23.6 (Inline Link Substitutions) below codifies the component taxonomy and the OG-data contract. Read that section first before implementing — it spells out the directive grammar, file naming, type/format taxonomies, and the shared `LinkPreviewData` shape every component consumes.
+
+**Phase 0 — Foundation (must land before any component work):**
+- [ ] OG metadata fetcher (build-time, cached). Reuses the spec from §4.23.5 — `og:*` + `twitter:*` extraction, JSON cache keyed by URL hash, configurable TTL, fail-cache for 4xx/timeout. Lives in `packages/lfm/src/plugins/og-fetcher.ts` (forthcoming) and the cache lands in each consuming site at `src/data/og-cache.json` (gitignored).
+- [ ] Inline-link classifier — counterpart to the existing bare-link classifier. Reads the same `Bare-Link-Provider-Catalog.md` to determine if a URL maps to a known type (Article default, Video for known video providers, etc.). Emits a normalized `LinkPreviewData` object the components consume.
+- [ ] `:::link-preview{type format}` directive — wraps a single URL, opts into substitution rendering. See §4.23.6 for grammar.
+- [ ] `:::link-rollup{type format}` directive — wraps multiple URLs into a single grouped component.
+
+**Phase 1 — `LinkPreview__Article` (first batch, simplest data shape):**
+- [ ] `LinkPreview__Article--Row.astro` — horizontal row, one line tall, suited for inline-with-prose. Inputs: title, description, image, source domain. Acceptance: renders cleanly inside paragraphs, doesn't break prose flow, works with one OG fetch.
+- [ ] `LinkPreview__Article--Card.astro` — vertical card, suited for asides and feature blocks. Inputs: same as Row plus published date and reading time (when available).
+- [ ] `LinkPreview__Article--Thumb.astro` — compact thumbnail with title only, for use inside rollups and dense lists.
+- [ ] `LinkPreview__Article--LiveSite.astro` — sandboxed iframe of the actual page. Author opt-in only (`:::link-preview{format=livesite trusted=true}`); off by default for security.
+
+**Phase 2 — `LinkPreview__Video` (depends on bare-link catalog matchers):**
+- [ ] `LinkPreview__Video--Row.astro` — thumbnail + title in a row, no autoplay. Reuses provider matchers from `Bare-Link-Provider-Catalog.md` to extract video ID and pick the right thumbnail URL.
+- [ ] `LinkPreview__Video--Card.astro` — thumbnail + title + duration as card.
+- [ ] `LinkPreview__Video--Thumb.astro` — small thumbnail for grids.
+- [ ] `LinkPreview__Video--Rollup-Gallery.astro` — multiple videos as a gallery, likely a video-aware sibling of `LinkRollup__Gallery` with hover-preview behavior.
+
+**Phase 3 — `LinkRollup` containers (consume Phase 1+2 thumbs):**
+- [ ] `LinkRollup__Column.astro` — vertical stacked list. Renders each child as a `Row` variant matching its type.
+- [ ] `LinkRollup__Gallery.astro` — grid layout (configurable `columns` attr; default 3). Renders each child as a `Card` variant.
+- [ ] `LinkRollup__Carousel.astro` — horizontal scrolling with prev/next controls and pagination dots. Renders each child as a `Card` variant.
+- [ ] `LinkRollup__ThumbRow--HorizontalScroll.astro` — horizontal scroll of `Thumb` variants, like an Apple Music album row. Densest layout; works well at the bottom of articles for "see also."
+
+**Cross-cutting acceptance:**
+- All components consume the same `LinkPreviewData` interface (defined in §4.23.6).
+- All components degrade to a plain autolink when OG fetch fails.
+- All components are theme-token-neutral (read semantic tokens like `--card`, `--brand-aqua`, `--foreground`, `--border` with hex fallbacks). Match the convention used in `MermaidChartDisplay.astro`, `YouTubeEmbed.astro`, etc.
+- Build-time OG fetches are batched (default `maxConcurrent: 10`) with timeouts (default 5s), and failed fetches don't block the build.
+
 ##### Table of Contents
 
 - [ ] Table of Contents
@@ -1041,6 +1076,518 @@ remarkLfm({
 ```
 
 **Print behavior**: All popovers are hidden in `@media print`. For tooltips, the content is rendered inline in parentheses. For link previews, the URL is shown after the link text. Citations print their superscript number only (the Sources section at the bottom has the full references).
+
+**4.23.6 — Inline Link Substitutions (`LinkPreview__*` and `LinkRollup__*`)**
+
+The popovers in 4.23.1–4 keep the link as inline text and reveal a card on hover. **Substitutions** instead replace the link in the document flow with a visual preview component. Same OG cache (4.23.5) feeds both — different render strategy.
+
+This section defines a unified link-grammar component family that gives authors three rendering positions for any URL:
+
+| Where the URL appears | What renders | Example component |
+|---|---|---|
+| Bare on its own line (paragraph with single autolink child) | Full embedded media — see §4.12 | `LinkPreview__Video--FullPlayer.astro` |
+| Inline in prose, default behavior | Plain autolink (CommonMark) | — none — |
+| Inline + author opt-in via `:::link-preview` directive | Substitution preview card | `LinkPreview__Article--Row.astro`, etc. |
+| Multiple URLs grouped in a `:::link-rollup` directive | Grouped collection | `LinkRollup__Gallery.astro`, etc. |
+| Inline link, hover-only enrichment | Popover, link stays inline (4.23.1) | — uses 4.23.5 popover infra — |
+
+###### Component naming taxonomy
+
+Two families:
+
+- **`LinkPreview__{Type}--{Format}.astro`** — single-URL substitution. The `__{Type}` segment names the resource kind (drives data shape and data source); the `--{Format}` segment names the visual layout/density.
+- **`LinkRollup__{Format}.astro`** — multi-URL container. No `__{Type}` segment because the type is carried by the directive's args and applied uniformly to all children. Format segment names the layout primitive.
+
+Both segments are CamelCase. The double-dash before `{Format}` is intentional: it survives Astro's filename slug rules and visually separates the format axis from any sub-variant (e.g. `ThumbRow--HorizontalScroll` vs hypothetical `ThumbRow--VerticalScroll`).
+
+###### Type taxonomy (`LinkPreview__{Type}`)
+
+| Type | Resource kind | Primary data source | Notes |
+|---|---|---|---|
+| `Article` | Blog post, news article, long-form web page | OG metadata via build-time fetch | Default for any URL not matching a richer type |
+| `Video` | YouTube / Vimeo / Loom etc. | Provider matchers from `Bare-Link-Provider-Catalog.md` + OG fallback | Reuses bare-link classifier infrastructure |
+| `Audio` (planned) | Spotify / SoundCloud / podcast episode | Provider matchers + oEmbed | Tier 3 |
+| `Code` (planned) | Gist, CodePen, JSFiddle | Provider matchers + content fetch | Tier 3 |
+| `Tweet` (planned) | Twitter / X status | oEmbed | Tier 3 |
+
+A new type lands in three steps: add a row to the bare-link catalog (or extend `LinkPreviewData` if the metadata shape differs), add the matcher to the inline-link classifier, ship the component variants.
+
+###### Format taxonomy (`--{Format}`)
+
+For `LinkPreview__*` (single-URL):
+
+| Format | Visual density | Best for | Min data |
+|---|---|---|---|
+| `Row` | Low (one line tall, ~80px) | Inline in prose without breaking flow | title, source domain |
+| `Card` | Medium (~200-300px tall) | Asides, feature blocks, sidebars | title, description, image |
+| `Thumb` | High (small image + title) | Inside rollups, dense grids | title, image |
+| `LiveSite` | Variable (iframe of the page) | Author-trusted demos, interactive embeds | URL only (sandboxed) |
+| `FullPlayer` | Full-bleed embedded media | Bare-URL auto-unfurl path (§4.12) | type-specific (provider, id) |
+
+For `LinkRollup__*` (multi-URL):
+
+| Format | Layout | Children render as |
+|---|---|---|
+| `Column` | Vertical stacked list | `Row` of the matching type |
+| `Gallery` | Grid (configurable `columns`) | `Card` of the matching type |
+| `Carousel` | Horizontal scroll with prev/next controls | `Card` of the matching type |
+| `ThumbRow--HorizontalScroll` | Horizontal scroll of compact thumbnails | `Thumb` of the matching type |
+
+###### Author syntax (directive-based)
+
+```markdown
+:::link-preview{type="article" format="card"}
+https://example.com/some-article
+:::
+
+:::link-preview{type="article" format="livesite" trusted}
+https://my-trusted-demo.example.com
+:::
+
+:::link-rollup{type="video" format="gallery" columns=3}
+https://youtu.be/aaa
+https://youtu.be/bbb
+https://youtu.be/ccc
+https://youtu.be/ddd
+:::
+```
+
+Defaults:
+- `type` defaults to `Article` when omitted.
+- `format` defaults to `Card` for `LinkPreview`, `Gallery` for `LinkRollup`.
+- Inside `:::link-rollup`, the `type` applies to every child URL. Mixed-type rollups require multiple containers.
+
+The directive emits a single MDAST `containerDirective` node whose name is `link-preview` or `link-rollup`, with attributes captured into `node.attributes`. The renderer dispatches on `name + attributes.format` to the right component.
+
+**Obsidian-equivalent code-fence form (mandatory for content portability).** Authors who edit in Obsidian have lots of content using community plugins that emit *code fences* with custom lang names (the safe-rendering pattern Obsidian uses for user-defined components). LFM MUST recognise a code fence whose lang matches a known directive name as semantically equivalent to the directive form:
+
+````markdown
+```link-preview type="article" format="card"
+https://example.com/some-article
+```
+
+```link-rollup type="video" format="gallery" columns=3
+https://youtu.be/aaa
+https://youtu.be/bbb
+https://youtu.be/ccc
+```
+````
+
+The fence info-string after the lang name carries the same `key=value` attributes the directive form accepts. The transform recognising this shape lives in `remark-code-fence-as-directive` (forthcoming) and runs *before* Shiki's syntax-highlighting pass — fences claimed by the directive registry are converted to `containerDirective` nodes; everything else continues as a normal code block. The directive registry is the source of truth (the bare-link catalog already declares directive names; this work extends that registry to include `link-preview`, `link-rollup`, and any other LFM directives a site may add). Reserved words like `js`, `ts`, `python`, `mermaid` etc. stay code blocks — only fences whose lang collides with a registered LFM directive are converted.
+
+This means the same content authored in Obsidian renders identically in our Astro pipeline without the author rewriting fences to `:::` directives.
+
+###### Aside positioning (the `aside` attribute)
+
+`Card`, `Thumb`, and most `LinkRollup__*` formats accept an optional `aside` attribute that wraps the rendered component in a semantic `<aside>` element and positions it relative to the article column. Same affordance NYTimes-blog or Stripe-docs margin notes use — driven by markdown, not hand-rolled HTML.
+
+| `aside` value | Rendering | Wrapper | Use when |
+|---|---|---|---|
+| `none` *(default)* | Inline document flow | regular block | The card *is* the focus of the paragraph; reading order matters. |
+| `left` | Floats **inside** the article column on the left; prose wraps right | `<aside class="lfm-aside lfm-aside--left">` | The card is supplementary; you want it visually adjacent but the prose carries the argument. |
+| `right` | Floats **inside** the article column on the right | `<aside class="lfm-aside lfm-aside--right">` | Same, visually opposite. |
+| `left-escape` | Aligns **outside** the main column in the left side track — where a docs-style file navigator / table-of-contents / page-nav typically lives | `<aside class="lfm-aside lfm-aside--left-escape">` | The card belongs to the page's *navigational frame*, not its prose flow — e.g. "while you're reading this section, here's the related piece you should keep handy." |
+| `right-escape` | Aligns **outside** the main column in the right side track — where a docs-style "On This Page" TOC typically lives | `<aside class="lfm-aside lfm-aside--right-escape">` | Same intent, opposite side. The most common production use ("see also" rail beside long-form prose). |
+
+The `*-escape` values are explicitly **not** "page margin bleed" in the NYTimes-blog sense — they target the same horizontal track where a future LFM-managed TOC or file-navigator component would render. The card sits as a peer to that navigation, not as a margin embellishment. This matters for layout authoring: a site that knows it will eventually want a TOC reserves the escape tracks via its grid declaration; sites that want pure prose with optional escape cards reserve the same tracks but only render content into them when an `aside=*-escape` directive appears.
+
+Author syntax (directive form):
+
+```markdown
+Body paragraph that the floated card sits alongside. The reader's eye reads
+this prose as the primary thread; the card is supplementary.
+
+:::link-preview{type=article format=card aside=right}
+https://example.com/related-piece
+:::
+
+Continuing prose that wraps around the floated card.
+```
+
+Code-fence form (Obsidian portability) accepts the same attribute:
+
+````markdown
+```link-preview type=article format=card aside=right-escape
+https://example.com/related-piece
+```
+````
+
+**Responsive fallback contract.** The `*-escape` variants require a containing layout that exposes margin tracks (typically a CSS Grid declaring `[full-bleed-start] 1fr [content-start] 65ch [content-end] 1fr [full-bleed-end]` or equivalent). At narrow viewports — or when no margin track is available — escape variants MUST gracefully collapse to inline document flow. The component renders the same `<aside>` element either way; CSS handles the responsive switch via container queries on the layout shell. This is non-negotiable: a margin-bleed card that overflows the viewport on mobile is a layout regression.
+
+**Width defaults** (sites override via theme tokens):
+
+| `aside` value | Default width |
+|---|---|
+| `left` / `right` (float-in-column) | `min(30ch, 50%)` |
+| `left-escape` / `right-escape` (margin-bleed) | available margin track width, capped at `28ch` |
+
+**Width override.** When a non-default width is needed, pass a `width` attribute (any CSS length unit):
+
+```markdown
+:::link-preview{type=article format=card aside=right width=20ch}
+:::
+```
+
+Most useful with `left`/`right` floats; the `*-escape` variants are constrained by the layout's margin track and the override is treated as a max-width hint.
+
+**Compatibility matrix:**
+
+| Component family | `aside=none` | `left` / `right` | `left-escape` / `right-escape` | Notes |
+|---|---|---|---|---|
+| `LinkPreview__*--Row` | ✅ | ❌ | ❌ | Row variants flow with prose; aside conflicts. Build warning, falls back to inline. |
+| `LinkPreview__*--Card` | ✅ | ✅ | ✅ | Primary intended consumer. |
+| `LinkPreview__*--Thumb` | ✅ | ✅ | ⚠️ | Float-only; escape values fall back to float (thumb is too narrow to read at margin width). |
+| `LinkPreview__*--LiveSite` | ✅ | ⚠️ | ⚠️ | Allowed but discouraged — iframes inside floats produce reflow churn. |
+| `LinkPreview__Video--FullPlayer` | ✅ | ❌ | ❌ | FullPlayer owns full-bleed bare-URL layout. `aside` silently ignored. |
+| `LinkRollup__Column` | ✅ | ✅ | ✅ | Vertical lists are the canonical content for margin tracks. |
+| `LinkRollup__Gallery` | ✅ | ✅ | ⚠️ | Multi-column galleries inside a margin track collapse to 1-column. |
+| `LinkRollup__Carousel` | ✅ | ⚠️ | ❌ | Carousel controls assume full content width; build warning if floated. |
+| `LinkRollup__ThumbRow--HorizontalScroll` | ✅ | ❌ | ❌ | Designed for full-width horizontal scrolling. Build warning. |
+
+Legend: ✅ supported · ⚠️ allowed but produces a build warning, may produce a fallback render · ❌ silently ignored or warned-and-fall-back.
+
+**Cross-cutting design intent.** `aside` is intentionally generic. Future adopters: callouts (`:::callout{type=info aside=right}`), image directives (`:::image{src=... aside=left-escape}`), data-point blocks, citation blocks, etc. For this work scope only `LinkPreview__*` and `LinkRollup__*` honor it. Adopting it elsewhere is a one-line addition per component (read `node.attributes.aside`, wrap output in `<aside class="lfm-aside lfm-aside--{value}">` when present, otherwise use a regular block).
+
+The `lfm-aside` and `lfm-aside--{value}` class names are stable and become part of the LFM render-time contract — site stylesheets target them to wire up float / escape behavior. A reference stylesheet ships in `packages/lfm-astro/css/aside.css` (forthcoming) for sites to import; sites with custom layouts override per-token via the same selectors.
+
+**Conflict resolution with future track-occupying components (TOC, file navigator, etc.).** The `*-escape` tracks are shared real estate — a future LFM-managed TOC component, a file-navigator, an in-page outline, or any other `<aside>`-class component might want to render in the same track. When a page combines them, the renderer must choose how to resolve the conflict. Three options, in order of preference:
+
+1. **Stack** *(default)* — both components share the track; track-occupying chrome (TOC, navigator) renders first, escape-cards stack below. The track scrolls if total height exceeds viewport. This is the docs-site mental model and the right default for almost every layout.
+2. **Inline-fallback** — escape-cards collapse to inline document flow whenever a track-occupying component is present, regardless of viewport width. Useful when the TOC is essential and the cards are nice-to-have.
+3. **Replace-on-section** — escape-cards take over the track only for the section they're authored in; the TOC re-appears for sibling sections. Requires intersection-observer scroll coordination. Niche, document for completeness.
+
+Resolution policy is configured per-site:
+
+```ts
+remarkLfm({
+  asideResolution: {
+    leftEscape: 'stack',           // 'stack' | 'inline-fallback' | 'replace-on-section'
+    rightEscape: 'stack',
+  },
+});
+```
+
+**Forward compatibility contract.** Any future LFM-managed component that wants to occupy a `*-escape` track MUST:
+- Render with the `lfm-aside lfm-aside--{value}-escape` class set (so site stylesheets target one selector for both content and chrome).
+- Publish a `data-lfm-track-occupant` attribute (`toc`, `file-nav`, `outline`, etc.) so the resolver can disambiguate during the `replace-on-section` mode.
+- Honor the `asideResolution` config and degrade gracefully when stacked beneath an escape-card.
+
+Components that don't yet exist but are foreseen (per the Workflow Status above): `LinkRollup__Column` deployed as a docs-side "related-pages" navigator, an in-page `TableOfContents--SideRight`, `TableOfContents--SideLeft`. When those land they slot into the same conflict-resolution model — no breaking change to the `aside` attribute is anticipated.
+
+###### Author-extensible classes and attributes (no-code escape hatches)
+
+Authors must be able to extend any LFM component — adding custom CSS classes, inline styles, data-attributes, or named site-specific variants — **without touching TypeScript, forking the component, or asking an AI agent to modify code.** The escape hatches must be uniform across all astro-knots sites, so the same syntax behaves identically wherever LFM renders.
+
+Three layers, in order of friction:
+
+**Layer 1 — Per-instance attributes (always available, zero setup).**
+
+Every LFM container directive accepts these reserved keys, merged onto the rendered wrapper element. Component-managed attributes (e.g., `format`, `aside`, `width`) take precedence and cannot be overridden via Layer 1.
+
+| Reserved attribute | Effect |
+|---|---|
+| `class="..."` | Space-separated list of CSS classes appended to the component's defaults. |
+| `style="..."` | Inline CSS, applied to the wrapper element. |
+| `id="..."` | DOM id (must be unique per page; the renderer warns on collisions). |
+| `data-*` | Any `data-*` key passes through to the wrapper. Use for analytics tracking, data-binding hooks, etc. |
+| `aria-*` | Any `aria-*` key passes through to the wrapper. Component defaults remain unless author explicitly overrides. |
+| `lang="..."` | Language hint for the wrapped content (overrides inherited document language). |
+
+```markdown
+:::link-preview{type=article format=card class="brand-glow my-feature-card" data-track="opp-pitch-q2" aria-label="Featured analysis"}
+https://example.com/article
+:::
+```
+
+renders as (conceptually):
+
+```html
+<aside class="lfm-link-preview lfm-link-preview--card brand-glow my-feature-card"
+       data-track="opp-pitch-q2"
+       aria-label="Featured analysis">
+  <!-- card contents -->
+</aside>
+```
+
+The component's built-in class set (`lfm-link-preview lfm-link-preview--card`) is **always** present and **always** comes first in the class list, so site stylesheets can rely on cascade order.
+
+**Layer 2 — Per-site variant registry (named bundles).**
+
+Authors who repeat the same class set across many components define a **named variant** in their site's variant registry, then reference it with a single `kind` attribute. This is the path for site-wide design language extensions.
+
+The registry lives at `src/config/lfm-variants.yaml` (canonical filename, picked up automatically by the LFM preset). Schema:
+
+```yaml
+# src/config/lfm-variants.yaml
+# Per-site LFM variant registry. Each top-level key matches a directive name.
+# Each "kind" inside that key declares a bundle of classes and attributes
+# the directive expands when the author writes `kind=<name>`.
+
+link-preview:
+  kind:
+    primary:
+      class: "border-2 border-aqua bg-card-elevated"
+      attrs:
+        data-emphasis: "high"
+    muted:
+      class: "opacity-75 grayscale-50"
+    investor-badge:
+      class: "ring-2 ring-purple-500 ring-offset-2"
+      attrs:
+        data-audience: "investor"
+
+link-rollup:
+  kind:
+    sources-rail:
+      class: "border-l-2 border-aqua pl-4"
+      attrs:
+        data-rollup-purpose: "sources"
+
+callout:
+  kind:
+    confidential:
+      class: "bg-amber-50 border-amber-400 ring-1 ring-amber-300"
+      attrs:
+        data-classification: "confidential"
+```
+
+Authors then write:
+
+```markdown
+:::link-preview{type=article format=card kind=investor-badge}
+https://example.com/diligence-piece
+:::
+```
+
+The renderer expands `kind=investor-badge` against the registry: appends `ring-2 ring-purple-500 ring-offset-2` to the class list, adds `data-audience="investor"` to the wrapper. Layer-1 attributes on the same directive (`class="..."`, `data-*=...`) merge on top of the variant's bundle (author-instance class wins for explicit collisions).
+
+**Why YAML, not TypeScript:** the registry should be human-editable by anyone on the team (designers, content authors, project leads) without requiring a build step or type-check pass. A typo in YAML produces a build warning at next render; a typo in TypeScript breaks the build. Consistent with [`feedback_yaml_data_files`](../../) — YAML for client-editable data, TypeScript for runtime logic.
+
+**Cross-site portability:** every astro-knots site uses the same registry filename, the same schema. A variant bundle that works on `mpstaton-site` works identically on `cilantro-site` if both sites declare the same kind. Sites can also import a shared baseline registry from a `@lossless-group/lfm-variants-base` package (forthcoming) and override per-site.
+
+**Layer 3 — Theme tokens (the design-system escape hatch).**
+
+For visual customization that's universal across components — wrapper background, border radius, accent color, etc. — the components read CSS custom properties. Sites override the tokens in their global stylesheet; no markdown change required.
+
+Reserved tokens (a complete list ships in `packages/lfm-astro/css/tokens.css`):
+
+```css
+:root {
+  /* Wrapper surface */
+  --lfm-card-bg: var(--card, #ffffff);
+  --lfm-card-fg: var(--foreground, #1A0D33);
+  --lfm-card-border: var(--border, rgba(145, 56, 224, 0.15));
+  --lfm-card-radius: 8px;
+
+  /* Accent (used by hover, focus, badges) */
+  --lfm-accent: var(--brand-aqua, #04E5E5);
+  --lfm-accent-hover: var(--brand-aqua, #04E5E5);
+
+  /* Aside-specific */
+  --lfm-aside-track-width: 28ch;       /* width of escape tracks */
+  --lfm-aside-float-width: min(30ch, 50%);
+  --lfm-aside-gap: 2rem;               /* gap between aside and prose */
+
+  /* Caption / metadata */
+  --lfm-caption-bg: var(--card, rgba(255, 255, 255, 0.05));
+  --lfm-caption-fg: var(--foreground, #e2e8f0);
+}
+```
+
+Sites override one or more in their `tokens.css` and every LFM component picks up the change with no markdown edits, no variant-registry edits, no JS reload. Token names are stable across LFM versions; renames go through deprecation cycles.
+
+**Reserved attribute names (cannot be overridden by authors):**
+
+These are managed by the component and silently filtered if an author tries to set them via Layer 1:
+
+- `format` — selects the variant file (`Row` / `Card` / `Thumb` etc.)
+- `type` — selects the data shape (`article` / `video` / etc.)
+- `aside` — positioning (see prior subsection)
+- `kind` — variant registry key (Layer 2)
+- Any internal `data-lfm-*` attributes the component sets for layout-resolver coordination
+
+Setting these via Layer 1 is silently ignored (with a build warning in dev mode).
+
+**Validation policy.** The LFM preset accepts a `strictAttributes` flag:
+
+```ts
+remarkLfm({
+  strictAttributes: 'warn',  // 'warn' (default) | 'error' | 'silent'
+});
+```
+
+- `warn` — unknown attributes pass through to the wrapper as-is and the build emits a warning. Default.
+- `error` — unknown attributes fail the build. Use in CI / production to catch typos.
+- `silent` — pass-through with no warning. Use during heavy authoring sessions to avoid noise.
+
+`class`, `style`, `id`, `data-*`, `aria-*`, `lang` are always-known and never trigger validation. The reserved component attributes and any registered `kind` values are also always-known. Everything else is "unknown" by definition.
+
+**Documentation discoverability.** Each component's reference page (in the design-system catalog at `/design-system/...`) MUST list:
+1. Its component-managed attributes (with allowed values).
+2. The Layer-1 escape hatches that always work.
+3. A link to the site's variant registry showing the configured `kind` values.
+4. A link to the token list (`packages/lfm-astro/css/tokens.css`).
+
+This is the contract that lets a non-developer author find what they can change without reading source.
+
+###### Shared data shape
+
+`LinkPreviewData` is the contract every `LinkPreview__*` and `LinkRollup__*` component reads from. It is intentionally a **minimum-viable subset** of the canonical Source schema described in [`cite-wide/context-v/blueprints/Maximize-Data-Collection-on-Cannonical-Sources.md`](../../../cite-wide/context-v/blueprints/Maximize-Data-Collection-on-Cannonical-Sources.md) — field names align with the canonical schema's vocabulary so that promoting a preview into the canonical catalog is a non-breaking enrichment, not a rename.
+
+```ts
+// packages/lfm/src/types/index.ts (forthcoming addition)
+export interface LinkPreviewData {
+  // === Identity ===
+  url: string;                       // canonical href; aligns with `accessed_at_url` in the canonical schema
+  type: 'article' | 'video' | 'audio' | 'code' | 'tweet' | 'unknown';
+
+  // === Surface metadata (extracted at build time from OG/twitter tags) ===
+  title?: string;                    // aligns with `title`
+  description?: string;              // aligns with `lede` (subtitle is canonical-only for now)
+  image?: string;                    // aligns with `piece_og_image`
+  imageAlt?: string;                 // local-only; canonical schema doesn't require it
+  source?: string;                   // aligns with `publisher` (display name when available, host fallback)
+  sourceUrl?: string;                // aligns with `publisher_url`
+  publishedAt?: string;              // aligns with `date_published` — ISO date
+  updatedAt?: string;                // aligns with `date_modified` — ISO date if available
+  duration?: string;                 // ISO 8601 duration for video/audio (no canonical equivalent yet)
+  authors?: string[];                // aligns with `authors` — array, matches canonical shape
+
+  // === Provider-specific (matches the bare-link catalog) ===
+  providerId?: string;               // e.g. YouTube video ID, Vimeo numeric ID
+  providerExtra?: Record<string, string>; // e.g. { hash: 'abc123' } for unlisted Vimeo
+
+  // === Bridge to canonical Sources catalog (set iff promoted) ===
+  canonicalSource?: {
+    uuid: string;                    // `internal_uuid` from canonical schema
+    hexcode?: string;                // `reference_hexcode` — already used in our citation system
+    slug?: string;                   // `default_slug` — for routing to the canonical entry's page
+  };
+
+  // === Provenance ===
+  fetchedAt?: string;                // when OG was last successfully fetched
+  cacheStatus: 'hit' | 'miss' | 'failed';
+}
+```
+
+**Every `LinkPreview__*` and `LinkRollup__*` component takes a `data: LinkPreviewData` (or `data: LinkPreviewData[]` for rollups) prop.** Components MUST render a graceful fallback when `cacheStatus === 'failed'` or required fields are missing — typically a plain link or a skeletal card with just URL + domain.
+
+###### Field alignment with the canonical Sources schema
+
+The canonical schema lives in `cite-wide` and has 17+ fields covering the full archival lifecycle (download paths, API references, AI-classified tags, etc.). `LinkPreviewData` covers the **render-surface subset** that's available from OG metadata alone. Naming alignment so that future canonicalization is additive, not breaking:
+
+| LinkPreviewData field | Canonical Sources field | Notes |
+|---|---|---|
+| `url` | `accessed_at_url` | Same semantic — the URL we fetched from |
+| `title` | `title` | Direct map |
+| `description` | `lede` | Canonical also has `subtitle` for content types that use both |
+| `image` | `piece_og_image` | Canonical also has `piece_thumbnail_url` for non-OG thumbnails |
+| `source` | `publisher` | Display name (canonical AI-normalizes "nytimes.com" → "The New York Times") |
+| `sourceUrl` | `publisher_url` | Direct map |
+| `publishedAt` | `date_published` | Direct map (ISO 8601) |
+| `updatedAt` | `date_modified` | Direct map (ISO 8601) |
+| `authors` | `authors` | Direct map (array) |
+| `canonicalSource.uuid` | `internal_uuid` | Stable interop anchor |
+| `canonicalSource.hexcode` | `reference_hexcode` | Already used by our citation system |
+| `canonicalSource.slug` | `default_slug` | For routing to the canonical entry's markdown page |
+| (not in preview) | `publisher_favicon_url` | Canonical-only — too noisy for build-time fetch |
+| (not in preview) | `publisher_type` | Canonical-only — AI classification, not deterministic |
+| (not in preview) | `tags` | Canonical-only — AI-derived |
+| (not in preview) | `edition_or_version` | Canonical-only — applies to a subset of source types |
+| (not in preview) | `api_provider_url`, `api_provider_name`, `api_source_url` | Canonical-only — requires search |
+| (not in preview) | `downloaded_content_path`, `structured_data_path` | Canonical-only — bit-preservation paths |
+| (not in preview) | `cited_in_files` | Canonical-only — backlink index |
+| (not in preview) | `date_accessed`, `date_added` | Canonical-only — archival timestamps; preview's `fetchedAt` is the closest analogue |
+
+When a URL is promoted to the canonical catalog, `LinkPreviewData` on existing pages remains valid; the renderer additionally sets `canonicalSource` on subsequent fetches so components can decorate previews with a "curated source" indicator and link to the canonical entry's slug.
+
+###### Promote to Canonical (future flow, do not block on this)
+
+The `cite-wide` blueprint describes a "Promote to Canonical Source" button that triggers an agent pipeline (UUID generation, download, structured-data extraction, AI classification, etc.). When that lands:
+
+1. The user picks a URL from any LFM-rendered page (preview, popover, citation marker — all share the OG cache).
+2. The agent fetches and enriches into a full canonical Source record (markdown file with overkill frontmatter in the canonical store).
+3. The OG cache entry for that URL is updated to set `canonicalSource: { uuid, hexcode, slug }`.
+4. On the next site build, every `LinkPreview__*` component rendering that URL automatically picks up the canonical pointer and can render a "curated" badge.
+
+This is a one-way bridge by design: previews can become canonical; canonical entries don't downgrade. **Implementation of this flow is out of scope for the link-preview component work** — they are separate tracks that share the OG cache as their integration surface. Do not block component shipping on the canonical pipeline.
+
+**See:** `cite-wide/context-v/blueprints/Maximize-Data-Collection-on-Cannonical-Sources.md` for the canonical schema design, the AI vs. deterministic field-fill strategy, and the second-brain rationale ("the rich schema is only applied to a few sources per piece of our content… 1-5 that I want to promote to a canonical archive").
+
+###### Rendering pipeline
+
+```
+Markdown source
+  │
+  ▼
+remark-parse + remark-gfm + remark-directive   // standard LFM preset
+  │
+  ▼
+remark-bare-link (forthcoming)                  // bare URLs → leafDirective (§4.12)
+  │
+  ▼
+remark-link-preview (forthcoming)               // :::link-preview / :::link-rollup
+  │  walks containerDirective nodes
+  │  classifies child URL(s) via shared matchers + OG cache
+  │  attaches LinkPreviewData to node.data
+  │
+  ▼
+AstroMarkdown.astro                             // dispatches on directive name + attributes.format
+  │
+  ├── name="link-preview" attr.format="row"   → <LinkPreview__Article--Row data={...} />
+  ├── name="link-preview" attr.format="card"  → <LinkPreview__Article--Card data={...} />
+  ├── name="link-rollup"  attr.format="gallery" → <LinkRollup__Gallery items={...} />
+  └── ... etc.
+```
+
+###### Build-time OG fetch
+
+Single fetcher serves both substitutions and hover popovers. Implementation lives in the LFM package as a remark transform (`packages/lfm/src/plugins/og-fetcher.ts` — forthcoming) plus a TypeScript helper (`packages/lfm/src/utils/og-cache.ts`). Per-site cache lands at `src/data/og-cache.json` and SHOULD be gitignored — sites regenerate on demand and cache hits are 100% on subsequent builds.
+
+Configuration is declared once on the LFM preset (see 4.23.5 example). Both `popovers.ogFetch` and (forthcoming) `linkPreviews.ogFetch` read from the same options block; if a site enables either feature, the cache populates for all observed URLs.
+
+**Fetch backend — pluggable, with a managed-service default.** Many publisher pages defeat naive `fetch()` (Cloudflare challenges, bot blocks, lazy-rendered OG meta, paywall walls). The fetcher MUST support pluggable backends so a site can pick what trades off against:
+
+| Backend | When to use | Notes |
+|---|---|---|
+| **Direct `fetch()`** | Simple sites, dev / smoke testing | Fails on ~10-20% of real-world URLs (Cloudflare, JS-rendered pages, anti-scrape headers). Free. |
+| **OpenGraph.io** *(default for production)* | Production builds across all astro-knots sites | API-driven, renders JS, normalises OG/twitter/Schema.org into one shape. The maintainer has an active account; a single API key environment variable powers all sites. Recommended default. |
+| **Managed scraping proxy** *(future)* | Pages OpenGraph.io can't reach (private intranet, auth-walled archives, IP-banned hosts) | Maintainer flagged this as something they'd subscribe to when needed; not blocking. |
+| **Author-supplied frontmatter** | Highly curated content — manual override | Skips fetch entirely; the author hands LFM the title/description/image. Useful inside the canonical Sources catalog flow. |
+
+Backend selection is a per-site config knob:
+
+```ts
+remarkLfm({
+  popovers: {
+    ogFetch: {
+      enabled: true,
+      backend: 'opengraph-io',           // 'direct' | 'opengraph-io' | 'proxy' | 'frontmatter-only'
+      apiKey: process.env.OPENGRAPH_IO_KEY,
+      ttl: 7 * 24 * 60 * 60,
+      timeout: 5000,
+      maxConcurrent: 10,
+      // proxy-specific options when backend === 'proxy'
+      proxyUrl: process.env.SCRAPER_PROXY_URL,
+    },
+  },
+});
+```
+
+The `direct` backend stays available for offline dev and as a free fallback. The plugin code SHOULD be a small dispatcher over backend modules — each backend exports the same async function `(url: string, opts) => Promise<OGFetchResult>`. Adding a new backend (e.g., a self-hosted Browserless instance later) is a single new module + a config-string entry, no plugin-API churn.
+
+###### Why substitutions are a separate primitive from popovers
+
+Both share the OG cache and the `LinkPreviewData` shape. The render strategy differs:
+
+- **Popovers (4.23.1)**: link stays inline; on hover, the global popover system (4.23.5) shows a card. Use when the author wants the URL to read like a normal citation/reference and only some readers want richer context.
+- **Substitutions (4.23.6)**: link is replaced by the card in the document flow. Use when the author wants the URL to *be* the rendered artifact (a curated "see this video" moment, an opinionated rollup of references, a feature card for a related read).
+
+Authors who want both behaviors on the same URL use a popover by default and opt into substitution per-instance via the directive.
+
+###### Print behavior
+
+Same as popovers (4.23 above): substitution components print as a clean text block — title, source, URL on its own line. The interactive iframe in `LinkPreview__*--LiveSite` collapses to a notice + URL.
 
 #### 4.24 Timeline / Changelog Blocks
 
@@ -3691,7 +4238,130 @@ This example demonstrates: frontmatter, hex-code citations, callouts, data point
 
 ---
 
-## 27. Glossary
+## 27. Implementation Reference: Link Substitution Components
+
+Self-contained handoff for implementing §4.23.6 (Inline Link Substitutions) plus the related Phase-0 foundation. Written so a fresh session can pick this up cold without re-reading the rest of the spec.
+
+### 27.1 What's already shipped
+
+| Capability | File pointer | Notes |
+|---|---|---|
+| Bare-URL classifier (render-time) | `sites/mpstaton-site/src/lib/markdown/classify-bare-link.ts` | Pure TS, mirrors the canonical catalog. Use as the model for the inline-link classifier. |
+| Bare-link provider catalog (canonical record) | `packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md` | Frontmatter is the source of truth. Already covers YouTube watch / short / playlist + Vimeo as `stable`; Loom / Spotify / SoundCloud as `planned`. |
+| Bare-link → component dispatch | `sites/mpstaton-site/src/components/markdown/AstroMarkdown.astro` (paragraph branch) | Reference for how to add the inline-link directive dispatch. |
+| `FullPlayer` components | `sites/mpstaton-site/src/components/markdown/{YouTubeEmbed,YouTubeShortsEmbed,YouTubePlaylistEmbed,VimeoEmbed}.astro` | These are the `LinkPreview__Video--FullPlayer` flavor under the new taxonomy. Don't rename existing files — alias the names in component dispatch when needed. |
+| OG popover infrastructure (specced, not built) | This spec, §4.23.5 | The single-global-popover pattern + build-time OG fetch are documented; `remark-bare-link` plus the OG fetcher remain to be built. |
+
+### 27.2 Build order (dependencies enforced)
+
+```
+Phase 0  ─┬─  OG fetcher (build-time, cached)
+          ├─  LinkPreviewData type in @lossless-group/lfm
+          └─  Inline-link classifier (mirror of bare-link classifier)
+              │
+              ▼
+Phase 1  ─┬─  ::: link-preview directive transform
+          ├─  LinkPreview__Article--Row.astro
+          ├─  LinkPreview__Article--Card.astro
+          ├─  LinkPreview__Article--Thumb.astro
+          └─  LinkPreview__Article--LiveSite.astro
+              │
+              ▼
+Phase 2  ─┬─  LinkPreview__Video--Row.astro
+          ├─  LinkPreview__Video--Card.astro
+          ├─  LinkPreview__Video--Thumb.astro
+          └─  LinkPreview__Video--Rollup-Gallery.astro
+              │
+              ▼
+Phase 3  ─┬─  ::: link-rollup directive transform
+          ├─  LinkRollup__Column.astro
+          ├─  LinkRollup__Gallery.astro
+          ├─  LinkRollup__Carousel.astro
+          └─  LinkRollup__ThumbRow--HorizontalScroll.astro
+```
+
+Each component lands in `sites/mpstaton-site/src/components/markdown/` first (per the "build in client sites first, extract later" motion). When the design is stable, copy into `packages/lfm-astro/components/` as the canonical pattern source for sibling sites.
+
+### 27.3 Files to read first when starting
+
+In order:
+
+1. **§4.23.6** of this spec — the design contract (component naming, directive grammar, type/format taxonomies, `LinkPreviewData` shape).
+2. **§4.23.5** — the OG-fetch + popover infrastructure that backs both this and the popover family.
+3. **`packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md`** — provider entries are the canonical match list; reuse for video metadata.
+4. **`sites/mpstaton-site/src/lib/markdown/classify-bare-link.ts`** — model for the inline-link classifier. Pattern: pure function, named-capture extraction, mirrors the catalog.
+5. **`sites/mpstaton-site/src/components/markdown/VimeoEmbed.astro`** — reference component shape (semantic-token theming, hex fallbacks, optional caption + copy-URL button).
+
+### 27.4 Architectural decisions already made
+
+- **OG fetcher lives in LFM, not per-site.** One canonical fetcher with one cache shape. Sites import it; cache file lands in each site under `src/data/og-cache.json` (gitignored).
+- **Cache key = URL hash, not URL string.** Avoid filesystem-unsafe characters. Use SHA-256 truncated to 16 hex chars.
+- **Failed fetches are cached as failures** (4xx, timeout, no OG tags) and retried after 24h. Don't block the build on a slow third party.
+- **Tier-A (bare URL) and Tier-B (`:::link-preview`) directives share directive names per provider.** When a YouTube URL is bare and unfurls to `::youtube-video`, the explicit Tier-B form is also `::youtube-video{...}`. The new `:::link-preview{type=video format=row}` is a *different* directive — substitution preview, not full embed.
+- **`LinkRollup__*` containers render their children as the matching format of the preview type.** A `Gallery` rollup of `Article` URLs renders each child as `LinkPreview__Article--Card` because Gallery := Card grid. The rollup component owns the layout primitive; the preview type owns the data shape.
+- **Hover popovers (4.23.1-4) and substitutions (4.23.6) are separate primitives sharing infrastructure.** Don't conflate. A page can use both on the same URL (popover by default; substitution per-instance via directive).
+- **Theme tokens are semantic, not brand-specific.** Use `--card`, `--brand-aqua`, `--foreground`, `--border` with hex fallbacks. Never bake `--bastille` or `--lossless-accent--brightest` into a copy-pattern component.
+- **OG fetcher backend is pluggable; OpenGraph.io is the production default.** Direct `fetch()` fails on too many real-world URLs (Cloudflare, JS-rendered, anti-scrape). The plugin is a thin dispatcher over backend modules — `direct`, `opengraph-io`, `proxy`, `frontmatter-only`. New backends are added as sibling modules without plugin-API churn. Required env: `OPENGRAPH_IO_KEY` (production sites). See §4.23.6 *Build-time OG fetch* "Fetch backend — pluggable" for the table and config shape.
+- **Code-fence form of LFM directives is mandatory for content portability.** Authors edit in Obsidian and depend on community plugins that emit code fences with the directive's name as the lang. ` ```link-preview ` and `:::link-preview` MUST resolve to the same `containerDirective` MDAST node. The `remark-code-fence-as-directive` transform (forthcoming) handles this *before* Shiki, with the directive registry as the source of truth. See §4.23.6 *Author syntax* for grammar.
+- **`LinkPreviewData` is a minimum-viable subset of the canonical Sources schema.** Field names align with the canonical vocabulary (`source` → `publisher`, `publishedAt` → `date_published`, etc.) and `canonicalSource?: { uuid, hexcode?, slug? }` provides a non-breaking promotion path. The full canonical pipeline (download, structured-data extraction, AI classification) lives in `cite-wide` and is **out of scope for the link-preview component work**. Do not block on it.
+- **`aside` is a generic positioning attribute, not LinkPreview-specific.** Implement the read in `LinkPreview__*` and `LinkRollup__*` components first, but use the stable class names `lfm-aside lfm-aside--{value}` so any future container directive (callouts, images, data-points, citations) can adopt with a one-line addition. `*-escape` values align *outside* the main content column in the docs-style nav/TOC track — not as page-margin bleed. Conflict-resolution config (`stack` default, `inline-fallback`, `replace-on-section`) lives on the LFM preset, not per-component.
+- **No-code extensibility is a three-layer system; implement all three from the start.** (1) Reserved Layer-1 attributes on every component (`class`, `style`, `id`, `data-*`, `aria-*`, `lang`) merged onto the wrapper. (2) Per-site variant registry at `src/config/lfm-variants.yaml` with `kind=<name>` lookups. (3) CSS custom-property tokens for theme-wide visual overrides. **Don't** ship a component without all three; missing any one creates a friction cliff that drives authors to ask AI to modify TS, defeating the purpose. Built-in component classes (`lfm-link-preview`, etc.) ALWAYS come first in the class list so site CSS cascade is predictable.
+
+### 27.5 Things NOT to do
+
+- ❌ Don't ship without the OG fetcher. Components rendering "url goes here" cards isn't a useful intermediate state.
+- ❌ Don't rename the existing `YouTubeEmbed.astro` / `VimeoEmbed.astro` to `LinkPreview__Video--FullPlayer.astro`. Alias them at the dispatch layer if the taxonomy requires it. Renaming breaks site git history and any imports that haven't migrated.
+- ❌ Don't put the OG cache in source control. It's a per-site, regeneratable artifact. Add to `.gitignore`.
+- ❌ Don't fetch OG metadata at request time. Build-time only. The fetcher is allowed to be slow once per build; per-request fetches fail Vercel cold-start budgets.
+- ❌ Don't make `LinkPreview__*--LiveSite` work without an explicit `trusted` flag. iframes of arbitrary URLs are an XSS / clickjacking risk. The default should refuse to render and emit a build warning.
+- ❌ Don't try to make rollups support mixed types. One `LinkRollup__*` container = one type. Mixed grids of Article + Video cards are a future feature with its own design.
+- ❌ Don't try to solve the canonical Sources mapping inside this work. The cite-wide blueprint is still evolving (Academic / Market Analyst / Web Ready / Obsidian Style sub-sections empty). Stay inside the bridge defined in §4.23.6 — `canonicalSource?` field, alignment table — and stop. The pipeline that *populates* canonical entries is its own track.
+- ❌ Don't hardcode `direct` as the fetch backend. Even for early dev, default to `opengraph-io` if a key is present in env; fall back to `direct` only when no key is configured AND emit a build warning that production should pin a real backend.
+- ❌ Don't render an `aside=*-escape` card without verifying the layout exposes the escape track (a CSS Grid declaring `[content-start]` / `[content-end]` lines or equivalent). On layouts that don't expose it, escape values MUST collapse to inline flow — silently in production, with a build warning in dev.
+- ❌ Don't hardcode the conflict-resolution policy in components. Read `asideResolution` from the LFM preset config; default to `stack` only when the config is absent. The right resolution differs per site (a docs-heavy site wants `stack`; a memo site that occasionally drops in `*-escape` cards wants `inline-fallback`).
+- ❌ Don't allow author-supplied attributes to overwrite component-managed ones. `format`, `type`, `aside`, `kind`, and internal `data-lfm-*` are filtered from Layer-1 input. Silent in production; build-warning in dev. An author setting `:::link-preview{format=card type=video format=row}` should land on the FIRST `format=card`, not on a Layer-1 override.
+- ❌ Don't put the variant registry in TypeScript. Per `feedback_yaml_data_files`: YAML for client-editable data, TypeScript for runtime logic. The registry is editable by content authors and designers; a typo should produce a build warning, not a build failure.
+
+### 27.6 Verification per phase
+
+**Phase 0 done when:**
+- `pnpm build` in mpstaton-site fetches OG metadata for all observed URLs and writes `src/data/og-cache.json`.
+- Re-running `pnpm build` is a no-op for the cache (100% hits).
+- A URL returning 404 is cached as a failure and doesn't crash the build.
+- The inline-link classifier correctly types a YouTube URL as `Video` and an arbitrary blog URL as `Article`.
+
+**Phase 1 done when:**
+- Authoring `:::link-preview{format=card}\nhttps://example.com/article\n:::` in a memo renders an OG-derived card.
+- The card degrades to a plain link if OG fetch failed.
+- All four `Article` format variants render correctly in `mpstaton-site`'s `_demo` content.
+- A `pnpm build` cycle with all four formats stays under the existing build budget (currently ~6s).
+
+**Phase 2 done when:**
+- Authoring `:::link-preview{type=video format=row}\nhttps://youtu.be/jCe2wg1ulus\n:::` renders a video row with thumbnail + title.
+- The classifier reuses the bare-link catalog's matchers; new providers don't require duplicate code.
+
+**Phase 3 done when:**
+- Authoring `:::link-rollup{type=video format=gallery}` with 6 video URLs renders a clean grid.
+- Carousel scrolls with arrow keys + buttons; gallery reflows responsively.
+- The whole demo memo (`/promote/_demo/memo/version-1`) showcases all formats end-to-end.
+
+### 27.7 Changelog markers when each phase ships
+
+Add a changelog entry to `sites/mpstaton-site/src/content/changelog/{date}_NN.md` for each phase, following the established style (title + body, mermaid diagrams welcome, demo URLs to test). Don't bundle phases — separate commits per phase, separate JSR releases for any LFM-package additions.
+
+### 27.8 Cross-references
+
+- **Spec §4.12** — bare-URL auto-unfurl (the FullPlayer path; complementary feature, shared catalog)
+- **Spec §4.23** — Smart Popovers and Link Previews (hover variant; shares OG infrastructure)
+- **Spec §4.23.5** — OG fetch architecture
+- **Spec §4.23.6** — design contract for this work
+- **Spec §6** — Shared Package Architecture (where the OG fetcher and inline-link classifier live)
+- **Catalog file** — `packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md`
+- **Existing FullPlayer reference implementations** — `sites/mpstaton-site/src/components/markdown/{YouTube*,Vimeo*}.astro`
+
+---
+
+## 28. Glossary
 
 | Term | Definition |
 |------|-----------|
@@ -3721,3 +4391,7 @@ This example demonstrates: frontmatter, hex-code citations, callouts, data point
 |------|--------|
 | 2026-03-25 | Initial draft — codifying existing capabilities and wish list |
 | 2026-03-25 | Major expansion — added directive deep dive, print/PDF behavior, accessibility, dark/light/vibrant mode, edge cases, domain-specific extensions, content portability, link handling, image handling, performance considerations, content linting, migration guide, VS Code support, worked example, and glossary |
+| 2026-05-03 | §4.12 updated to point at the canonical bare-link catalog and component names; §4.23.6 added (Inline Link Substitutions — `LinkPreview__*` and `LinkRollup__*` taxonomy + directive grammar + `LinkPreviewData` shape); refined `#### Next` workflow with phased build order; added §27 Implementation Reference for next-session pickup. |
+| 2026-05-03 | §4.23.6 extended in response to author feedback: (1) `LinkPreviewData` field-aligned with the canonical Sources schema in `cite-wide` and `canonicalSource?: { uuid, hexcode?, slug? }` added as a non-breaking promotion bridge; (2) code-fence form of directives (` ```link-preview `) made mandatory for Obsidian content portability via `remark-code-fence-as-directive`; (3) OG fetcher backends made pluggable with OpenGraph.io as the production default. §27 architectural-decisions and "things not to do" lists updated to match. |
+| 2026-05-03 | §4.23.6 extended again with the `aside` positioning attribute (`none \| left \| right \| left-escape \| right-escape`). `*-escape` values align components **outside** the main content column in the same docs-style nav/TOC track, with explicit conflict-resolution policy (`stack` default \| `inline-fallback` \| `replace-on-section`) for the future where a TOC / file-navigator / page-outline component shares the track. Stable `lfm-aside lfm-aside--{value}` class contract. Compatibility matrix per component family. Cross-cutting: any container directive can adopt the attribute. §27 decisions / anti-patterns updated. |
+| 2026-05-03 | §4.23.6 extended with the no-code extensibility scheme. Three layers: **Layer 1** — reserved per-instance attributes (`class`, `style`, `id`, `data-*`, `aria-*`, `lang`) on every directive, merged onto the wrapper. **Layer 2** — per-site variant registry at `src/config/lfm-variants.yaml` with `kind=<name>` resolving to bundles of classes + attrs, schema portable across all astro-knots sites. **Layer 3** — CSS custom-property tokens in `packages/lfm-astro/css/tokens.css` for theme-wide visual override. Reserved attribute names (`format`, `type`, `aside`, `kind`, internal `data-lfm-*`) are component-managed. Validation knob `strictAttributes: 'warn' \| 'error' \| 'silent'`. §27 decisions / anti-patterns updated. |
