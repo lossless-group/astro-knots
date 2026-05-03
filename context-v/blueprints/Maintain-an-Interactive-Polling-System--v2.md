@@ -8,7 +8,7 @@ date_first_published: null
 site_uuid: e9b53105-c5e3-4c4a-8bb9-e72d88764e0
 publish: true
 title: "Maintain an Interactive Polling System"
-slug: maintain-an-interactive-polling-system
+slug: maintain-an-interactive-polling-system-v2
 lede: "Implementation blueprint for embeddable, theme-aware interactive polls on Astro SSG sites — covering Session/Poll data model, Astro DB on Turso storage, DB→markdown materialization for archive, live-meeting authoring motions, and Svelte + GSAP UI contracts. v0.0.1 ships four templates and one live session."
 at_semantic_version: 0.0.0.2
 status: Draft

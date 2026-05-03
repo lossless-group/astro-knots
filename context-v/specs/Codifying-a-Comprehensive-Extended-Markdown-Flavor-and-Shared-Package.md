@@ -2,10 +2,10 @@
 title: Codifying a Comprehensive Extended Markdown Flavor and Shared Package
 lede: A specification for a named, versioned extended markdown flavor that codifies our existing rendering capabilities, incorporates features from GFM, Obsidian, MDX, and directive-based systems, and defines a wish list for future development — all backed by a shared remark/rehype package.
 date_authored_initial_draft: 2025-01-25
-date_authored_current_draft: 2026-04-26
+date_authored_current_draft: 2026-05-03
 date_authored_final_draft:
 date_first_published:
-date_last_updated: 2026-04-26
+date_last_updated: 2026-05-03
 at_semantic_version: 0.0.1.1
 status: Draft
 augmented_with: Claude Code (Opus 4.6)
@@ -16,7 +16,7 @@ authors:
   - AI Labs Team
 image_prompt: A layered blueprint showing standard markdown at the base, GFM and Obsidian features in the middle, and custom directive-based extensions at the top — all flowing through a unified rendering pipeline into polished web pages and PDFs.
 date_created: 2026-03-25
-date_modified: 2026-03-30
+date_modified: 2026-05-03
 ---
 
 # Codifying a Comprehensive Extended Markdown Flavor and Shared Package
@@ -27,12 +27,29 @@ date_modified: 2026-03-30
 
 ***
 ### Workflow Status
+
+#### Next
+
+##### Basic to Advanced link support
+
+- [ ] Add bare URL (auto-unfurl) support, conditional for video.
+ - [ ] component for bare url to video share links (support YouTube and Vimeo out of the box): LinkPreview__Video--FullPlayer.astro
+- [ ] Add any URL not bare dynamic components: 
+ - [ ] LinkPreview__Article--Row.astro, LinkPreview__Article--Card.astro, LinkPreview__Article--Thumb.astro, LinkPreview__Article--LiveSite.astro, 
+  - [ ] LinkPreview__Video--Row.astro, LinkPreview__Video--Card.astro, LinkPreview__Video--Thumb.astro, 
+
+##### Wikilinks / Backlinks
+-
+| Wikilinks | `[[Page Name]]` | **Wish List**, though working on https://lossless.group |
+
+
 #### Done
-- [ ] GitHub Flavor Markdown working
-- [ ] Citations reordering, including for unique hexCode based citation pairs, is working. 
+- [x] GitHub Flavor Markdown working
+- [x] Citations reordering, including for unique hexCode based citation pairs, is working. 
+- [x] Support Mermaid through CDN (always updated)
 #### In Review
 - [ ] Image component with rich metadata including caption, source, and CSS styles. First iteration done.  Looks good but haven't thoroughly tested it. 
-
+- [ ] Citations vs sources?
 ***
 
 ## 1. Problem

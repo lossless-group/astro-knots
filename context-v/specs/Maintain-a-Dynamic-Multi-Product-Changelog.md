@@ -16,7 +16,7 @@ date_modified: 2025-10-14
 authors:
   - Michael Staton
 image_prompt: "A busy intersection has convertibles coming from all sides, many in the wrong lanes. Each convertible has their backseat filled with software code, stacked on top of each other, often flying off the back of the car. There is a traffic policeman in the middle of the insersection, trying to direct traffic to assure there is not a wreck."
-slug: maintain-a-rigorous-test-suite
+slug: maintain-a-dynamic-multi-product-changelog
 tags: [State-Of-The-Art-Practices, CI-CD-Pipelines]
 ---
 
