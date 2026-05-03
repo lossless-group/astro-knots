@@ -678,31 +678,37 @@ https://soundcloud.com/user/track-name
 
 The renderer detects the platform from the URL and renders the appropriate embed component — no directive syntax, no IDs to extract, no ceremony. The author just pastes the URL.
 
-**Supported auto-unfurl platforms**:
+**Supported auto-unfurl platforms** (canonical record: [`packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md`](../../packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md) — its frontmatter is the source of truth; the table below summarises):
 
-| Platform | URL Patterns | Renders As |
-|----------|-------------|-----------|
-| YouTube | `youtube.com/watch?v=`, `youtu.be/` | Responsive video player with privacy facade |
-| SoundCloud | `soundcloud.com/` | Audio player widget |
-| Vimeo | `vimeo.com/` | Responsive video player |
-| Loom | `loom.com/share/` | Responsive video player |
-| Twitter/X | `twitter.com/*/status/`, `x.com/*/status/` | Tweet embed card |
-| Figma | `figma.com/file/`, `figma.com/design/` | Interactive Figma embed |
-| Spotify | `open.spotify.com/` | Audio player widget |
-| CodePen | `codepen.io/` | Interactive code demo |
-| GitHub Gist | `gist.github.com/` | Rendered gist with syntax highlighting |
+| Status | Platform / kind | URL shapes | Directive emitted | Component |
+|---|---|---|---|---|
+| ✅ Stable | YouTube — full video | `youtu.be/{id}`, `youtube.com/watch?v={id}` | `::youtube-video` | `YouTubeEmbed` |
+| ✅ Stable | YouTube — Short | `youtube.com/shorts/{id}` | `::youtube-short` | `YouTubeShortsEmbed` |
+| ✅ Stable | YouTube — Playlist | `youtube.com/playlist?list={id}` | `::youtube-playlist` | `YouTubePlaylistEmbed` |
+| 🟡 Planned | Vimeo | `vimeo.com/{id}`, `player.vimeo.com/video/{id}` | `::vimeo` | `VimeoEmbed` |
+| 🟡 Planned | Loom | `loom.com/share/{id}` | `::loom` | `LoomEmbed` |
+| 🟡 Planned | Spotify | `open.spotify.com/{type}/{id}` | `::spotify` | `SpotifyEmbed` |
+| 🟡 Planned | SoundCloud | `soundcloud.com/{user}/{track}` | `::soundcloud` | `SoundCloudEmbed` |
+| 🟡 Planned | Twitter / X | `twitter.com/*/status/`, `x.com/*/status/` | `::tweet` | `TweetEmbed` |
+| 🟡 Planned | Figma | `figma.com/file/`, `figma.com/design/` | `::figma` | `FigmaEmbed` |
+| 🟡 Planned | CodePen | `codepen.io/` | `::codepen` | `CodePenEmbed` |
+| 🟡 Planned | GitHub Gist | `gist.github.com/` | `::gist` | `GistEmbed` |
+
+The three stable YouTube classes already have working components in `lossless-monorepo/site/src/components/markdown/`. Note that Shorts get the **dedicated** `YouTubeShortsEmbed` (centered, max-width 320, 9:16 wrapper) rather than the hybrid `YouTubeEmbed` — bare-URL classification is precise enough to pick the right component without relying on internal branching.
+
+**Why a markdown file holds the catalog (not a TS file or JSON)**: the providers list is read by humans more often than by machines — when adding a new platform or auditing why a URL didn't unfurl, plain-prose entries with named captures and explanatory `description:` fields are much faster to scan than typed code. The plugin's build step extracts the frontmatter into a typed JSON module the runtime imports, so source-of-truth stays human-editable while runtime stays fast.
 
 **Tier B — Leaf directive** (when you need control over embed behavior):
 
 ```markdown
-::youtube{id="dQw4w9WgXcQ" start="42" autoplay}
+::youtube-video{id="dQw4w9WgXcQ" start="42" autoplay}
 
 ::soundcloud{url="https://soundcloud.com/user/track" color="#6643e2" visual}
 
 ::figma{url="https://www.figma.com/file/abc123" height="450"}
 ```
 
-Directives give access to platform-specific attributes (start time, color, height, autoplay) that bare URLs don't support.
+Tier-A and Tier-B share **the same directive name per provider** (the `directive` field in the catalog), so the renderer registers one dispatch arm per provider — not two. Directives give access to platform-specific attributes (start time, color, height, autoplay) that bare URLs don't support.
 
 **Tier C — Generic embed** (for unsupported platforms):
 
@@ -718,7 +724,9 @@ Falls back to a sandboxed `<iframe>` with the URL. Use for platforms not in the 
 \https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ```
 
-**Implementation**: A remark plugin scans for paragraph nodes containing a single URL child (a link node with no siblings). If the URL matches a known platform pattern, the paragraph is replaced with a `leafDirective` node typed to that platform. This happens before the directive-to-component mapping, so the rendering layer sees the same MDAST regardless of whether the author used a bare URL or a directive.
+**Implementation** (`packages/lfm/src/plugins/remark-bare-link.ts`): A remark plugin runs after `remark-gfm`'s autolink pass. It walks `paragraph` nodes and detects the bare-URL signal — a paragraph whose only child is a `link` whose `value` equals its `url`. The URL is matched against each provider's matchers (host + path regex with named `(?<id>...)` capture, optional query-parameter constraints) in catalog order; first match wins. Matched paragraphs are replaced with a `leafDirective` node carrying `{ provider, id, url, kind }` attributes. Inline link previews (the `LinkPreview__*--Row/Card/Thumb` family) are an entirely separate concern handled by a different transform that walks inline `link` nodes — the bare-link plugin never touches them.
+
+**Distinct from inline link previews**: bare URL → embedded **player** (full media surface); inline URL with surrounding text → autolink today, optionally a `LinkPreview__*--Row/Card/Thumb` card later. Two transforms, two intents, one shared classification catalog.
 
 #### 4.13 Image Gallery
 
