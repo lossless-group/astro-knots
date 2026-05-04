@@ -11,6 +11,7 @@ packages:
   - sites/arthouse-site
   - sites/fullstack-vc
   - sites/calmstorm-decks
+  - sites/reach-edu-hub
   - design-system-viewer
 
 onlyBuiltDependencies:
