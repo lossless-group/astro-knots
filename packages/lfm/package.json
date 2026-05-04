@@ -16,7 +16,12 @@
       "types": "./dist/types/index.d.ts"
     }
   },
-  "files": ["src", "dist", "README.md", "LICENSE"],
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
@@ -29,6 +34,7 @@
   },
   "devDependencies": {
     "@types/mdast": "^4.0.0",
+    "@types/node": "^25.6.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },

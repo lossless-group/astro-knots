@@ -74,6 +74,9 @@ importers:
       '@types/mdast':
         specifier: ^4.0.0
         version: 4.0.4
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(jiti@2.6.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.3)
@@ -397,8 +400,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.3(astro@6.1.1(@types/node@25.6.0)(@vercel/functions@3.4.3)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.52.4)(typescript@5.9.3)(yaml@2.8.3))(rollup@4.52.4)(svelte@5.55.4)
       '@lossless-group/lfm':
-        specifier: workspace:^
-        version: link:../../packages/lfm
+        specifier: npm:@jsr/lossless-group__lfm@^0.2.2
+        version: '@jsr/lossless-group__lfm@0.2.2'
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
@@ -1528,6 +1531,9 @@ packages:
 
   '@jsr/lossless-group__lfm@0.2.1':
     resolution: {integrity: sha512-c+CxAoCxQjDz01C4ULgRPyDJLS6w5k5L0Iy4vJGe5kBynbXr9koOfXCVJ0PBmoe3vvZYtH9A1hfigwfugNddJA==, tarball: https://npm.jsr.io/~/11/@jsr/lossless-group__lfm/0.2.1.tgz}
+
+  '@jsr/lossless-group__lfm@0.2.2':
+    resolution: {integrity: sha512-1BfpEIV4wAVnEaQfjasTX5idAYE6JBcXPqu97t44JRPPAB/UJ6EIhqZwmC53Pv4/V6ryeYTGzX4i34R0yoNZnw==, tarball: https://npm.jsr.io/~/11/@jsr/lossless-group__lfm/0.2.2.tgz}
 
   '@libsql/client@0.17.3':
     resolution: {integrity: sha512-HXk9wiAoJbKFbyBH4O+aEhN6ir5ERXuXvwE5OD2eR4/5RUa3Pw/8L9zrnVdU+iNJitRvisPWaIwmhkO3bH7giA==}
@@ -8374,6 +8380,16 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@jsr/lossless-group__lfm@0.2.1':
+    dependencies:
+      '@types/mdast': 4.0.4
+      remark-directive: 3.0.1
+      remark-gfm: 4.0.1
+      remark-parse: 11.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
+
+  '@jsr/lossless-group__lfm@0.2.2':
     dependencies:
       '@types/mdast': 4.0.4
       remark-directive: 3.0.1
