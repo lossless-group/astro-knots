@@ -324,10 +324,12 @@ Theme switches do not touch mode, and vice versa. Both persist to `localStorage`
 Tailwind utilities **must** read from CSS custom properties — never hardcode hex/RGB. Tokens come in two tiers (full detail in Themes blueprint §2.1):
 
 - **Named tokens (Tier 1)** — raw values, BEM-ish syntax, top of `theme.css`:
-  - `--color__blue-azure`, `--color__rose-quartz`, `--font__lato`, `--font__playfair-display`
+  - `--color__blue-azure`, `--color__cyan-bright`, `--color__violet-deep`, `--color__lime-terminal`
+  - `--font__lato`, `--font__playfair-display`
   - `__` separator marks "raw named value, not a semantic role." Components do **not** read these directly.
 - **Semantic tokens (Tier 2)** — kebab-case, the system layer Tailwind consumes:
-  - `--color-primary`, `--color-primary-500`, `--color-surface`, `--font-heading-1`, `--font-body`
+  - `--color-primary`, `--color-surface`, `--color-text`, `--color-border`
+  - `--font-heading-1`, `--font-body`
   - Each one references a named token via `var()`. Tailwind v4's `@theme` only auto-generates utilities for kebab-case tokens — that's why this tier stays kebab-case.
 - **Effect tokens (`--fx-*`)** — semantic-tier; carry mode-adaptive intensity for glows, shadows, gradients, canvas/Three.js flares. Same names across modes, different values per mode. See blueprint §9.
 
@@ -338,21 +340,57 @@ Tailwind utilities **must** read from CSS custom properties — never hardcode h
 ```css
 /* Tier 1 — named tokens at the top */
 :root {
-  --color__blue-azure: #1f7ae0;
+  --color__blue-azure: #2563eb;
+  --color__cyan-bright: #06b6d4;
+  --color__violet-deep: #7c3aed;
+  --color__lime-terminal: #84cc16;
+  --color__slate-950: #020617;
+  --color__white: #ffffff;
   --font__lato: 'Lato', system-ui, sans-serif;
 }
+
 /* Tier 2 — semantic tokens in the theme block */
 .theme-default {
   --color-primary: var(--color__blue-azure);
+  --color-accent: var(--color__lime-terminal);
   --font-body: var(--font__lato);
+}
+
+/* MODE: light */
+[data-mode="light"] {
+  --color-background: var(--color__white);
+  --color-surface: #f8fafc;
+  --color-text: var(--color__black);
+  --fx-glow-opacity: 0.06;
+}
+
+/* MODE: dark */
+[data-mode="dark"] {
+  --color-background: var(--color__slate-950);
+  --color-surface: var(--color__slate-900);
+  --color-text: var(--color__white);
+  --fx-glow-opacity: 0.22;
+}
+
+/* MODE: vibrant — CRITICAL: dark-based, not light-based */
+[data-mode="vibrant"] {
+  --color-background: var(--color__black);
+  --color-surface: color-mix(in srgb, var(--color__violet-deep) 20%, var(--color__slate-950));
+  --color-text: var(--color__white);
+  --color-border: var(--color__blue-azure);  /* neon borders */
+  --fx-glow-opacity: 0.55;  /* much higher than dark mode */
+  --fx-headline-gradient: linear-gradient(120deg, var(--color__lime-terminal) 0%, var(--color__cyan-bright) 40%, var(--color__blue-azure) 70%, var(--color__violet-deep) 100%);
 }
 ```
 
-Layering:
+**Layering:**
 
-1. `:root` defines named tokens (Tier 1) and base default scales.
+1. `:root` defines named tokens (Tier 1).
 2. `.theme-*` blocks wire semantic tokens (Tier 2) per brand.
-3. `[data-mode="dark"]` / `[data-mode="vibrant"]` blocks override `--fx-*` and any mode-specific tokens.
+3. `[data-mode="..."]` blocks redefine semantic tokens per mode.
+
+**Critical: Vibrant mode must set all surface/text tokens**  
+A common error: vibrant mode only overrides `--fx-glow-opacity` and inherits light mode's white background. Vibrant is **dark-based**. Always set `--color-background`, `--color-surface`, `--color-text`, `--color-border` in vibrant mode blocks.
 
 ## 6.3 Required Files to Copy
 
@@ -427,11 +465,27 @@ The toggle reads `window.modeSwitcher` (booted by the `<script>` block above). I
 
 Every site ships two internal reference pages — a `/brand-kit` and a `/design-system`. The Brand Kit doubles as the canonical manual test surface for the three-mode system. Full instructions in **Phase 7**.
 
-## 6.6 Mode-Aware Brand Mark
+## 6.6 Vibrant Mode Verification Checklist
+
+After implementing Phase 6, **verify vibrant mode is distinct** from light mode:
+
+- [ ] Toggle to vibrant mode in header
+- [ ] Background is **dark** (not white)
+- [ ] Borders are **neon bright** (not gray)
+- [ ] Text is light/white on dark background
+- [ ] Headline gradient is **multi-color** (4+ stops: lime → cyan → blue → violet)
+- [ ] Glows/shadows are **visibly stronger** than dark mode
+- [ ] Light and vibrant are **obviously different** at first glance
+
+**If light and vibrant look the same:** vibrant mode didn't set `--color-surface` / `--color-text`. See §6.2 above.
+
+**Reference implementation:** `sites/fullstack-vc/src/styles/theme.css` lines 90-130 (vibrant mode block).
+
+## 6.8 Mode-Aware Brand Mark
 
 Logos disappear when their contrast doesn't match the background. Copy `SiteBrandMarkModeWrapper.astro` from `sites/banner-site/src/components/ui/` (the three-mode version) and provide both `lightSrc` and `darkSrc` images. CSS-only swap via `html[data-mode="..."]` selectors — no JS. See blueprint §8.
 
-## 6.7 Verify
+## 6.9 Verify
 
 - [ ] `<html>` carries a `theme-*` class, `data-theme`, and `data-mode` after page load
 - [ ] Toggling mode swaps light ↔ dark ↔ vibrant and persists across reloads
