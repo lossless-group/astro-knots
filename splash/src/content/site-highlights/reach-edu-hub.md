@@ -6,7 +6,7 @@ status: In progress
 repo: https://github.com/lossless-group/reach-edu-hub
 icon: 🎓
 maintained_by: The Lossless Group (client)
-tags: [Education, Hub]
+tags: [Education-Sector-Websites, Client-Work-Hubs, Deck-Generation-Processes]
 ---
 
 The newest site in the workspace. Watch this one to see which patterns survive contact with a

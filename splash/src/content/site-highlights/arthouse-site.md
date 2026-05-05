@@ -2,7 +2,7 @@
 title: arthouse-site
 lede: An image-heavy portfolio surface — the test bed for the gallery and image-rendering patterns.
 order: 90
-status: Active
+status: In-Progress
 repo: https://github.com/lossless-group/arthouse-site
 icon: 🖼️
 maintained_by: The Lossless Group

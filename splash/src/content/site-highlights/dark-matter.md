@@ -1,12 +1,12 @@
 ---
-title: dark-matter
-lede: Matter — the canonical design-system reference. If you need to see the full component catalog rendered in real theme + mode, this is where to look.
+title: matter-site
+lede: Prototype site for a new VC firm, the first instance of using Scroll Decks instead of Reveal.js -- which generated much better designs on first pass and iterations. 
 order: 50
 status: Active
 repo: https://github.com/lossless-group/matter-site
 icon: 🜃
-maintained_by: Matter (client)
-tags: [Client, Design-system]
+maintained_by: Client developer agency.
+tags: [Venture-Capital-Website, Design-System]
 ---
 
 The canonical implementation of the in-site `/design-system` page. The catalog you'd otherwise

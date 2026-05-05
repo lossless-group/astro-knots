@@ -2,7 +2,7 @@
 title: cogs-site
 lede: A steampunk-flavoured exploration of the brand-kit motion — different aesthetic, same conventions.
 order: 110
-status: In progress
+status: Archived
 repo: https://github.com/lossless-group/cogs-site
 icon: ⚙️
 maintained_by: The Lossless Group

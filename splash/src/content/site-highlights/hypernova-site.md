@@ -1,6 +1,6 @@
 ---
 title: hypernova-site
-lede: Hypernova Labs — the canonical reference for the brand-kit page, the three-mode toggle wiring, and the masonry-layout hero.
+lede: Hypernova Capital's future website. Strong brand-kit page, the three-mode toggle wiring, and the masonry-layout hero.
 order: 40
 status: Active
 repo: https://github.com/lossless-group/hypernova-site

@@ -1,13 +1,13 @@
 ---
-title: banner-site
-lede: Banner.vc — first home of the Portfolio-Wide Job Aggregator pattern, scraping 194 live jobs across portfolio companies via free public APIs.
+title: emblem-site
+lede: A site for a new VC firm, first home of the Portfolio-Wide Job Aggregator pattern, scraping 194 live jobs across portfolio companies via free public APIs.
 order: 30
 status: Active
 repo: https://github.com/lossless-group/emblem-site
 icon: 📣
 featured: true
-maintained_by: The Lossless Group (client)
-tags: [Venture, Job-aggregator, Greenhouse, Ashby, Pinpoint]
+maintained_by: The Lossless Group
+tags: [Venture-Capital-Website, Job-Aggregators, Greenhouse-APIs, Ashby-APIs, Pinpoint-APIs]
 ---
 
 Built the first instance of the Portfolio-Wide Job Aggregator. Spec at
