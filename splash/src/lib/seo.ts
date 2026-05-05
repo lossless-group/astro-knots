@@ -1,10 +1,22 @@
 /**
  * Site-wide SEO + OpenGraph registry for the astro-knots splash.
  *
- * One source of truth for titles and descriptions. The OG image is local
- * (public/og-knot.svg) since astro-knots doesn't have a CDN-hosted banner;
- * GitHub Pages will serve it. Some unfurlers may struggle with SVG OG —
- * if that becomes a problem, swap for a generated PNG.
+ * One source of truth for titles, descriptions, and og:image overrides.
+ *
+ * Banner / portrait / square come from the Image-Gin pipeline, hosted on
+ * ImageKit. Convention: the `banner_image` (~1200×630) is the default
+ * og:image; `portrait_image` and `square_image` are exported for the rare
+ * platform that prefers a different aspect.
+ *
+ * Content-type note: the ImageKit URLs end in `.webp` but the CDN
+ * content-negotiates via `Vary: Accept` and serves `image/jpeg` to clients
+ * that don't advertise webp support — which is the case for most link
+ * unfurlers (iMessage, WhatsApp, Slack, LinkedIn). We therefore declare
+ * `image/jpeg` for og:image:type so the type matches the bytes those
+ * clients actually receive.
+ *
+ * Local fallback at /public/og-knot.svg is kept around for emergencies
+ * (CDN outage, etc.) but no longer the default.
  */
 
 import { getCollection } from 'astro:content';
@@ -14,12 +26,32 @@ export const SITE_NAME = 'astro-knots';
 export const SITE_TAGLINE =
   'A workspace of Astro sites tied loosely together by shared patterns and one published package.';
 
-export const DEFAULT_OG_IMAGE = '/og-knot.svg';
+/* ──────────────────────────────────────────────────────────────────────
+   Default OG image — banner aspect (~1.91:1)
+   ────────────────────────────────────────────────────────────────────── */
+
+export const DEFAULT_OG_IMAGE =
+  'https://ik.imagekit.io/xvpgfijuw/Image-Gin/2026-05/Agent_Development_Kit_banner_image_1778013903566_nGqvMx_SX.webp';
 export const DEFAULT_OG_IMAGE_WIDTH = 1200;
 export const DEFAULT_OG_IMAGE_HEIGHT = 630;
-export const DEFAULT_OG_IMAGE_TYPE = 'image/svg+xml';
+export const DEFAULT_OG_IMAGE_TYPE = 'image/jpeg';
 export const DEFAULT_OG_IMAGE_ALT =
-  'astro-knots — interlocking threads representing a workspace of Astro sites.';
+  'astro-knots — a workspace of Astro sites tied loosely together by shared patterns.';
+
+/* ──────────────────────────────────────────────────────────────────────
+   Aspect variants — exported for any page that wants a non-banner share
+   ────────────────────────────────────────────────────────────────────── */
+
+/** Tall (~3:4 / Pinterest, Stories). */
+export const PORTRAIT_OG_IMAGE =
+  'https://ik.imagekit.io/xvpgfijuw/Image-Gin/2026-05/Agent_Development_Kit_portrait_image_1778013904536_GYatYiHaq.webp';
+
+/** Square (1:1 / older Twitter, some embed cards). */
+export const SQUARE_OG_IMAGE =
+  'https://ik.imagekit.io/xvpgfijuw/Image-Gin/2026-05/Agent_Development_Kit_square_image_1778013904829_0Y_T9fanGF.webp';
+
+/** Local SVG fallback. Not the default — kept for CDN-outage emergencies. */
+export const FALLBACK_OG_IMAGE = '/og-knot.svg';
 
 export const TITLE_SUFFIX = 'astro-knots';
 

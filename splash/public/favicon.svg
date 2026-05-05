@@ -1,17 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <defs>
-    <linearGradient id="a" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+    <!-- Ribbon A — indigo-electric → chartreuse (matches --color-accent → --color-thread in dark mode) -->
+    <linearGradient id="ka" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#5b6fff"/>
       <stop offset="100%" stop-color="#c8ff2e"/>
     </linearGradient>
-    <linearGradient id="b" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ec3a8c"/>
+    <!-- Ribbon B — chartreuse → amber (matches --color-thread → --color-accent-warm in dark mode) -->
+    <linearGradient id="kb" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c8ff2e"/>
       <stop offset="100%" stop-color="#ffb84d"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0c0c14"/>
-  <path d="M 14 32 C 14 18 26 14 32 22 C 38 30 50 30 50 18" stroke="url(#a)" stroke-width="4"/>
-  <path d="M 50 18 C 50 30 38 30 32 38 C 26 46 14 46 14 32" stroke="url(#a)" stroke-width="4"/>
-  <path d="M 14 18 C 14 30 26 30 32 22" stroke="url(#b)" stroke-width="4"/>
-  <path d="M 32 38 C 38 46 50 46 50 32 C 50 18 38 14 32 22" stroke="url(#b)" stroke-width="4"/>
+
+  <!-- Ribbon A — left loop into right under-pass -->
+  <path d="M 12 32 C 12 18 24 14 32 22 C 38 30 52 30 52 18" stroke="url(#ka)" stroke-width="3.4"/>
+  <path d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#ka)" stroke-width="3.4"/>
+
+  <!-- Ribbon B — drawn last so it appears on top at the cross -->
+  <path d="M 12 18 C 12 30 24 30 32 22" stroke="url(#kb)" stroke-width="3.4"/>
+  <path d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#kb)" stroke-width="3.4"/>
 </svg>
