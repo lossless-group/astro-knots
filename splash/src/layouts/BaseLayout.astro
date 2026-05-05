@@ -1,0 +1,90 @@
+---
+import MetaTags from '@components/MetaTags.astro';
+import { STATIC_SEO } from '@lib/seo';
+import '@styles/theme.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageType?: string;
+  ogImageAlt?: string;
+  ogType?: string;
+  noindex?: boolean;
+  canonical?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description = STATIC_SEO.root.description,
+  ogImage,
+  ogImageWidth,
+  ogImageHeight,
+  ogImageType,
+  ogImageAlt,
+  ogType,
+  noindex,
+  canonical,
+  publishedTime,
+  modifiedTime,
+  author,
+  tags,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+---
+
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {/* Resolve persisted mode BEFORE first paint to avoid flash. */}
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('astro-knots-mode');
+          var mode = stored === 'light' || stored === 'vibrant' || stored === 'dark'
+            ? stored
+            : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-mode', mode);
+        } catch (e) {
+          /* localStorage unavailable — leave default */
+        }
+      })();
+    </script>
+    <MetaTags
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      ogImageWidth={ogImageWidth}
+      ogImageHeight={ogImageHeight}
+      ogImageType={ogImageType}
+      ogImageAlt={ogImageAlt}
+      ogType={ogType}
+      noindex={noindex}
+      canonical={canonical}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      tags={tags}
+    />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..900,30..100,0..1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <slot />
+  </body>
+</html>

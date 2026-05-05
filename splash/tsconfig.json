@@ -1,0 +1,18 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@loaders/*": ["src/loaders/*"],
+      "@content/*": ["src/content/*"],
+      "@pages/*": ["src/pages/*"],
+      "@styles/*": ["src/styles/*"],
+      "@lib/*": ["src/lib/*"],
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src", ".astro/types.d.ts"],
+  "exclude": ["dist", "node_modules"]
+}

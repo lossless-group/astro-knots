@@ -1,0 +1,17 @@
+{
+  "name": "astro-knots-splash",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "description": "GitHub Pages splash for the astro-knots pseudomonorepo",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "rollup:sync": "node --experimental-strip-types --no-warnings scripts/rollup-sync.ts"
+  },
+  "dependencies": {
+    "astro": "^6.1.7"
+  }
+}

@@ -1,0 +1,642 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import KnotMark from '@components/KnotMark.astro';
+import KnotDivider from '@components/KnotDivider.astro';
+import ModeToggle from '@components/ModeToggle.astro';
+import SiteCard from '@components/SiteCard.astro';
+import TokenSwatchRow from '@components/TokenSwatchRow.astro';
+import { STATIC_SEO } from '@lib/seo';
+
+const base = import.meta.env.BASE_URL;
+
+// Sites — sorted by `order`, alphabetical fallback. Featured first via order.
+const sites = (await getCollection('site-highlights')).sort((a, b) => {
+  const oa = a.data.order ?? 999;
+  const ob = b.data.order ?? 999;
+  if (oa !== ob) return oa - ob;
+  return a.id.localeCompare(b.id);
+});
+
+// Latest changelog teasers (best-effort — empty teaser is fine).
+let latestChangelog: Awaited<ReturnType<typeof getCollection<'changelog'>>> = [];
+try {
+  const all = await getCollection('changelog');
+  latestChangelog = all
+    .filter((e) => e.data.publish !== false)
+    .sort((a, b) => {
+      const da = a.data.date_modified ?? a.data.date_created ?? a.data.date ?? new Date(0);
+      const db = b.data.date_modified ?? b.data.date_created ?? b.data.date ?? new Date(0);
+      return new Date(db).getTime() - new Date(da).getTime();
+    })
+    .slice(0, 3);
+} catch {
+  latestChangelog = [];
+}
+
+const stats = [
+  { value: sites.length.toString(), label: 'Astro sites tied together' },
+  { value: '3', label: 'Modes (light · dark · vibrant)' },
+  { value: '1', label: 'Real published package (LFM)' },
+];
+
+const candor = [
+  {
+    h: 'What survived.',
+    p: 'Co-located development. Each site visible alongside its siblings so patterns can be compared. Submodules so each site stays its own repo and ships independently. A shared context-v/ that travels with the workspace.',
+    tone: 'good',
+  },
+  {
+    h: 'What got promoted.',
+    p: 'Lossless Flavored Markdown. The one piece that was identical across every site — remark/rehype — earned its way out of pattern-land into a real published package. Everything else stayed copy-and-adapt.',
+    tone: 'good',
+  },
+  {
+    h: 'What didn\'t work.',
+    p: 'Treating @knots/* as importable dependencies. Style-free shared components. "Copy when you remember" — we usually didn\'t. Every site\'s design diverged enough that generic UI components were a tax, not a gift.',
+    tone: 'caution',
+  },
+  {
+    h: 'Where it\'s going.',
+    p: 'Selective sharing where it\'s justified, copy-and-adapt where it isn\'t. The two-tier token system + three-mode contract are the closest thing to a non-negotiable convention. You can toggle them in the header right now.',
+    tone: 'good',
+  },
+];
+
+const repoUrl = 'https://github.com/lossless-group/astro-knots';
+---
+
+<BaseLayout title={STATIC_SEO.root.title} description={STATIC_SEO.root.description}>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="topbar__brand" href={base}>
+        <KnotMark size={32} />
+        <span class="topbar__name mono">astro-knots</span>
+      </a>
+      <nav class="topbar__nav" aria-label="Primary">
+        <a href="#sites">Sites</a>
+        <a href="#tokens">Tokens</a>
+        <a href="#candor">Candor</a>
+        <a href={`${base}changelog`}>Changelog</a>
+        <a href={`${base}context-v`}>Notes</a>
+      </nav>
+      <div class="topbar__actions">
+        <ModeToggle />
+        <a href={repoUrl} target="_blank" rel="noopener" class="topbar__cta mono">GitHub →</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">A pseudomonorepo of Astro sites · The Lossless Group</p>
+
+        <div class="hero__lockup">
+          <div class="hero__mark"><KnotMark size={120} /></div>
+          <h1 class="hero__title">
+            <span class="display">Loose threads,</span>
+            <span class="display gradient-text">tied with intent.</span>
+          </h1>
+        </div>
+
+        <p class="hero__lede">
+          Twelve Astro sites. One workspace. A shared context layer, a single published package, and
+          a strict three-mode color contract. Not a true monorepo — never tried to be — but tied
+          together by patterns the team actually uses.
+        </p>
+
+        <div class="hero__actions">
+          <a href="#sites" class="btn btn--primary">See the lattice</a>
+          <a href={repoUrl} target="_blank" rel="noopener" class="btn btn--ghost">View on GitHub →</a>
+          <p class="hero__hint mono">↑ try the mode toggle, watch everything pivot.</p>
+        </div>
+
+        <ul class="hero__stats">
+          {stats.map((s) => (
+            <li>
+              <span class="hero__stat-value display">{s.value}</span>
+              <span class="hero__stat-label">{s.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <KnotDivider />
+
+    <!-- SITES -->
+    <section id="sites" class="section">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">The lattice</p>
+          <h2 class="display">The sites</h2>
+          <p class="section__lede">
+            Each site is its own repo, included here as a git submodule. Each card carries a thread
+            in that site's brand color — a small reminder that nothing's actually merged.
+          </p>
+        </header>
+
+        <div class="sites-grid">
+          {sites.map((s) => (
+            <div class={s.data.featured ? 'sites-cell sites-cell--wide' : 'sites-cell'}>
+              <SiteCard
+                title={s.data.title ?? s.id}
+                slug={s.id}
+                lede={s.data.lede}
+                status={s.data.status}
+                repo={s.data.repo}
+                liveUrl={s.data.live_url}
+                icon={s.data.icon}
+                featured={s.data.featured}
+                tags={s.data.tags}
+                threadColor={s.data.thread_color}
+                maintainedBy={s.data.maintained_by}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKEN DEMO -->
+    <section id="tokens" class="section section--alt">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">The contract</p>
+          <h2 class="display">Two tiers. Three modes. <span class="gradient-text">One toggle.</span></h2>
+          <p class="section__lede">
+            Every astro-knots site declares <code>--color__name</code> raw values at the top of
+            <code>theme.css</code>, then composes <code>--color-bg</code> / <code>--color-accent</code>
+            semantic tokens from them — re-bound per <code>data-mode</code>. Tailwind v4 generates
+            utilities from the kebab-case tier only. Toggle the mode in the header and watch these
+            swatches pivot live.
+          </p>
+        </header>
+
+        <TokenSwatchRow />
+
+        <p class="section__footnote mono">
+          Reference: <code>context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md</code>
+        </p>
+      </div>
+    </section>
+
+    <KnotDivider />
+
+    <!-- CANDOR -->
+    <section id="candor" class="section">
+      <div class="container">
+        <header class="section__head">
+          <p class="eyebrow">Honest notes</p>
+          <h2 class="display">What worked. What didn't.</h2>
+          <p class="section__lede">
+            We tried to be a monorepo. We aren't. Here's what actually held up against the friction
+            of a small team.
+          </p>
+        </header>
+
+        <div class="candor-grid">
+          {candor.map((c) => (
+            <article class={`candor-card candor-card--${c.tone}`}>
+              <h3 class="display">{c.h}</h3>
+              <p>{c.p}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- LATEST CHANGELOG -->
+    {latestChangelog.length > 0 && (
+      <section class="section section--alt">
+        <div class="container">
+          <header class="section__head">
+            <p class="eyebrow">Latest from the workspace</p>
+            <h2 class="display">Recent ship notes</h2>
+            <p class="section__lede">
+              The most recent threads pulled. Each links back to the spec or blueprint that asked
+              for it.
+            </p>
+          </header>
+
+          <ul class="changelog-list">
+            {latestChangelog.map((entry) => {
+              const date = entry.data.date_modified ?? entry.data.date_created ?? entry.data.date;
+              return (
+                <li class="changelog-item">
+                  <a href={`${base}changelog/${entry.id}`}>
+                    <div class="changelog-meta">
+                      {entry.data.from && entry.data.from !== 'astro-knots' && (
+                        <span class="from-tag mono">{entry.data.from}</span>
+                      )}
+                      {date && (
+                        <time class="mono" datetime={new Date(date).toISOString()}>
+                          {new Date(date).toISOString().slice(0, 10)}
+                        </time>
+                      )}
+                      {entry.data.at_semantic_version && (
+                        <span class="pill">{entry.data.at_semantic_version}</span>
+                      )}
+                    </div>
+                    <h3 class="display">{entry.data.title ?? entry.id}</h3>
+                    {entry.data.lede && <p>{entry.data.lede}</p>}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div class="section__foot">
+            <a href={`${base}changelog`} class="btn btn--ghost">All ship notes →</a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA -->
+    <section class="section">
+      <div class="container cta">
+        <div class="cta__text">
+          <h2 class="display">Read the thinking.</h2>
+          <p>
+            Specs, blueprints, prompts, reminders — the working notes that underwrite the code,
+            kept in each site's <code>context-v/</code> and rolled up here.
+          </p>
+        </div>
+        <div class="cta__actions">
+          <a href={`${base}context-v`} class="btn btn--primary">Browse notes</a>
+          <a href={`${base}changelog`} class="btn btn--ghost">Changelog →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <KnotMark size={28} static />
+        <div>
+          <p class="mono footer__mark">astro-knots</p>
+          <p class="footer__tagline">
+            Tied together by <a href="https://www.lossless.group" target="_blank" rel="noopener">The Lossless Group</a>.
+            Part of the <a href="https://github.com/lossless-group/lossless-monorepo" target="_blank" rel="noopener">lossless-monorepo</a>.
+          </p>
+        </div>
+      </div>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href={repoUrl} target="_blank" rel="noopener">Source</a>
+        <a href="https://github.com/lossless-group" target="_blank" rel="noopener">Org</a>
+        <a href="https://jsr.io/@lossless-group/lfm" target="_blank" rel="noopener">@lossless-group/lfm</a>
+      </nav>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* TOPBAR */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: color-mix(in oklab, var(--color-bg) 75%, transparent);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .topbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: 12px;
+  }
+  .topbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text);
+  }
+  .topbar__brand:hover { color: var(--color-accent); }
+  .topbar__name { font-size: 0.95rem; }
+  .topbar__nav {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+    font-size: 0.875rem;
+  }
+  .topbar__nav a { color: var(--color-text-soft); }
+  .topbar__nav a:hover { color: var(--color-accent); }
+  .topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .topbar__cta {
+    color: var(--color-thread) !important;
+    font-size: 0.875rem;
+  }
+  @media (max-width: 880px) {
+    .topbar__nav { display: none; }
+  }
+
+  /* HERO */
+  .hero {
+    padding: clamp(4rem, 14vh, 9rem) 0 clamp(3rem, 8vh, 6rem);
+    position: relative;
+  }
+  .hero__lockup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-4);
+    flex-wrap: wrap;
+  }
+  .hero__mark {
+    flex-shrink: 0;
+  }
+  .hero__title {
+    font-size: clamp(2.6rem, 7.5vw, 5.5rem);
+    line-height: 0.98;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    max-width: 18ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .hero__lede {
+    margin-top: var(--space-6);
+    max-width: 62ch;
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    color: var(--color-text-soft);
+    line-height: 1.55;
+  }
+  .hero__actions {
+    margin-top: var(--space-8);
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .hero__hint {
+    margin-left: var(--space-3);
+    color: var(--color-text-dim);
+    font-size: 0.78rem;
+  }
+
+  .hero__stats {
+    margin-top: var(--space-16);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-6);
+    list-style: none;
+    padding: var(--space-6) 0 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .hero__stats li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .hero__stat-value {
+    font-family: var(--font__display);
+    font-size: clamp(2.5rem, 4.5vw, 3.4rem);
+    font-weight: 600;
+    background: var(--gradient-thread);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+  }
+  .hero__stat-label {
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-family: var(--font__mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    cursor: pointer;
+  }
+  .btn--primary {
+    background: var(--gradient-thread);
+    color: var(--color-bg);
+    font-weight: 600;
+    box-shadow: var(--shadow-glow);
+  }
+  .btn--primary:hover {
+    transform: translateY(-1px);
+    color: var(--color-bg);
+    box-shadow: 0 12px 32px color-mix(in oklab, var(--color-accent) 35%, transparent);
+  }
+  .btn--ghost {
+    background: color-mix(in oklab, var(--color-text) 4%, transparent);
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+  .btn--ghost:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-accent);
+    background: color-mix(in oklab, var(--color-accent) 8%, transparent);
+  }
+
+  /* SECTION */
+  .section {
+    padding: clamp(4rem, 9vh, 7rem) 0;
+  }
+  .section--alt {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklab, var(--color-bg-soft) 60%, transparent) 50%,
+      transparent 100%
+    );
+  }
+  .section__head { max-width: 720px; margin-bottom: var(--space-12); }
+  .section__head h2 {
+    margin-top: var(--space-3);
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+  }
+  .section__lede {
+    margin-top: var(--space-4);
+    color: var(--color-text-soft);
+    font-size: 1.05rem;
+    max-width: 62ch;
+  }
+  .section__lede code {
+    font-family: var(--font__mono);
+    background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    color: var(--color-accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  .section__foot { margin-top: var(--space-8); }
+  .section__footnote {
+    margin-top: var(--space-6);
+    color: var(--color-text-dim);
+    font-size: 0.78rem;
+  }
+  .section__footnote code { color: var(--color-accent); }
+
+  /* SITES GRID — featured spans wide on large screens */
+  .sites-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-4);
+  }
+  .sites-cell {
+    grid-column: span 3;
+    display: flex;
+  }
+  .sites-cell--wide { grid-column: span 6; }
+  .sites-cell > :global(.site-card) { width: 100%; }
+  @media (min-width: 900px) {
+    .sites-cell--wide { grid-column: span 3; }
+    .sites-cell { grid-column: span 2; }
+  }
+  @media (max-width: 640px) {
+    .sites-grid { grid-template-columns: 1fr; }
+    .sites-cell, .sites-cell--wide { grid-column: span 1; }
+  }
+
+  /* CANDOR */
+  .candor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .candor-card {
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    position: relative;
+  }
+  .candor-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--color-accent);
+  }
+  .candor-card--caution::before { background: var(--color-accent-hot); }
+  .candor-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+  .candor-card--caution h3 { color: var(--color-accent-hot); }
+  .candor-card p {
+    color: var(--color-text-soft);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* CHANGELOG TEASER */
+  .changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .changelog-item a {
+    display: block;
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    transition: border-color 200ms ease, transform 200ms ease;
+  }
+  .changelog-item a:hover {
+    border-color: var(--color-border-accent);
+    transform: translateY(-2px);
+    color: var(--color-text);
+  }
+  .changelog-meta {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-2);
+    color: var(--color-text-dim);
+    font-size: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .changelog-item h3 { font-size: 1.15rem; margin-bottom: var(--space-2); }
+  .changelog-item p { color: var(--color-text-soft); font-size: 0.95rem; }
+
+  /* CTA */
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    padding: var(--space-12);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-accent) 10%, transparent),
+        color-mix(in oklab, var(--color-thread) 6%, transparent)
+      );
+  }
+  .cta__text h2 { font-size: clamp(1.75rem, 3.5vw, 2.5rem); }
+  .cta__text p {
+    margin-top: var(--space-3);
+    color: var(--color-text-soft);
+    max-width: 50ch;
+  }
+  .cta__text code {
+    font-family: var(--font__mono);
+    background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    color: var(--color-accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.95em;
+  }
+  .cta__actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+
+  /* FOOTER */
+  .footer {
+    padding: var(--space-12) 0 var(--space-16);
+    border-top: 1px solid var(--color-border);
+  }
+  .footer__inner {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+  }
+  .footer__brand {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  .footer__mark { font-size: 1rem; margin-bottom: var(--space-2); }
+  .footer__tagline { color: var(--color-text-dim); font-size: 0.875rem; max-width: 50ch; }
+  .footer__nav {
+    display: flex;
+    gap: var(--space-6);
+    align-items: flex-start;
+    font-size: 0.875rem;
+  }
+</style>

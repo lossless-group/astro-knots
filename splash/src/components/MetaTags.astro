@@ -1,0 +1,97 @@
+---
+import {
+  SITE_NAME,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_WIDTH,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  DEFAULT_OG_IMAGE_TYPE,
+  DEFAULT_OG_IMAGE_ALT,
+  CHAR_LIMITS,
+  buildPageTitle,
+  truncate,
+} from '@lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageType?: string;
+  ogImageAlt?: string;
+  ogType?: string;
+  noindex?: boolean;
+  canonical?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  ogImageWidth,
+  ogImageHeight,
+  ogImageType,
+  ogImageAlt,
+  ogType = 'website',
+  noindex = false,
+  canonical,
+  publishedTime,
+  modifiedTime,
+  author,
+  tags,
+} = Astro.props;
+
+const usingDefault = !ogImage || ogImage === DEFAULT_OG_IMAGE;
+const isAbsoluteCustom = !!ogImage && ogImage.startsWith('http');
+
+const resolvedImage = ogImage ?? DEFAULT_OG_IMAGE;
+const resolvedWidth = ogImageWidth ?? DEFAULT_OG_IMAGE_WIDTH;
+const resolvedHeight = ogImageHeight ?? DEFAULT_OG_IMAGE_HEIGHT;
+const resolvedType = ogImageType ?? (usingDefault ? DEFAULT_OG_IMAGE_TYPE : isAbsoluteCustom ? 'image/jpeg' : DEFAULT_OG_IMAGE_TYPE);
+const resolvedAlt = ogImageAlt ?? DEFAULT_OG_IMAGE_ALT;
+
+const siteOrigin = (Astro.site?.toString() ?? Astro.url.origin).replace(/\/$/, '');
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonicalUrl = canonical ?? `${siteOrigin}${Astro.url.pathname}`;
+
+const absoluteOgImage = resolvedImage.startsWith('http')
+  ? resolvedImage
+  : `${siteOrigin}${basePath}${resolvedImage.startsWith('/') ? resolvedImage : `/${resolvedImage}`}`;
+
+const fullTitle = truncate(buildPageTitle(title), CHAR_LIMITS.title);
+const trimmedDescription = truncate(description ?? '', CHAR_LIMITS.description);
+const robotsContent = noindex ? 'noindex, nofollow, noarchive, nosnippet' : 'index, follow';
+const isArticle = ogType === 'article';
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={trimmedDescription} />
+<meta name="robots" content={robotsContent} />
+<link rel="canonical" href={canonicalUrl} />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={trimmedDescription} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={absoluteOgImage} />
+<meta property="og:image:secure_url" content={absoluteOgImage} />
+<meta property="og:image:type" content={resolvedType} />
+<meta property="og:image:width" content={String(resolvedWidth)} />
+<meta property="og:image:height" content={String(resolvedHeight)} />
+<meta property="og:image:alt" content={resolvedAlt} />
+
+{isArticle && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{isArticle && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{isArticle && author && <meta property="article:author" content={author} />}
+{isArticle && tags && tags.map((t) => <meta property="article:tag" content={t} />)}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={trimmedDescription} />
+<meta name="twitter:image" content={absoluteOgImage} />
+<meta name="twitter:image:alt" content={resolvedAlt} />

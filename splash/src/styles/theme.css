@@ -1,0 +1,344 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   theme.css — astro-knots splash
+   Built per the Astro Knots two-tier token + three-mode contract this
+   pseudomonorepo itself promotes.
+
+   Tier 1: NAMED tokens (BEM-ish: --color__name, --font__name) — raw values.
+   Tier 2: SEMANTIC tokens (kebab-case: --color-bg, --font-heading-1) —
+           reference the named tier; switch by mode.
+
+   Mode is set on <html data-mode="light|dark|vibrant">.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ─── Tier 1: NAMED tokens (mode-invariant raw values) ─────────────── */
+
+  /* Threads — palette borrowed from across the sibling sites */
+  --color__indigo-deep: #1e1b4b;
+  --color__indigo-electric: #5b6fff;
+  --color__indigo-soft: #c7d2ff;
+  --color__cerise: #ec3a8c;
+  --color__cerise-deep: #b3196a;
+  --color__chartreuse: #c8ff2e;
+  --color__chartreuse-soft: #e6ffa3;
+  --color__amber: #ffb84d;
+  --color__amber-deep: #d4900a;
+  --color__aqua: #4fd1c5;
+  --color__bone: #f6f1e6;
+  --color__sand: #d8cfb8;
+  --color__charcoal: #16161f;
+  --color__ink: #0c0c14;
+  --color__midnight: #060612;
+  --color__slate: #4a4e69;
+  --color__rose: #d96773;
+  --color__terracotta: #c97a55;
+
+  /* Per-site brand threads — used on SiteCard accents */
+  --thread__fullstack-vc: #c4a256;
+  --thread__mpstaton-site: #c8ff2e;
+  --thread__banner-site: #ffb84d;
+  --thread__hypernova-site: #5b6fff;
+  --thread__dark-matter: #7c5cff;
+  --thread__twf_site: #4fd1c5;
+  --thread__cilantro-site: #6fb86b;
+  --thread__cogs-site: #c97a55;
+  --thread__coglet-shuffle: #c97a55;
+  --thread__calmstorm-decks: #6b86c8;
+  --thread__reach-edu-hub: #ec7a6e;
+  --thread__arthouse-site: #d96773;
+
+  /* Type — Tier 1 */
+  --font__display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font__sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font__mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Spacing — invariant */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+
+  /* Defaults to dark — overridden by data-mode below. */
+  color-scheme: dark;
+}
+
+/* ─── Tier 2: SEMANTIC tokens — DARK MODE (default) ──────────────────── */
+:root,
+:root[data-mode='dark'] {
+  --color-bg: var(--color__ink);
+  --color-bg-soft: var(--color__charcoal);
+  --color-bg-elevated: #1c1c28;
+  --color-bg-card: rgba(28, 28, 40, 0.62);
+
+  --color-text: #f1ecdc;
+  --color-text-soft: #c8c1ad;
+  --color-text-dim: #847e6c;
+  --color-text-dimmer: #5a5546;
+
+  --color-accent: var(--color__indigo-electric);
+  --color-accent-soft: var(--color__indigo-soft);
+  --color-accent-warm: var(--color__amber);
+  --color-accent-hot: var(--color__cerise);
+
+  --color-thread: var(--color__chartreuse);
+  --color-thread-soft: var(--color__chartreuse-soft);
+
+  --color-border: rgba(241, 236, 220, 0.08);
+  --color-border-strong: rgba(241, 236, 220, 0.16);
+  --color-border-accent: rgba(91, 111, 255, 0.45);
+
+  --shadow-glow: 0 0 50px rgba(91, 111, 255, 0.18);
+  --shadow-card: 0 18px 36px -22px rgba(0, 0, 0, 0.65);
+
+  /* Hero ornament gradient — used by .gradient-text and the knot */
+  --gradient-thread:
+    linear-gradient(110deg, var(--color__indigo-electric) 0%, var(--color__chartreuse) 50%, var(--color__amber) 100%);
+
+  color-scheme: dark;
+}
+
+/* ─── Tier 2: SEMANTIC tokens — LIGHT MODE ───────────────────────────── */
+:root[data-mode='light'] {
+  --color-bg: var(--color__bone);
+  --color-bg-soft: #ece6d3;
+  --color-bg-elevated: #fffbef;
+  --color-bg-card: rgba(255, 251, 239, 0.78);
+
+  --color-text: var(--color__ink);
+  --color-text-soft: #2a2934;
+  --color-text-dim: #5a5546;
+  --color-text-dimmer: #847e6c;
+
+  --color-accent: var(--color__indigo-deep);
+  --color-accent-soft: #4a4e8c;
+  --color-accent-warm: var(--color__amber-deep);
+  --color-accent-hot: var(--color__cerise-deep);
+
+  --color-thread: var(--color__cerise-deep);
+  --color-thread-soft: #e8a4c4;
+
+  --color-border: rgba(12, 12, 20, 0.1);
+  --color-border-strong: rgba(12, 12, 20, 0.2);
+  --color-border-accent: rgba(30, 27, 75, 0.45);
+
+  --shadow-glow: 0 0 50px rgba(30, 27, 75, 0.12);
+  --shadow-card: 0 18px 36px -22px rgba(20, 18, 50, 0.18);
+
+  --gradient-thread:
+    linear-gradient(110deg, var(--color__indigo-deep) 0%, var(--color__cerise-deep) 50%, var(--color__amber-deep) 100%);
+
+  color-scheme: light;
+}
+
+/* ─── Tier 2: SEMANTIC tokens — VIBRANT MODE ─────────────────────────── */
+/* The "voice" mode for astro-knots — saturation cranked, neon on midnight.
+   This is the differentiator from generic dark mode. */
+:root[data-mode='vibrant'] {
+  --color-bg: var(--color__midnight);
+  --color-bg-soft: #0e0c2a;
+  --color-bg-elevated: #181442;
+  --color-bg-card: rgba(20, 16, 56, 0.72);
+
+  --color-text: #f7faff;
+  --color-text-soft: #d6dcff;
+  --color-text-dim: #8b95d6;
+  --color-text-dimmer: #5e6ba8;
+
+  --color-accent: var(--color__chartreuse);
+  --color-accent-soft: var(--color__chartreuse-soft);
+  --color-accent-warm: var(--color__amber);
+  --color-accent-hot: var(--color__cerise);
+
+  --color-thread: var(--color__cerise);
+  --color-thread-soft: #ffa3cc;
+
+  --color-border: rgba(200, 255, 46, 0.14);
+  --color-border-strong: rgba(200, 255, 46, 0.32);
+  --color-border-accent: rgba(236, 58, 140, 0.55);
+
+  --shadow-glow: 0 0 70px rgba(200, 255, 46, 0.28);
+  --shadow-card: 0 22px 60px -28px rgba(236, 58, 140, 0.45);
+
+  --gradient-thread:
+    linear-gradient(110deg, var(--color__chartreuse) 0%, var(--color__cerise) 50%, var(--color__indigo-electric) 100%);
+
+  color-scheme: dark;
+}
+
+/* ─── Reset & base ───────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-bg);
+  transition: background 320ms ease;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font__sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+  transition: background 320ms ease, color 320ms ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-family: var(--font__display);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'SOFT' 50, 'WONK' 0, 'opsz' 32;
+}
+
+p { margin: 0; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+a:hover { color: var(--color-accent-warm); }
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-thread);
+  color: var(--color-bg);
+}
+
+/* ─── Bg ornament — knotted threads, subtle ─────────────────────────── */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 18% 8%, color-mix(in oklab, var(--color-accent) 18%, transparent), transparent 55%),
+    radial-gradient(ellipse at 82% 12%, color-mix(in oklab, var(--color-thread) 14%, transparent), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--color-accent-warm) 12%, transparent), transparent 60%);
+  transition: background 320ms ease;
+}
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-text) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-text) 4%, transparent) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at top, black 0%, transparent 70%);
+  opacity: 0.6;
+}
+
+body > :not(.bg-mesh) {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.mono { font-family: var(--font__mono); }
+.display { font-family: var(--font__display); }
+
+.eyebrow {
+  font-family: var(--font__mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+.gradient-text {
+  background: var(--gradient-thread);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font__mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-soft);
+  background: color-mix(in oklab, var(--color-text) 4%, transparent);
+}
+.pill[data-status='Active'],
+.pill[data-status='Stable'] {
+  color: var(--color-thread);
+  border-color: color-mix(in oklab, var(--color-thread) 50%, transparent);
+  background: color-mix(in oklab, var(--color-thread) 10%, transparent);
+}
+.pill[data-status='In progress'],
+.pill[data-status='Beta'] {
+  color: var(--color-accent);
+  border-color: color-mix(in oklab, var(--color-accent) 50%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+.pill[data-status='Alpha'],
+.pill[data-status='Experiment'] {
+  color: var(--color-accent-hot);
+  border-color: color-mix(in oklab, var(--color-accent-hot) 50%, transparent);
+  background: color-mix(in oklab, var(--color-accent-hot) 10%, transparent);
+}
+
+.from-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font__mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--color-thread);
+  background: color-mix(in oklab, var(--color-thread) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-thread) 28%, transparent);
+}
+.from-tag::before { content: '◆'; font-size: 0.6rem; opacity: 0.85; }
+
+/* Mode-toggle prefers-reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

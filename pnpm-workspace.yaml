@@ -1,10 +1,11 @@
 packages:
   - packages/*
+  - ../lfm
   - sites/hypernova-site
   - sites/cilantro-site
   - sites/coglet-shuffle
   - sites/coglet-shuffle/astro-site
-  - sites/twf_site
+  - '!sites/twf_site'
   - sites/banner-site
   - sites/dark-matter
   - sites/mpstaton-site

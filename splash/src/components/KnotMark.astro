@@ -1,0 +1,90 @@
+---
+/**
+ * KnotMark — the signature interlocking-thread mark for astro-knots.
+ *
+ * Two ribbons pass through each other in a Solomon's-knot-style braid.
+ * Strokes use the live theme tokens so the mark recolors with the mode
+ * toggle. An animated dasharray gives a faint "pulling thread" motion.
+ */
+
+interface Props {
+  /** Width/height in pixels. Default 56. */
+  size?: number;
+  /** Disable the breathing animation. */
+  static?: boolean;
+}
+
+const { size = 56, static: isStatic = false } = Astro.props;
+---
+
+<svg
+  class:list={["knot-mark", { "knot-mark--static": isStatic }]}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id="knot-thread-a" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-accent)" />
+      <stop offset="100%" stop-color="var(--color-thread)" />
+    </linearGradient>
+    <linearGradient id="knot-thread-b" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-thread)" />
+      <stop offset="100%" stop-color="var(--color-accent-warm)" />
+    </linearGradient>
+  </defs>
+
+  {/* Ribbon A — left loop into right under-pass */}
+  <path
+    class="knot-thread knot-thread--a"
+    d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18"
+    stroke="url(#knot-thread-a)"
+    stroke-width="3.4"
+  />
+  <path
+    class="knot-thread knot-thread--a"
+    d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32"
+    stroke="url(#knot-thread-a)"
+    stroke-width="3.4"
+  />
+
+  {/* Ribbon B — right loop into left under-pass, drawn second so it appears on top at the cross */}
+  <path
+    class="knot-thread knot-thread--b"
+    d="M 12 18 C 12 30 24 30 32 22"
+    stroke="url(#knot-thread-b)"
+    stroke-width="3.4"
+  />
+  <path
+    class="knot-thread knot-thread--b"
+    d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22"
+    stroke="url(#knot-thread-b)"
+    stroke-width="3.4"
+  />
+</svg>
+
+<style>
+  .knot-mark {
+    overflow: visible;
+    filter: drop-shadow(0 0 14px color-mix(in oklab, var(--color-accent) 32%, transparent));
+  }
+  .knot-thread {
+    stroke-dasharray: 220;
+    stroke-dashoffset: 0;
+  }
+  .knot-mark:not(.knot-mark--static) .knot-thread--a {
+    animation: knot-flow 9s ease-in-out infinite;
+  }
+  .knot-mark:not(.knot-mark--static) .knot-thread--b {
+    animation: knot-flow 9s ease-in-out infinite;
+    animation-delay: -4.5s;
+  }
+  @keyframes knot-flow {
+    0%, 100% { stroke-dashoffset: 0; }
+    50% { stroke-dashoffset: 60; }
+  }
+</style>

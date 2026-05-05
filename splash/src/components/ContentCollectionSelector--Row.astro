@@ -1,0 +1,147 @@
+---
+/**
+ * ContentCollectionSelector--Row
+ *
+ * Pure HTML+CSS+vanilla-JS filter row. Click a pill → only matching list items
+ * remain visible (via the native `hidden` attribute). Click "All" → reset.
+ */
+
+interface Option {
+  value: string;
+  label: string;
+  count?: number;
+}
+
+interface Props {
+  options: Option[];
+  targetSelector: string;
+  matchAttribute: string;
+  defaultValue?: string;
+  label?: string;
+  id?: string;
+}
+
+const {
+  options,
+  targetSelector,
+  matchAttribute,
+  defaultValue = 'all',
+  label = 'Filter by source',
+  id,
+} = Astro.props;
+
+const totalCount = options.reduce((acc, o) => acc + (o.count ?? 0), 0);
+const merged: Option[] = [
+  { value: 'all', label: 'All', count: totalCount > 0 ? totalCount : undefined },
+  ...options,
+];
+---
+
+<nav
+  class="cc-selector"
+  {...(id ? { id } : {})}
+  aria-label={label}
+  data-target-selector={targetSelector}
+  data-match-attribute={matchAttribute}
+>
+  <ul class="cc-selector-list" role="list">
+    {merged.map((opt) => (
+      <li>
+        <button
+          class="cc-selector-btn"
+          type="button"
+          data-cc-value={opt.value}
+          aria-pressed={opt.value === defaultValue ? 'true' : 'false'}
+        >
+          <span class="cc-selector-label">{opt.label}</span>
+          {opt.count != null && <span class="cc-selector-count">{opt.count}</span>}
+        </button>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .cc-selector { margin-bottom: var(--space-8); }
+  .cc-selector-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .cc-selector-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-text) 4%, transparent);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-soft);
+    font-family: var(--font__mono);
+    font-size: 0.78rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+  }
+  .cc-selector-btn:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+  }
+  .cc-selector-btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+  .cc-selector-btn[aria-pressed='true'] {
+    color: var(--color-bg);
+    background: var(--gradient-thread);
+    border-color: transparent;
+    font-weight: 600;
+  }
+  .cc-selector-count {
+    display: inline-flex;
+    align-items: center;
+    min-width: 1.25em;
+    justify-content: center;
+    font-size: 0.7rem;
+    opacity: 0.85;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-text) 8%, transparent);
+  }
+  .cc-selector-btn[aria-pressed='true'] .cc-selector-count {
+    background: rgba(0, 0, 0, 0.18);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.cc-selector').forEach((root) => {
+    const targetSelector = root.dataset.targetSelector;
+    const matchAttribute = root.dataset.matchAttribute;
+    if (!targetSelector || !matchAttribute) return;
+
+    const list = document.querySelector(targetSelector);
+    if (!list) return;
+    const items = Array.from(list.querySelectorAll<HTMLElement>(`[${matchAttribute}]`));
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      const btn = target?.closest<HTMLButtonElement>('button[data-cc-value]');
+      if (!btn) return;
+
+      const value = btn.dataset.ccValue;
+      if (value === undefined) return;
+
+      root.querySelectorAll<HTMLButtonElement>('button[data-cc-value]').forEach((b) => {
+        b.setAttribute('aria-pressed', b.dataset.ccValue === value ? 'true' : 'false');
+      });
+
+      items.forEach((item) => {
+        const matches = value === 'all' || item.getAttribute(matchAttribute) === value;
+        item.toggleAttribute('hidden', !matches);
+      });
+    });
+  });
+</script>

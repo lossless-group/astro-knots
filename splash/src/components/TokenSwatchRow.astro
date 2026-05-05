@@ -1,0 +1,62 @@
+---
+/**
+ * TokenSwatchRow — a tiny demo of the two-tier token system.
+ * Each swatch shows a SEMANTIC token (--color-bg, --color-accent, etc.)
+ * resolving to whichever named token the active mode points at. Toggle
+ * the mode in the header and watch this row pivot in real time.
+ */
+
+const swatches = [
+  { token: '--color-bg', label: 'bg' },
+  { token: '--color-bg-elevated', label: 'bg-elevated' },
+  { token: '--color-text', label: 'text' },
+  { token: '--color-text-soft', label: 'text-soft' },
+  { token: '--color-accent', label: 'accent' },
+  { token: '--color-accent-warm', label: 'accent-warm' },
+  { token: '--color-thread', label: 'thread' },
+  { token: '--color-accent-hot', label: 'accent-hot' },
+];
+---
+
+<div class="token-swatch-row" aria-label="Live semantic token swatches — toggle mode to see them shift">
+  {swatches.map((s) => (
+    <div class="swatch">
+      <div class="swatch__chip" style={`background: var(${s.token});`}></div>
+      <code class="swatch__code">{s.token}</code>
+      <code class="swatch__label">{s.label}</code>
+    </div>
+  ))}
+</div>
+
+<style>
+  .token-swatch-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .swatch__chip {
+    height: 48px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    transition: background 320ms ease;
+  }
+  .swatch__code {
+    font-family: var(--font__mono);
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+  }
+  .swatch__label {
+    font-family: var(--font__mono);
+    font-size: 0.78rem;
+    color: var(--color-accent);
+  }
+</style>

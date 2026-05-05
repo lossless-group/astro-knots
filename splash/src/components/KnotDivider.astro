@@ -1,0 +1,38 @@
+---
+/**
+ * KnotDivider — a thin horizontal SVG flourish used between sections.
+ * Two sine-wave threads weaving through each other. Width: 100%; height: 24px.
+ */
+---
+
+<div class="knot-divider" aria-hidden="true">
+  <svg viewBox="0 0 800 24" preserveAspectRatio="none" fill="none" stroke-linecap="round">
+    <path
+      class="knot-divider__thread knot-divider__thread--a"
+      d="M 0 12 Q 100 0 200 12 T 400 12 T 600 12 T 800 12"
+      stroke="var(--color-accent)"
+      stroke-width="1.5"
+      opacity="0.6"
+    />
+    <path
+      class="knot-divider__thread knot-divider__thread--b"
+      d="M 0 12 Q 100 24 200 12 T 400 12 T 600 12 T 800 12"
+      stroke="var(--color-thread)"
+      stroke-width="1.5"
+      opacity="0.6"
+    />
+  </svg>
+</div>
+
+<style>
+  .knot-divider {
+    width: 100%;
+    height: 24px;
+    margin: var(--space-8) 0;
+  }
+  .knot-divider svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
