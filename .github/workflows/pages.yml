@@ -1,0 +1,74 @@
+name: Deploy splash to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: splash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # No submodules needed — rolled-up content lives in splash/src/rollup/
+          # already, synced manually via `pnpm rollup:sync` and committed to
+          # the repo. Build is pure file IO.
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: splash/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build
+        run: pnpm build
+        # No GITHUB_TOKEN needed — rolled-up content is pre-synced in
+        # splash/src/rollup/. Run `pnpm rollup:sync` locally and commit
+        # to refresh.
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages on first run so the workflow bootstraps itself
+          # even when "Get Pages site" returns 404 the very first time.
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: splash/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

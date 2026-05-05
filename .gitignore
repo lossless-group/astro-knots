@@ -38,6 +38,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+data.json
 
 # Editors & OS
 .DS_Store
