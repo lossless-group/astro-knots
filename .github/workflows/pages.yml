@@ -42,7 +42,10 @@ jobs:
           cache-dependency-path: splash/pnpm-lock.yaml
 
       - name: Install
-        run: pnpm install --frozen-lockfile=false
+        # --ignore-workspace because the parent astro-knots/pnpm-workspace.yaml
+        # doesn't include splash/. Without it, pnpm walks up, finds the parent
+        # workspace, and refuses to install splash's deps.
+        run: pnpm install --ignore-workspace --frozen-lockfile=false
 
       - name: Build
         run: pnpm build
