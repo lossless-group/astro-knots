@@ -205,9 +205,9 @@ Each Tier-A component MUST:
 - Same input set, minus `start` (Shorts are too short for time deep-links to matter).
 
 ##### `YouTubePlaylistEmbed` *(current focus — see §4.1.3)*
-- 16:9 frame with a playlist sidebar (provider's own UI when `&list={id}` is in the embed URL).
-- Inputs: `id` (the playlist ID, prefixed `PL`/`UU`/`OL` etc.), `index?` (which item to start on), `start?` (seconds within the starting item).
-- **Distinguishes itself visually** from a single-video embed — see open questions in §4.1.3.
+- 16:9 player paired with **our own** sidebar (theme-token-chromed, server-rendered from build-time data) — not YouTube's iframe sidebar. The author-facing surface is one component; under the hood it's an Astro shell + a small Svelte island for click-to-play interactivity.
+- Inputs: `id` (the playlist ID, prefixed `PL`/`UU`/`OL` etc.), `index?` (which item to start on, default 0), `start?` (seconds within the starting item).
+- **Distinguishes itself visually** from a single-video embed via header strip (title + item count + channel) and item sidebar — see §4.1.3 for the full architecture.
 
 ##### `VimeoEmbed`
 - 16:9 frame, Vimeo's player chrome.
@@ -218,16 +218,110 @@ Each Tier-A component MUST:
 - Per Loom's embed URL pattern (`loom.com/embed/{id}`).
 - Inputs: `id`, `start?`, `t?`. Loom's iframe has the most stable embed contract of the planned providers.
 
-#### 4.1.3 Playlist UX — The Specific Gap This Spec Triggers
+#### 4.1.3 Playlist UX — Full Architecture
 
-A playlist URL today auto-unfurls to a frame that looks identical to a single-video embed — same chrome, same aspect, same affordances. Authors expect the playlist nature to be communicated visually before the user clicks play. Open questions:
+A playlist URL today auto-unfurls to a frame that looks identical to a single-video embed — same chrome, same aspect, same affordances. The fix is to **own the sidebar**: server-render our own list of playlist items at build time, hide YouTube's built-in sidebar, and use a small client-side island to wire click-to-play through the YouTube IFrame Player API.
 
-1. **Sidebar visible by default?** YouTube's `?list=` embed param plus `&listType=playlist` exposes the sidebar, but it pushes the player to the left and on narrow viewports becomes unreadable. Decision pending: sidebar-on by default at ≥1024px, sidebar-off below.
-2. **Header strip with playlist title and item count.** Pulled from oEmbed (`https://www.youtube.com/oembed?url=...`) at build-time and cached alongside the OG cache. Falls back to "YouTube playlist" if the fetch fails.
-3. **"Play first" affordance vs. "Show all" link to YouTube** — both, with the first being the default action.
-4. **Theme-token chrome around the iframe** — a thin `--card`/`--border` frame so the playlist component reads as a *bundle* visually, not as a single-video player. This is the cheapest visual cue and should land first.
+This decision favors *control* over *zero-API-key minimum*. The cost is a YouTube Data API v3 key in `.env`; the payoff is a playlist component that visually communicates "this is a bundle of N videos" before the user clicks play, themes cleanly, and never makes a runtime API call (everything is build-time and cached).
 
-These four points define the playlist component's near-term roadmap. They are scoped narrowly so progress is visible without a full UX overhaul.
+##### 4.1.3.1 Data acquisition (build-time)
+
+A `youtube-playlist-fetcher` runs during the build, parallel to the existing OG fetcher. For each unique playlist ID encountered in the markdown corpus:
+
+1. **Playlist metadata** — `GET https://www.googleapis.com/youtube/v3/playlists?id={id}&part=snippet,contentDetails&key={YOUTUBE_API_KEY}`. Returns title, description, channel, item count.
+2. **Playlist items** — `GET https://www.googleapis.com/youtube/v3/playlistItems?playlistId={id}&part=snippet,contentDetails&maxResults=50&pageToken={...}&key={...}`. Returns each item's `videoId`, position, title, thumbnails, channel. Paginated when item count > 50.
+3. **Video durations** — `GET https://www.googleapis.com/youtube/v3/videos?id={comma-separated-ids}&part=contentDetails&key={...}`. Batched in groups of 50 video IDs per request. Required because `playlistItems` does not include duration.
+
+The three calls combine into a single cache entry per playlist:
+
+```ts
+interface PlaylistCacheEntry {
+  id: string;                       // playlist ID
+  title: string;
+  description?: string;
+  channelTitle: string;
+  channelId: string;
+  itemCount: number;                 // contentDetails.itemCount
+  thumbnail: string;                 // playlist thumbnail (highest available)
+  fetchedAt: string;                 // ISO timestamp
+  items: PlaylistItem[];
+}
+
+interface PlaylistItem {
+  videoId: string;
+  position: number;                  // zero-indexed, matches IFrame API playVideoAt
+  title: string;
+  thumbnail: string;                 // medium or high res
+  duration?: string;                 // ISO 8601 (PT4M30S); absent if video is unavailable
+  channelTitle?: string;
+  unavailable?: boolean;             // private / deleted videos that show as "Private video"
+}
+```
+
+##### 4.1.3.2 Cache and quotas
+
+Cache file: `src/data/youtube-playlist-cache.json` (gitignored, like the OG cache). Keyed by playlist ID. TTL configurable per-site (default 30 days — playlists change rarely; titles change rarer).
+
+Quota: each playlist costs ~3 API calls (1 playlist + 1 playlistItems for ≤50 items + 1 videos for durations). The free tier (10,000 units/day) covers hundreds of unique playlists per build. A site with >100 unique playlists per build should consider extending the TTL or upgrading the quota.
+
+Failure modes:
+- **API key missing** — fetcher logs a warning, writes a minimal cache entry with just `id` and `itemCount: 0`, the component degrades to facade mode (poster + "Open on YouTube" CTA).
+- **Rate limited (429)** — same fallback; the playlist with no fresh data gets last-known-good from the existing cache, or facade mode if no prior cache entry exists.
+- **Playlist private/deleted** — fetcher records `unavailable: true` and the component shows a deactivated card.
+
+##### 4.1.3.3 Render layout
+
+```
+┌──────────────────────────────────────────┬──────────────────────────────┐
+│                                          │  Playlist title              │
+│                                          │  Channel · 12 videos          │
+│         16:9 player iframe               │  ─────────────────────────   │
+│         (YouTube IFrame, jsapi=1)        │  ▶ 1. First video    4:32    │
+│                                          │    2. Second video   3:18    │
+│                                          │    3. Third video    7:01    │
+│                                          │    4. ...                    │
+└──────────────────────────────────────────┴──────────────────────────────┘
+```
+
+- **Header strip** above the player: playlist title, channel, item count.
+- **Sidebar list** to the right at ≥1024px viewport width; collapses below the player at <1024px (sidebar becomes a horizontal-scroll thumb row or a "Show 12 videos" disclosure depending on viewport).
+- **Theme-token chrome** wraps the whole component (`--card` / `--border` / `--brand-aqua` accents) so the assembly visually reads as a single bundle, not two stacked widgets.
+- **Active item highlighted** in the sidebar; updates as the iframe advances.
+
+##### 4.1.3.4 Interactivity (Svelte island)
+
+The Astro shell server-renders everything: header strip, iframe `<iframe>` element with `?listType=playlist&list={id}&enablejsapi=1&modestbranding=1&rel=0`, sidebar list with each item's metadata. Static HTML, fast first paint, no JS needed to *see* the playlist.
+
+A small Svelte island (`PlaylistController.svelte`) hydrates **only** the sidebar interactivity:
+
+- Click an item → `iframe.contentWindow.postMessage({event: 'command', func: 'playVideoAt', args: [position]}, '*')` per the YouTube IFrame Player API.
+- Listens for `onStateChange` events from the iframe (`postMessage` with `{event: 'infoDelivery', info: {videoData: {...}}}`) and updates the active-item highlight.
+- No external fetch at runtime; all data was inlined into the island's props by the Astro shell.
+
+Why Svelte and not vanilla JS: this is the smallest interactive unit on the site that's worth a framework — the postMessage/event-listener wiring + the active-item state syncing is tedious in vanilla, three lines in Svelte. Astro's `client:visible` directive defers hydration until the playlist scrolls into view, so playlists below the fold don't pay the JS cost until needed.
+
+##### 4.1.3.5 Authoring contract (unchanged)
+
+The author writes either a bare URL or the directive form. Both paths produce the same component with the same props:
+
+```markdown
+https://youtube.com/playlist?list=PLME9DvdybGUN7PtbmJhSyYcUakt7tAya1
+
+:::youtube-playlist{align="left"}
+https://youtube.com/playlist?list=PLME9DvdybGUN7PtbmJhSyYcUakt7tAya1
+:::
+
+::youtube-playlist{id="PLME9DvdybGUN7PtbmJhSyYcUakt7tAya1" index=2}
+```
+
+The `align` attribute on directive form mirrors the Shorts pattern (§4.1.2 — float right by default, `align="left"` to flip). Default for playlists is full-column though, since at typical reading widths the sidebar won't fit at float widths. `align` becomes meaningful only at viewports wide enough to host both the player and surrounding prose.
+
+##### 4.1.3.6 Open implementation questions
+
+1. **Active-item highlight on first paint.** The Svelte island can't know the current video before hydration; the SSR'd sidebar shows item 0 (or the `index` prop value) as active. If the user has been watching a few items before scrolling back, the highlight will lag until hydration catches up. Acceptable for v1.
+2. **Playlist with >200 items.** Fetcher pages through all of them but the sidebar gets unwieldy. Decision: cap displayed items at 50, show a "Show all on YouTube" link below the sidebar when the playlist exceeds the cap. Cache still stores all items for completeness.
+3. **Private/deleted items** show as inactive sidebar entries with a struck-through title and no click handler. Not skipped — the position numbering matters for parity with YouTube's own list.
+4. **Sidebar at narrow widths.** Use the cross-cutting mobile-sidebar pattern (§5.9): in-article a compact "feature placeholder" card shows a thumbnail strip + title + count + a "Browse playlist →" CTA. Tapping the CTA (or swiping left) slides the sidebar in as a full-screen panel; swipe right (or tap a back button) returns the reader to the article. The iframe player remains in the article view; the full-screen sidebar is browse-only. This pattern applies to *every* sidebar-positioned component in LFM, not just playlists — playlist is the first consumer.
 
 ### 4.2 Tier B — Directive-Form Players
 
@@ -412,6 +506,39 @@ Useful for "I'm referencing this URL, I don't want a player" situations.
 
 YouTube embeds use `youtube-nocookie.com` by default. Vimeo's player is GDPR-friendly out of the box. Sites that need stricter posture (e.g. publishing in EU jurisdictions with an active cookie banner) opt into facade-only mode (§5.4) so no provider iframe loads until the reader explicitly clicks play.
 
+### 5.9 Mobile Sidebar Pattern (cross-cutting)
+
+Any LFM component that renders a *sidebar* alongside primary content on desktop — the playlist sidebar (§4.1.3.3), the upcoming `LinkRollup__Column` aside variant, the `LinkPreview__*--Card` with `aside="right"`, or any future sidebar-shaped surface — needs a coherent mobile fallback. The reading column on a phone is too narrow to host a sidebar inline; collapsing the sidebar to a stacked block below the primary content buries it.
+
+**The pattern (`MobileFeaturePlaceholder`):**
+
+On mobile (≤768px viewport), the sidebar is replaced inline by a **feature-placeholder card** — a compact, scannable preview of what's in the sidebar plus a clear CTA to browse the full thing. Tapping the CTA (or a leftward swipe gesture on the placeholder) slides the full sidebar in as a **full-screen panel** that occupies the viewport. The reader navigates the sidebar in that dedicated screen; a back button or a rightward swipe returns them to the article view at the same scroll position.
+
+| Surface | Desktop (≥1024px) | Tablet (768–1023px) | Mobile (≤768px) |
+|---|---|---|---|
+| Primary content (player / article body) | Visible alongside sidebar | Visible alongside sidebar (narrower) | Visible; sidebar replaced by placeholder card |
+| Sidebar | Right column, sticky-friendly | Right column, narrower | **Full-screen panel** on demand |
+| Reader navigation between the two | Always-visible side-by-side | Always-visible side-by-side | Tap CTA / swipe → swipe back |
+
+**Why this pattern, not "stack below" or "horizontal-scroll thumb row":**
+
+- *Stack below* loses the affordance — the sidebar's "I'm related but secondary" semantics get flattened into "more body content."
+- *Horizontal-scroll thumb row* works only when the sidebar's items are visually compact (thumbnails) and uniform (no per-item metadata that wants vertical space). A playlist item with title + duration + channel doesn't fit.
+- *Full-screen panel* preserves the spatial relationship readers learn from desktop ("this thing is *over there*, accessible when I want it") and gives the sidebar enough room to render its native density without compromise.
+
+**Component contract:**
+
+A new shared component `MobileFeaturePlaceholder.astro` (lives in `src/components/markdown/` per consuming site, or eventually in a shared `@knots/*` patterns package) accepts:
+- A *placeholder render* (Astro slot) — the compact preview visible inline on mobile
+- A *full-content render* (Astro slot) — the same content the desktop sidebar shows, displayed in the full-screen panel
+- A `label` prop ("Browse playlist", "See related", etc.) — the CTA text
+
+The component handles the panel slide-in/-out, swipe gestures (touch events with a horizontal-velocity threshold), focus management (panel traps focus when open, returns it on close), scroll restoration, and the back-button affordance (both an in-panel button and the browser back button via `history.pushState` so swipe-back isn't the only escape).
+
+The desktop sidebar render is wrapped in a `<MobileFeaturePlaceholder>` boundary by every consuming component. CSS `@media` rules and the placeholder's internal logic decide which surface (inline placeholder vs. always-visible sidebar vs. full-screen panel) is active at the current viewport.
+
+**Implementation track:** Phase 1a builds this for the playlist as the first consumer, then any future sidebar-positioned component reuses the same `MobileFeaturePlaceholder` boundary. The pattern is documented here, not deferred to per-component implementation, so subsequent components inherit the contract instead of inventing their own.
+
 ***
 
 ## 6. Implementation Phases
@@ -422,9 +549,22 @@ YouTube embeds use `youtube-nocookie.com` by default. Vimeo's player is GDPR-fri
 - [x] OG fetcher (build-time, cached) — used as fallback when provider matchers don't extract a thumbnail/title
 
 ### Phase 1 — Tier-A polish (current focus)
-- [ ] Playlist component visual differentiation (§4.1.3, items 1–4)
-- [ ] Facade mode wired in `YouTubeEmbed`, `YouTubeShortsEmbed`, `YouTubePlaylistEmbed`, `VimeoEmbed`
-- [ ] oEmbed enrichment build step that populates title/duration/thumbnail for catalog providers and writes to the OG cache
+
+#### Phase 1a — Playlist component (full architecture per §4.1.3)
+- [ ] Add `YOUTUBE_API_KEY` to `.env` (free quota; ~10k units/day)
+- [ ] Build `youtube-playlist-fetcher` parallel to `og-fetcher`: collects unique playlist IDs from the markdown corpus, fetches `playlists` + `playlistItems` (paginated) + `videos` (durations, batched), writes `src/data/youtube-playlist-cache.json`
+- [ ] Cache shape: `PlaylistCacheEntry` with title, channel, item count, items[]; TTL configurable per-site (default 30 days)
+- [ ] Refactor `YouTubePlaylistEmbed.astro` from "iframe-only" to "Astro shell + Svelte island" architecture: server-rendered header strip + sidebar list, hydrate sidebar interactivity only
+- [ ] Implement `PlaylistController.svelte`: postMessage to iframe via YouTube IFrame Player API (`enablejsapi=1`), `playVideoAt(index)` on item click, listen for `onStateChange` to update active highlight; mount with `client:visible`
+- [ ] Hide YouTube's built-in sidebar (don't pass `&listType=playlist` to the iframe URL); render our themed sidebar instead
+- [ ] Responsive: sidebar to the right at ≥1024px; tablet (768–1023px) keeps inline sidebar with narrower width; mobile uses the §5.9 `MobileFeaturePlaceholder` pattern
+- [ ] **Build `MobileFeaturePlaceholder.astro` (cross-cutting per §5.9)** — placeholder slot + full-content slot + label prop; handles slide-in panel, swipe gestures, focus trap, scroll restoration, browser-back integration. First consumer is the playlist sidebar; future sidebar components reuse the same boundary.
+- [ ] Failure modes: missing API key → facade fallback; rate-limit → last-known-good cache or facade; private/deleted items → struck-through inactive entries
+- [ ] Cap displayed items at 50; show "Show all on YouTube" link when the playlist exceeds the cap
+
+#### Phase 1b — Other Tier-A polish
+- [ ] Facade mode wired in `YouTubeEmbed`, `YouTubeShortsEmbed`, `VimeoEmbed` (the playlist component handles facade as a degraded state under Phase 1a)
+- [ ] oEmbed enrichment build step that populates title/duration/thumbnail for catalog providers (single-video, Vimeo, Loom) and writes to the OG cache
 
 ### Phase 2 — `LinkPreview__Video--{Format}` family
 - [ ] `Card` first (richest data shape, biggest payoff)
@@ -446,11 +586,13 @@ YouTube embeds use `youtube-nocookie.com` by default. Vimeo's player is GDPR-fri
 
 ## 7. Open Questions
 
-1. **Should `YouTubePlaylistEmbed` carry an `index` prop for "start playing item N"?** YouTube's embed URL supports it; the matcher does not currently extract it. Likely yes — easy add.
-2. **oEmbed at build time or on-demand?** Build-time is cheaper for static sites but means stale titles for long-published memos when video titles change. Default: build-time, with a "freshness window" config.
+1. ~~**Should `YouTubePlaylistEmbed` carry an `index` prop for "start playing item N"?**~~ **Resolved (2026-05-07):** yes. Required for the IFrame API `playVideoAt` integration in §4.1.3.4.
+2. ~~**oEmbed at build time or on-demand?**~~ **Resolved (2026-05-07):** build-time, with a per-site TTL config (default 30 days for playlist data; oEmbed for single videos can use the same config). The cache is gitignored; CI rebuilds repopulate.
 3. **Do `LinkPreview__Video--*` variants require their own files, or are they CSS variants of one component?** The naming taxonomy implies separate files; pragmatism may collapse them. Decide during Phase 2 implementation.
 4. **Carousel keyboard/screenreader contract.** Carousels are the format most likely to ship with a11y bugs. Block on documented keyboard nav (arrow keys, Home/End, focus management on slide change) before merging.
 5. **Should the Vimeo channel URL pattern (`vimeo.com/channels/{name}/{id}`) preserve the channel context anywhere in the rendered UI?** Today the matcher discards it. Probably yes for `Card` and `LiveSite`; not needed for `Row`/`Thumb`.
+6. **YouTube Data API quota when many playlists exist in the corpus.** Free tier is 10,000 units/day; one playlist costs ~3 units (1 + 1 + 1). Sites with >3,000 unique playlists per build need an upgraded quota or a longer TTL. No action until a real site approaches that scale.
+7. **Cache invalidation when an author edits a playlist on YouTube.** TTL-based invalidation will lag — a 30-day TTL means up to 30 days of staleness for title/items. A manual "rebuild playlist cache" script can short-circuit the TTL when the author knows a playlist changed. Out of scope for v1.
 
 ***
 
