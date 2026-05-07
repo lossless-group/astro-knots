@@ -28,6 +28,12 @@ date_modified: 2026-05-03
 ***
 ### Workflow Status
 
+#### New jot
+- [ ] Backlinks
+ - [ ] Backlinks array resolver
+ - [ ] Backlinks conversion resolver
+ 
+
 #### Responses and Feedback
 
 > **Status:** all five items addressed in §4.23.6.
@@ -58,11 +64,7 @@ date_modified: 2026-05-03
 - [ ] `LinkPreview__Article--Thumb.astro` — compact thumbnail with title only, for use inside rollups and dense lists.
 - [ ] `LinkPreview__Article--LiveSite.astro` — sandboxed iframe of the actual page. Author opt-in only (`:::link-preview{format=livesite trusted=true}`); off by default for security.
 
-**Phase 2 — `LinkPreview__Video` (depends on bare-link catalog matchers):**
-- [ ] `LinkPreview__Video--Row.astro` — thumbnail + title in a row, no autoplay. Reuses provider matchers from `Bare-Link-Provider-Catalog.md` to extract video ID and pick the right thumbnail URL.
-- [ ] `LinkPreview__Video--Card.astro` — thumbnail + title + duration as card.
-- [ ] `LinkPreview__Video--Thumb.astro` — small thumbnail for grids.
-- [ ] `LinkPreview__Video--Rollup-Gallery.astro` — multiple videos as a gallery, likely a video-aware sibling of `LinkRollup__Gallery` with hover-preview behavior.
+**Phase 2 — `LinkPreview__Video` (depends on bare-link catalog matchers):** moved to its own spec — see [[Versatile-Component-Library-for-Video-Players]] at `context-v/specs/Versatile-Component-Library-for-Video-Players.md`. If the path has moved, search the repo: `grep -r "Versatile Component Library for Video Players" .` or `fzf` on the filename.
 
 **Phase 3 — `LinkRollup` containers (consume Phase 1+2 thumbs):**
 - [ ] `LinkRollup__Column.astro` — vertical stacked list. Renders each child as a `Row` variant matching its type.
@@ -709,33 +711,15 @@ The `::image` directive renders as a `<figure>` element containing:
 
 #### 4.12 Zero-Friction Media Embeds
 
-Embedding media should require the absolute minimum effort. We support three tiers of embed syntax, from effortless to precise:
+Embedding media should require the absolute minimum effort. LFM supports three tiers of embed syntax, from effortless to precise — Tier A (bare URL auto-unfurl), Tier B (leaf directive), Tier C (generic embed fallback). All three route through the same provider classification.
 
-**Tier A — Bare URL auto-unfurl** (preferred for authors):
-
-A recognized media URL on its own line (not inline in a paragraph) is automatically detected and rendered as an embedded player or rich card:
-
-```markdown
-Here's the pitch video:
-
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
-
-And here's the podcast episode:
-
-https://soundcloud.com/user/track-name
-```
-
-The renderer detects the platform from the URL and renders the appropriate embed component — no directive syntax, no IDs to extract, no ceremony. The author just pastes the URL.
-
-**Supported auto-unfurl platforms** (canonical record: [`packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md`](../../packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md) — its frontmatter is the source of truth; the table below summarises):
+**Provider catalog** (canonical record: [`packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md`](../../packages/lfm/src/plugins/Bare-Link-Provider-Catalog.md) — its frontmatter is the source of truth):
 
 | Status | Platform / kind | URL shapes | Directive emitted | Component |
 |---|---|---|---|---|
-| ✅ Stable | YouTube — full video | `youtu.be/{id}`, `youtube.com/watch?v={id}` | `::youtube-video` | `YouTubeEmbed` |
-| ✅ Stable | YouTube — Short | `youtube.com/shorts/{id}` | `::youtube-short` | `YouTubeShortsEmbed` |
-| ✅ Stable | YouTube — Playlist | `youtube.com/playlist?list={id}` | `::youtube-playlist` | `YouTubePlaylistEmbed` |
-| ✅ Stable | Vimeo | `vimeo.com/{id}` (incl. `/{hash}`, `/channels/...`), `player.vimeo.com/video/{id}` | `::vimeo` | `VimeoEmbed` |
-| 🟡 Planned | Loom | `loom.com/share/{id}` | `::loom` | `LoomEmbed` |
+| ✅ Stable | YouTube (video / Short / Playlist) | `youtu.be/{id}`, `youtube.com/watch`, `/shorts/{id}`, `/playlist?list={id}` | `::youtube-*` | see video spec |
+| ✅ Stable | Vimeo | `vimeo.com/{id}` (incl. `/{hash}`, `/channels/...`), `player.vimeo.com/video/{id}` | `::vimeo` | see video spec |
+| 🟡 Planned | Loom | `loom.com/share/{id}` | `::loom` | see video spec |
 | 🟡 Planned | Spotify | `open.spotify.com/{type}/{id}` | `::spotify` | `SpotifyEmbed` |
 | 🟡 Planned | SoundCloud | `soundcloud.com/{user}/{track}` | `::soundcloud` | `SoundCloudEmbed` |
 | 🟡 Planned | Twitter / X | `twitter.com/*/status/`, `x.com/*/status/` | `::tweet` | `TweetEmbed` |
@@ -743,15 +727,13 @@ The renderer detects the platform from the URL and renders the appropriate embed
 | 🟡 Planned | CodePen | `codepen.io/` | `::codepen` | `CodePenEmbed` |
 | 🟡 Planned | GitHub Gist | `gist.github.com/` | `::gist` | `GistEmbed` |
 
-The three stable YouTube classes already have working components in `lossless-monorepo/site/src/components/markdown/`. Note that Shorts get the **dedicated** `YouTubeShortsEmbed` (centered, max-width 320, 9:16 wrapper) rather than the hybrid `YouTubeEmbed` — bare-URL classification is precise enough to pick the right component without relying on internal branching.
+**Video — full component family lives in its own spec.** The per-provider component contracts (sizing, aspect, accessibility, lazy-load/facade strategy), the inline-substitution variants (`LinkPreview__Video--Row/Card/Thumb/LiveSite/FullPlayer`), the multi-URL containers (`LinkRollup__*` × `type="video"`), the `LinkPreviewData` shape for video, and the S→T→C dispatch model are all specified in [[Versatile-Component-Library-for-Video-Players]] at `context-v/specs/Versatile-Component-Library-for-Video-Players.md`. If the path has moved, search the repo: `grep -r "Versatile Component Library for Video Players" .` or `fzf` on the filename.
 
 **Why a markdown file holds the catalog (not a TS file or JSON)**: the providers list is read by humans more often than by machines — when adding a new platform or auditing why a URL didn't unfurl, plain-prose entries with named captures and explanatory `description:` fields are much faster to scan than typed code. The plugin's build step extracts the frontmatter into a typed JSON module the runtime imports, so source-of-truth stays human-editable while runtime stays fast.
 
 **Tier B — Leaf directive** (when you need control over embed behavior):
 
 ```markdown
-::youtube-video{id="dQw4w9WgXcQ" start="42" autoplay}
-
 ::soundcloud{url="https://soundcloud.com/user/track" color="#6643e2" visual}
 
 ::figma{url="https://www.figma.com/file/abc123" height="450"}
@@ -767,13 +749,9 @@ Tier-A and Tier-B share **the same directive name per provider** (the `directive
 
 Falls back to a sandboxed `<iframe>` with the URL. Use for platforms not in the auto-unfurl list.
 
-**Auto-unfurl opt-out**: Prefix a URL with `\` to prevent auto-unfurling and render it as a plain link:
+**Auto-unfurl opt-out**: Prefix a URL with `\` to prevent auto-unfurling and render it as a plain link.
 
-```markdown
-\https://www.youtube.com/watch?v=dQw4w9WgXcQ
-```
-
-**Implementation** (`packages/lfm/src/plugins/remark-bare-link.ts`): A remark plugin runs after `remark-gfm`'s autolink pass. It walks `paragraph` nodes and detects the bare-URL signal — a paragraph whose only child is a `link` whose `value` equals its `url`. The URL is matched against each provider's matchers (host + path regex with named `(?<id>...)` capture, optional query-parameter constraints) in catalog order; first match wins. Matched paragraphs are replaced with a `leafDirective` node carrying `{ provider, id, url, kind }` attributes. Inline link previews (the `LinkPreview__*--Row/Card/Thumb` family) are an entirely separate concern handled by a different transform that walks inline `link` nodes — the bare-link plugin never touches them.
+**Implementation** (`packages/lfm/src/plugins/remark-bare-link.ts`): A remark plugin runs after `remark-gfm`'s autolink pass, walks `paragraph` nodes for the bare-URL signal (paragraph whose only child is a `link` whose `value` equals its `url`), matches against provider matchers in catalog order, and replaces matched paragraphs with a `leafDirective` node carrying `{ provider, id, url, kind }` attributes. Inline link previews (the `LinkPreview__*--Row/Card/Thumb` family) are a separate transform that walks inline `link` nodes — the bare-link plugin never touches them.
 
 **Distinct from inline link previews**: bare URL → embedded **player** (full media surface); inline URL with surrounding text → autolink today, optionally a `LinkPreview__*--Row/Card/Thumb` card later. Two transforms, two intents, one shared classification catalog.
 
@@ -1105,7 +1083,7 @@ Both segments are CamelCase. The double-dash before `{Format}` is intentional: i
 | Type | Resource kind | Primary data source | Notes |
 |---|---|---|---|
 | `Article` | Blog post, news article, long-form web page | OG metadata via build-time fetch | Default for any URL not matching a richer type |
-| `Video` | YouTube / Vimeo / Loom etc. | Provider matchers from `Bare-Link-Provider-Catalog.md` + OG fallback | Reuses bare-link classifier infrastructure |
+| `Video` | YouTube / Vimeo / Loom etc. | Provider matchers from `Bare-Link-Provider-Catalog.md` + OG fallback | Reuses bare-link classifier infrastructure. **Full component family in [[Versatile-Component-Library-for-Video-Players]]** (`context-v/specs/Versatile-Component-Library-for-Video-Players.md`; if moved, `grep -r "Versatile Component Library for Video Players" .`). |
 | `Audio` (planned) | Spotify / SoundCloud / podcast episode | Provider matchers + oEmbed | Tier 3 |
 | `Code` (planned) | Gist, CodePen, JSFiddle | Provider matchers + content fetch | Tier 3 |
 | `Tweet` (planned) | Twitter / X status | oEmbed | Tier 3 |
