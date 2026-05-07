@@ -253,10 +253,14 @@ interface PlaylistItem {
   title: string;
   thumbnail: string;                 // medium or high res
   duration?: string;                 // ISO 8601 (PT4M30S); absent if video is unavailable
+  addedAt?: string;                  // ISO timestamp; sourced from snippet.publishedAt;
+                                     // primary sort key for the default "most-recently-added on top" view
   channelTitle?: string;
   unavailable?: boolean;             // private / deleted videos that show as "Private video"
 }
 ```
+
+**Default sort.** Items are stored by playlist `position` in the cache (the playlist owner's defined order). The render layer sorts by `addedAt` descending before passing items to the scroller, so the most-recently-added video is on top regardless of the playlist owner's curation order. Click handler still uses each item's actual `position` for the iframe's `playVideoAt(N)` call, so the visual order of the scroller is decoupled from playback addressing.
 
 ##### 4.1.3.2 Cache and quotas
 
@@ -269,38 +273,131 @@ Failure modes:
 - **Rate limited (429)** — same fallback; the playlist with no fresh data gets last-known-good from the existing cache, or facade mode if no prior cache entry exists.
 - **Playlist private/deleted** — fetcher records `unavailable: true` and the component shows a deactivated card.
 
-##### 4.1.3.3 Render layout
+##### 4.1.3.3 Render layout — two sibling elements, not one card
+
+The component renders **two visually-separate sibling elements**, not a single combined card:
+
+1. **The player card** (`.yt-playlist-card`) — header strip + 16:9 iframe. Stays in the article reading column at the column's full width. Treated as a normal embed in the prose flow.
+2. **The playlist scroller** (`.yt-playlist-scroller`) — the sortable, scrollable list of items. **Escape-positioned in the right margin track** at ≥1280px viewport. Below 1280px, stacks below the card (capped to ~3 items visible). Below 768px, becomes a `MobileFeaturePlaceholder` placeholder + full-screen panel.
+
+The two are siblings inside a `position: relative` wrapper. The card flows normally; the scroller uses absolute positioning to escape into the right margin track. **The scroller can be taller than the card** — its natural height runs down past the card's bottom edge, parallel to the prose that follows the playlist URL. Prose in the article column never overlaps the scroller because the scroller's left edge starts past the article column's right edge.
 
 ```
-┌──────────────────────────────────────────┬──────────────────────────────┐
-│                                          │  Playlist title              │
-│                                          │  Channel · 12 videos          │
-│         16:9 player iframe               │  ─────────────────────────   │
-│         (YouTube IFrame, jsapi=1)        │  ▶ 1. First video    4:32    │
-│                                          │    2. Second video   3:18    │
-│                                          │    3. Third video    7:01    │
-│                                          │    4. ...                    │
-└──────────────────────────────────────────┴──────────────────────────────┘
+                  article column                       right margin track
+  ┌────────────────────────────────────────┐         ┌─────────────────────┐
+  │  prose paragraph above the playlist    │         │                     │
+  │                                        │         │                     │
+  │  ┌────────────────────────────────┐    │         │  ┌──────────────┐   │
+  │  │ YOUTUBE PLAYLIST                │    │         │  │ ▶ 1. video 1 │   │
+  │  │ Lossless Toolkit                │    │ ←gap→  │  │   12:56      │   │
+  │  │ Michael Staton · 1899 videos    │    │         │  ├──────────────┤   │
+  │  ├────────────────────────────────┤    │         │  │   2. video 2 │   │
+  │  │                                 │    │         │  │   32:52      │   │
+  │  │      16:9 iframe player         │    │         │  ├──────────────┤   │
+  │  │                                 │    │         │  │   3. video 3 │   │
+  │  └────────────────────────────────┘    │         │  │   25:48      │   │
+  │                                        │         │  ├──────────────┤   │
+  │  prose paragraph after the playlist    │         │  │   4. video 4 │   │
+  │  flows under the player card normally  │         │  │   ...        │   │
+  │  while the scroller continues hanging  │         │  │              │   │
+  │  in the right margin track             │         │  │  Show all    │   │
+  │                                        │         │  │  on YouTube  │   │
+  └────────────────────────────────────────┘         └─────────────────────┘
 ```
 
-- **Header strip** above the player: playlist title, channel, item count.
-- **Sidebar list** to the right at ≥1024px viewport width; collapses below the player at <1024px (sidebar becomes a horizontal-scroll thumb row or a "Show 12 videos" disclosure depending on viewport).
-- **Theme-token chrome** wraps the whole component (`--card` / `--border` / `--brand-aqua` accents) so the assembly visually reads as a single bundle, not two stacked widgets.
-- **Active item highlighted** in the sidebar; updates as the iframe advances.
+**Why two siblings, not one card:**
 
-##### 4.1.3.4 Interactivity (Svelte island)
+- Reading flow stays intact. The player is treated as a normal in-column embed, like any other iframe a memo might paste; readers don't have to retrain their eye on a wider content surface.
+- The scroller can be tall without forcing the player to also be tall, and without leaving a giant empty space below the player.
+- The two elements decouple visually — the scroller reads as supplementary nav (a sticky-note in the margin), not as a sub-region of the player's frame.
+- The pattern generalizes. Any future component that wants the same "primary in column, supplementary in margin" structure can ship its own card + scroller pair using the same wrapper conventions.
 
-The Astro shell server-renders everything: header strip, iframe `<iframe>` element with `?listType=playlist&list={id}&enablejsapi=1&modestbranding=1&rel=0`, sidebar list with each item's metadata. Static HTML, fast first paint, no JS needed to *see* the playlist.
+**Breakpoints:**
 
-A small Svelte island (`PlaylistController.svelte`) hydrates **only** the sidebar interactivity:
+| Viewport | Player card | Scroller |
+|---|---|---|
+| ≥1280px | In article column at full column width | Escape-positioned in right margin via `position: absolute` |
+| 768–1279px | In article column at full column width | Stacks below the card; `max-height: 232px` (~3 items + scroll) |
+| ≤768px | In article column | `MobileFeaturePlaceholder` — placeholder card + full-screen panel on tap |
 
-- Click an item → `iframe.contentWindow.postMessage({event: 'command', func: 'playVideoAt', args: [position]}, '*')` per the YouTube IFrame Player API.
-- Listens for `onStateChange` events from the iframe (`postMessage` with `{event: 'infoDelivery', info: {videoData: {...}}}`) and updates the active-item highlight.
-- No external fetch at runtime; all data was inlined into the island's props by the Astro shell.
+**Active-item highlight** in the scroller updates as the iframe's `getPlaylistIndex()` changes, regardless of which mode the scroller is in.
+
+##### 4.1.3.4 The two-component DOM and Svelte island
+
+DOM shape rendered by `YouTubePlaylistEmbed.astro` (or whichever orchestrator file the consuming site uses):
+
+```astro
+<div class="yt-playlist-block">
+  <!-- 1. Player card — flows in article column -->
+  <aside class="yt-playlist-card">
+    <header class="yt-playlist-card__header">
+      <!-- title, channel, count, "Open on YouTube" CTA -->
+    </header>
+    <div class="yt-playlist-card__player">
+      <iframe id={iframeId} src="...enablejsapi=1..." />
+    </div>
+  </aside>
+
+  <!-- 2. Scroller — escape-positioned in margin (≥1280px) or stacked below (<1280px) -->
+  <aside class="yt-playlist-scroller">
+    <MobileFeaturePlaceholder ...>
+      <Fragment slot="placeholder">...</Fragment>
+      <PlaylistSidebar client:visible items={...} iframeId={iframeId} />
+    </MobileFeaturePlaceholder>
+  </aside>
+</div>
+```
+
+The card and the scroller are **independent DOM siblings**. They communicate only via the `iframeId` prop the orchestrator passes to both: the scroller's Svelte island finds the iframe by ID and uses `postMessage` to send `playVideoAt(N)` commands. No shared state, no parent component holding both, no event-bus pattern. The Svelte island is the thinnest possible interactive layer.
+
+A consuming site that wants to extract the player card and the scroller as separate components later can do so with no behavior change — the contract (one shared `iframeId` string, the YouTube IFrame Player API for messaging) doesn't depend on file boundaries.
+
+##### 4.1.3.5 The `aside-escape` CSS recipe (cross-cutting)
+
+The escape behavior on the scroller is the first concrete consumer of the **right-escape** pattern named in §5.5 of the parent spec. The CSS recipe at ≥1280px:
+
+```css
+.yt-playlist-block {
+  position: relative;
+}
+
+.yt-playlist-card {
+  /* normal flow; full article column width */
+}
+
+@media (min-width: 1280px) {
+  .yt-playlist-scroller {
+    position: absolute;
+    top: 0;                                                            /* aligned with card top */
+    left: calc(100% + 1.5rem);                                         /* gap past column edge */
+    width: min(340px, calc(((100vw - 100%) / 2) - 2rem));              /* fits available margin */
+    max-height: min(80vh, 720px);                                      /* practical cap */
+    /* Inner list scrolls within this height */
+  }
+}
+```
+
+**Why this works:**
+- `100%` resolves to the wrapper (`.yt-playlist-block`)'s width, which matches the article column's content width.
+- `(100vw - 100%) / 2` is the unused margin space outside the centered article column.
+- The scroller's left edge starts 1.5rem past the column's right edge; its width fills the remaining margin, capped at 340px, with 2rem of viewport-edge padding.
+- Because the scroller is `position: absolute`, it's taken out of flow — the wrapper's height equals only the card's height, and prose after the playlist URL flows from the card's bottom normally. The scroller hangs down into the margin track in parallel with that prose.
+
+**Below 1280px:**
+```css
+.yt-playlist-scroller {
+  margin-top: 0.5rem;
+  max-height: 232px;       /* ~3 items + scroll affordance */
+  overflow: hidden;
+  /* Inner list scrolls within max-height */
+}
+```
+
+**Generalizing:** any future component that wants the same structure (in-column primary + escape-positioned aside) can declare its own `.foo-block` wrapper with `position: relative`, render the primary content as a normal-flow child, and apply the same `position: absolute; left: calc(100% + gap); width: min(maxw, ...)` recipe to its aside child. When a second consumer needs this, the CSS becomes a `MarginEscape.astro` wrapper component (not yet extracted; deferred per "premature extraction is worse than waiting one round").
 
 Why Svelte and not vanilla JS: this is the smallest interactive unit on the site that's worth a framework — the postMessage/event-listener wiring + the active-item state syncing is tedious in vanilla, three lines in Svelte. Astro's `client:visible` directive defers hydration until the playlist scrolls into view, so playlists below the fold don't pay the JS cost until needed.
 
-##### 4.1.3.5 Authoring contract (unchanged)
+##### 4.1.3.6 Authoring contract (unchanged)
 
 The author writes either a bare URL or the directive form. Both paths produce the same component with the same props:
 
@@ -316,7 +413,7 @@ https://youtube.com/playlist?list=PLME9DvdybGUN7PtbmJhSyYcUakt7tAya1
 
 The `align` attribute on directive form mirrors the Shorts pattern (§4.1.2 — float right by default, `align="left"` to flip). Default for playlists is full-column though, since at typical reading widths the sidebar won't fit at float widths. `align` becomes meaningful only at viewports wide enough to host both the player and surrounding prose.
 
-##### 4.1.3.6 Open implementation questions
+##### 4.1.3.7 Open implementation questions
 
 1. **Active-item highlight on first paint.** The Svelte island can't know the current video before hydration; the SSR'd sidebar shows item 0 (or the `index` prop value) as active. If the user has been watching a few items before scrolling back, the highlight will lag until hydration catches up. Acceptable for v1.
 2. **Playlist with >200 items.** Fetcher pages through all of them but the sidebar gets unwieldy. Decision: cap displayed items at 50, show a "Show all on YouTube" link below the sidebar when the playlist exceeds the cap. Cache still stores all items for completeness.
