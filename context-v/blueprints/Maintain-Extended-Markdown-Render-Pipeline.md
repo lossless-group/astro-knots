@@ -258,6 +258,35 @@ Lossless design but with a smaller feature set.
       - Read `node.attributes` (e.g. `type`, `title`).
       - Render a `Callout.astro` component, passing children as slotted content.
 
+  - **Nesting policy: full LFM features inside callouts.**
+
+    Callouts in LFM are containers, not rendering-only blocks. Every LFM and
+    AstroMarkdown feature available at the document level — other directives,
+    citations, fenced code blocks, tables, link previews, video embeds, image
+    directives, and even other callouts — MUST work when nested inside a
+    callout. This is intentional and divergent from upstream conventions:
+
+    - **CommonMark blockquotes** carry markdown children but typically render
+      plainly without participating in extended pipelines.
+    - **Obsidian callouts** support some inline markdown (bold, italic, links)
+      but are not full participants in the render pipeline — custom embeds,
+      directives, and citation systems generally don't work inside them.
+
+    In LFM we deliberately enable full nesting because the `Callout.astro`
+    component recursively delegates to `AstroMarkdown` for every child node.
+    There is no safety challenge here: a callout is just a `containerDirective`
+    in the MDAST, and rendering its children through the same renderer used
+    for the rest of the document is simpler than special-casing what's allowed
+    inside. The cost of a "what works where" allowlist would be ongoing
+    feature drift between document body and callout body.
+
+    **Implementation requirement:** any Callout component (per-site copy or
+    canonical pattern) MUST recursively render `node.children` via
+    `<AstroMarkdown node={child} data={data} />` (or equivalent self-recursion),
+    never via `toString(node)` or a plain-text fallback. The `mdast-util-to-string`
+    fallback path that early scaffolds sometimes ship with disables nesting
+    silently — remove it.
+
   - `badge` (text directive):
     - Syntax example:
       ```markdown
