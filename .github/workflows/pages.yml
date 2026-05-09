@@ -52,6 +52,11 @@ jobs:
         # No GITHUB_TOKEN needed — rolled-up content is pre-synced in
         # splash/src/rollup/. Run `pnpm rollup:sync` locally and commit
         # to refresh.
+        env:
+          # OpenPanel clientId is publicly visible in rendered HTML, so it
+          # lives as a repo Variable, not a Secret. Set in repo settings →
+          # Secrets and variables → Actions → Variables.
+          OPENPANEL_CLIENT_ID: ${{ vars.OPENPANEL_CLIENT_ID }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

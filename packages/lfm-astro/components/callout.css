@@ -1,0 +1,199 @@
+/* Callout styling — base layout + per-type accent overrides.
+ *
+ * Each `.ak-callout--{type}` rule sets exactly one custom property:
+ * `--callout-accent`, sourced from a Tier-1 named token in theme.css. The base
+ * `.ak-callout` rule does the actual painting via color-mix() against that
+ * accent, so adding a new callout type means: pick a named-token color, drop
+ * one rule below, done.
+ *
+ * The `--callout-accent` indirection is intentional: it keeps callout-specific
+ * semantics co-located with the component (no theme.css explosion across
+ * three modes), while still funneling through the named-token palette.
+ */
+
+.ak-callout {
+  /* Accent default; per-type rules below override. */
+  --callout-accent: var(--color__graphite-400);
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+  border: 1px solid color-mix(in srgb, var(--callout-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--callout-accent) 8%, transparent);
+  border-left: 4px solid var(--callout-accent);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  margin: 1.25rem 0;
+  color: var(--color-text);
+}
+
+.ak-callout-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--callout-accent);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.ak-callout-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.ak-callout-header {
+  grid-column: 2;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--callout-accent);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.ak-callout-body {
+  grid-column: 2;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.ak-callout-body > :first-child { margin-top: 0; }
+.ak-callout-body > :last-child { margin-bottom: 0; }
+
+/* Restore prose flow inside callouts — Tailwind preflight zeros out paragraph
+ * margins and list styling, but markdown content needs both back. Scoped so
+ * only callout interiors are affected. */
+.ak-callout-body p {
+  margin: 0.5em 0;
+}
+.ak-callout-body ul,
+.ak-callout-body ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+.ak-callout-body ul { list-style: disc; }
+.ak-callout-body ol { list-style: decimal; }
+.ak-callout-body li {
+  margin: 0.25em 0;
+}
+.ak-callout-body li > p {
+  margin: 0;
+}
+.ak-callout-body code {
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--callout-accent) 12%, transparent);
+}
+
+/* When the callout has no header, span the body across both columns so the
+ * icon sits flush-left without an empty title row above it. */
+.ak-callout--no-header .ak-callout-body {
+  grid-column: 2;
+}
+
+/* ---------------------------------------------------------------------------
+ * Per-type accent overrides — each line is the *vibrant-mode* default. Light
+ * and dark modes override these below to maintain contrast and avoid
+ * retina-burn. Every callout MUST obey the mode switcher — this is law in
+ * Astro-Knots projects (see context-v/blueprints/Maintain-Themes-Mode-...).
+ * ------------------------------------------------------------------------- */
+.ak-callout--note      { --callout-accent: var(--color__graphite-400); }
+.ak-callout--info      { --callout-accent: var(--color__cyan-vapor); }
+.ak-callout--tip       { --callout-accent: var(--color__lime-terminal); }
+.ak-callout--success   { --callout-accent: var(--color__lime-terminal); }
+.ak-callout--warning   { --callout-accent: var(--color__amber-flare); }
+.ak-callout--danger    { --callout-accent: var(--color__magenta-fuse); }
+.ak-callout--quote     { --callout-accent: var(--color__violet-electric); }
+.ak-callout--example   { --callout-accent: var(--color__violet-electric); }
+.ak-callout--question  { --callout-accent: var(--color__cyan-vapor); }
+.ak-callout--important { --callout-accent: var(--color__magenta-fuse); }
+
+/* ---- LIGHT MODE: deepen accents so they read against bone backgrounds ---- */
+[data-mode="light"] .ak-callout--note      { --callout-accent: var(--color__graphite-600); }
+[data-mode="light"] .ak-callout--info      { --callout-accent: color-mix(in srgb, var(--color__cyan-vapor) 30%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--tip       { --callout-accent: color-mix(in srgb, var(--color__lime-terminal) 38%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--success   { --callout-accent: color-mix(in srgb, var(--color__lime-terminal) 38%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--warning   { --callout-accent: color-mix(in srgb, var(--color__amber-flare) 55%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--danger    { --callout-accent: color-mix(in srgb, var(--color__magenta-fuse) 45%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--quote     { --callout-accent: var(--color__violet-deep); }
+[data-mode="light"] .ak-callout--example   { --callout-accent: var(--color__violet-deep); }
+[data-mode="light"] .ak-callout--question  { --callout-accent: color-mix(in srgb, var(--color__cyan-vapor) 30%, var(--color__ink)); }
+[data-mode="light"] .ak-callout--important { --callout-accent: color-mix(in srgb, var(--color__magenta-fuse) 45%, var(--color__ink)); }
+
+/* ---- DARK MODE: gently desaturate the loudest accents so they don't burn ---- */
+[data-mode="dark"] .ak-callout--info      { --callout-accent: color-mix(in srgb, var(--color__cyan-vapor) 78%, var(--color__graphite-600)); }
+[data-mode="dark"] .ak-callout--tip       { --callout-accent: color-mix(in srgb, var(--color__lime-terminal) 80%, var(--color__graphite-600)); }
+[data-mode="dark"] .ak-callout--success   { --callout-accent: color-mix(in srgb, var(--color__lime-terminal) 80%, var(--color__graphite-600)); }
+[data-mode="dark"] .ak-callout--danger    { --callout-accent: color-mix(in srgb, var(--color__magenta-fuse) 80%, var(--color__graphite-600)); }
+[data-mode="dark"] .ak-callout--question  { --callout-accent: color-mix(in srgb, var(--color__cyan-vapor) 78%, var(--color__graphite-600)); }
+[data-mode="dark"] .ak-callout--important { --callout-accent: color-mix(in srgb, var(--color__magenta-fuse) 80%, var(--color__graphite-600)); }
+/* warning + quote + example + note read fine raw in dark mode — no override. */
+
+/* Quote callouts read better in italic — preserves the original blockquote feel
+ * while still benefiting from the accented container. */
+.ak-callout--quote .ak-callout-body { font-style: italic; }
+
+/* ---------------------------------------------------------------------------
+ * Per-type visual overrides (above-and-beyond the accent color)
+ * Keep these scoped, additive, and minimal — most types share the base look.
+ * ------------------------------------------------------------------------- */
+
+/* `info` is the brand's hero callout — bigger, brighter, glowy edges. Used
+ * for marketing-flavored "why this matters" emphasis blocks at the top of
+ * sessions, posts, and changelog entries.
+ *
+ * Mode-awareness: the *structure* (size, padding, border weight) is constant.
+ * The *intensity* (background tint, glow strength, shadow spread) rides on
+ * theme.css's `--fx-glow-opacity` and `--fx-glow-spread` tokens, which already
+ * vary per mode (light=0.06/8px, dark=0.22/24px, vibrant=0.55/48px). One
+ * source of truth for "how loud is this mode" — callouts inherit it. */
+.ak-callout--info {
+  /* Structural: same in every mode. */
+  padding: 1.25rem 1.5rem;
+  margin: 1.75rem 0;
+  border-width: 2px;
+  border-left-width: 6px;
+  border-radius: 0.75rem;
+  gap: 0.75rem 1rem;
+
+  /* Background tint scales with mode loudness via --fx-glow-opacity.
+   * Multiplying by 100% via calc() converts the 0–1 ratio into a
+   * percentage that color-mix accepts. Light: ~6% wash. Dark: ~22%. Vibrant: ~55%. */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--callout-accent) calc(var(--fx-glow-opacity) * 100%), transparent),
+    color-mix(in srgb, var(--callout-accent) calc(var(--fx-glow-opacity) * 50%), transparent)
+  );
+  border-color: color-mix(in srgb, var(--callout-accent) 60%, transparent);
+  border-left-color: var(--callout-accent);
+
+  /* Edges-that-pop glow — spread + opacity both ride the mode tokens, so the
+   * glow is near-invisible in light mode and full-blast in vibrant. */
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--callout-accent) 30%, transparent),
+    0 0 var(--fx-glow-spread) calc(var(--fx-glow-spread) / -6) color-mix(in srgb, var(--callout-accent) calc(var(--fx-glow-opacity) * 200%), transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--callout-accent) 20%, transparent);
+}
+
+.ak-callout--info .ak-callout-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  /* Halo also scales with mode — flat in light, glowing in vibrant. */
+  filter: drop-shadow(0 0 calc(var(--fx-glow-spread) / 4) color-mix(in srgb, var(--callout-accent) calc(var(--fx-glow-opacity) * 200%), transparent));
+}
+
+.ak-callout--info .ak-callout-header {
+  font-size: 1.0625rem;
+  letter-spacing: 0.005em;
+  color: var(--callout-accent);
+}
+
+.ak-callout--info .ak-callout-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}

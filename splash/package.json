@@ -12,6 +12,6 @@
     "rollup:sync": "node --experimental-strip-types --no-warnings scripts/rollup-sync.ts"
   },
   "dependencies": {
-    "astro": "^6.1.7"
+    "astro": "^6.3.1"
   }
 }
