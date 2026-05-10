@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lossless-group.github.io/astro-knots/sitemap-index.xml
