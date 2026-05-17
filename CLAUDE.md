@@ -776,3 +776,18 @@ git checkout main
 2. Are there any `workspace:*` dependencies that would break deployment?
 3. Is the submodule initialized and on the right branch?
 4. Does `.npmrc` have the `@lossless-group` registry configured?
+
+## Local RAG over the Lossless corpus (ChromaDB)
+
+A local Chroma database is wired into Claude Code via the `chroma` MCP server. Four collections aggregate prior Lossless work across the whole tree:
+
+- `context-vigilance-corpus` — section-chunked `context-v/` files across every repo
+- `lossless-changelog`        — every `<repo>/changelog/` entry, cross-repo
+- `claude-code-sessions`      — every prior Claude Code message turn
+- `claude-code-tool-traces`   — every prior tool invocation, with success/error flag
+
+**Use it before answering from training data.** When the user asks a question that prior work might answer — *"what did we decide about X"*, *"when did we ship X"*, *"why did we choose X over Y"*, *"has this errored before"*, *"where did we put X"* — call `mcp__chroma__chroma_query_documents` against the most relevant collection (start with `n_results=5`). If results cover the question, synthesize an answer and cite `source_path` + timestamp + `source_repo_slug` for every claim. If there is a gap, run one more focused query. **Cap at 5 chroma queries per question** — if the corpus has no answer, say so explicitly rather than silently falling back to training data.
+
+The full algorithm (decompose → execute → evaluate → synthesize, plus `where`-filter patterns, anti-patterns, and when NOT to use it) lives in the `search-lossless-corpus` skill, which auto-loads when the question matches the trigger shapes. This block is the backstop so the corpus is known to exist even when the skill description does not match.
+
+Ingestion lives under `ai-labs/context-vigilance-kit/scripts/` (`ingest-all.sh` is the master). Do not re-ingest as a side effect of unrelated work — the user runs it deliberately.
