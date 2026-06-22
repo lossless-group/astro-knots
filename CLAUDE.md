@@ -777,6 +777,26 @@ git checkout main
 3. Is the submodule initialized and on the right branch?
 4. Does `.npmrc` have the `@lossless-group` registry configured?
 
+## Skills sync — opening & closing habit
+
+Lossless skills live in `context-v/skills/<name>/` at the anchor monorepo root
+(`/Users/mpstaton/code/lossless-monorepo/context-v/skills`). Claude Code only
+discovers a skill when it has its **own** direct-child symlink at
+`~/.claude/skills/<name>` — a symlinked *parent* dir does **not** expose the
+skills nested inside it. A skill that's authored but never linked is invisible
+to every session.
+
+- **Opening (session start):** sync so any skills added since last session are linked.
+- **Closing (after authoring or editing any skill):** sync again — newly-linked
+  skills load in the *next* session, not the current one.
+
+```bash
+bash /Users/mpstaton/code/lossless-monorepo/context-v/skills/sync-skills-symlinks.sh
+```
+
+Idempotent: links every `context-v/skills/*` dir with a top-level `SKILL.md`
+that isn't already linked; never clobbers a non-symlink. Re-run it freely.
+
 ## Local RAG over the Lossless corpus (ChromaDB)
 
 A local Chroma database is wired into Claude Code via the `chroma` MCP server. Four collections aggregate prior Lossless work across the whole tree:
