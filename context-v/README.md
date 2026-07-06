@@ -64,6 +64,7 @@ context-v/
 ├── reminders/         — durable rules and project-wide invariants
 ├── issue-resolution/  — incidents, root causes, fixes worth remembering
 ├── explorations/      — open questions, landscape scans, decisions in progress
+├── loops/             — recurring Claude Code /loop agents with full upgrade/maintenance prompts
 ├── strategy/          — business and product strategy notes (private context)
 ├── sitemap/           — page/section/component breakdowns for sites in flight
 └── extra/             — long-form source material we draw on but don't render
@@ -137,6 +138,23 @@ Current contents:
 - `prompts/Flare__Concentric-Wobble-Rings.md` — creative brief for a "flare" decorative component (concentric wobble rings). → [[context-v/prompts/Flare__Concentric-Wobble-Rings.md]]
 
 The `Page__` and `Flare__` prefixes are conventional namespaces — they say "this prompt produces a thing of this shape." Expect to see more of them.
+
+---
+
+## `loops/` — recurring maintenance agents
+
+**Loops** are Claude Code `/loop` agents — self-contained prompt documents that, when loaded via `/loop`, run autonomously through a repeating or multi-step maintenance task. They are operational rather than design artifacts: the document *is* the agent's instruction set.
+
+Unlike prompts (one-shot conversation starters), loops are designed to iterate — checking a condition, doing work, and self-pacing until the work is done.
+
+Current contents:
+
+- `loops/Dependency-Upgrade-Loop.md` — fans out across all active Astro Knots sites, upgrades dependencies in safe → risky order, fixes Astro and TypeScript breaking changes, verifies builds, writes changelog entries, and pushes submodules. The first loop. → [[context-v/loops/Dependency-Upgrade-Loop.md]]
+
+**Invoke any loop with:**
+```
+/loop context-v/loops/<Loop-Name>.md
+```
 
 ---
 
