@@ -38,3 +38,7 @@
 	path = sites/fullstack-vc
 	url = https://github.com/lossless-group/fullstack-vc.git
 	branch = main
+[submodule "sites/learnstart-site"]
+	path = sites/learnstart-site
+	url = https://github.com/lossless-group/learnstart-site.git
+	branch = main

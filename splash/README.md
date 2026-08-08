@@ -8,7 +8,7 @@ Live: <https://lossless-group.github.io/astro-knots/>
 
 A small Astro site that:
 
-1. Greets visitors with a hero, the candid "what worked / what didn't" reading of the workspace, and a curated gallery of the 12 sibling sites under `sites/`.
+1. Greets visitors with a hero, the candid "what worked / what didn't" reading of the workspace, and a curated gallery of the sibling sites under `sites/` — one card per file in `src/content/site-highlights/`, so the count follows the directory rather than a number in this sentence.
 2. Demonstrates the **two-tier token + three-mode contract** that astro-knots is built on, with a live mode toggle in the header — toggle it and the entire splash pivots between light, dark, and vibrant.
 3. Renders the parent's `context-v/` and (when synced) each sibling site's `changelog/` and `context-v/` as readable archives.
 4. Deploys for free off GitHub Pages on push to `main`.
