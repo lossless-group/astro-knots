@@ -42,3 +42,7 @@
 	path = sites/learnstart-site
 	url = https://github.com/lossless-group/learnstart-site.git
 	branch = main
+[submodule "sites/lossless-changelog"]
+	path = sites/lossless-changelog
+	url = https://github.com/lossless-group/lossless-changelog.git
+	branch = main
