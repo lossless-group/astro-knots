@@ -1,0 +1,155 @@
+---
+// HeadingAnchor — the share affordance beside a heading.
+//
+// Copies a deep link to this exact heading. Pair it with the `id` that
+// @lossless-group/lfm's remarkHeadingIds stamped on the node:
+//
+//   const id = (node as any).data?.id;
+//   <h2 id={id}>{children}<HeadingAnchor id={id} label={text} /></h2>
+//
+// NEVER recompute the slug here. The whole point of remarkHeadingIds is that
+// one place decides what a fragment URL says; a second implementation in the
+// render layer is how the fleet drifted apart in the first place. See
+// lossless-monorepo/lfm/context-v/Maintain-Heading-Anchors-and-Share-Links.md
+//
+// Adapted from lossless-monorepo/site's CopyLinkButton.astro. Differences:
+//   - reads theme tokens instead of hardcoded hex + a site-specific
+//     --clr-lossless-accent--brightest that exists on exactly one site
+//   - one delegated listener per page rather than one per heading (the
+//     original registers a document-level listener inside every button's
+//     inline script — 40 headings meant 40 identical listeners)
+//   - falls back to selecting the URL rather than alert() on clipboard failure
+//   - keyboard reachable, with :focus-visible styling
+
+export interface Props {
+  /** The heading's anchor id — from `node.data.id`. */
+  id: string;
+  /** Plain heading text, for the accessible label. From `node.data.headingText`. */
+  label?: string;
+}
+
+const { id, label } = Astro.props as Props;
+const description = label ? `Copy link to “${label}”` : 'Copy link to this section';
+---
+
+<button
+  class="lfm-heading-anchor"
+  type="button"
+  data-heading-anchor={id}
+  title={description}
+  aria-label={description}
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1" />
+    <path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1" />
+  </svg>
+</button>
+
+<script>
+  // Guard: this component renders once per heading, so the module would
+  // otherwise bind a listener per instance.
+  if (!(window as any).__lfmHeadingAnchorBound) {
+    (window as any).__lfmHeadingAnchorBound = true;
+
+    document.addEventListener('click', async (e) => {
+      const btn = (e.target as HTMLElement)?.closest?.('[data-heading-anchor]') as HTMLButtonElement | null;
+      if (!btn) return;
+
+      const id = btn.dataset.headingAnchor;
+      if (!id) return;
+
+      // Deliberately rebuilt from origin + pathname rather than href, so an
+      // existing fragment or tracking query on the current URL isn't carried in.
+      const url = `${window.location.origin}${window.location.pathname}#${id}`;
+
+      const done = (text: string) => {
+        btn.classList.add('is-copied');
+        const prior = btn.getAttribute('aria-label');
+        btn.setAttribute('aria-label', text);
+        setTimeout(() => {
+          btn.classList.remove('is-copied');
+          if (prior) btn.setAttribute('aria-label', prior);
+        }, 1200);
+      };
+
+      try {
+        await navigator.clipboard.writeText(url);
+        done('Link copied');
+      } catch {
+        // Clipboard API is unavailable on insecure origins and in some
+        // embedded webviews. Put the URL somewhere the user can grab it
+        // rather than throwing an alert at them.
+        const sel = window.getSelection();
+        const tmp = document.createElement('span');
+        tmp.textContent = url;
+        tmp.style.cssText = 'position:absolute;left:-9999px';
+        document.body.appendChild(tmp);
+        const range = document.createRange();
+        range.selectNodeContents(tmp);
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        done('Press ⌘C to copy');
+        setTimeout(() => tmp.remove(), 4000);
+      }
+
+      // Reflect the anchor in the address bar without a scroll jump, so the
+      // thing the user just copied matches what they see.
+      history.replaceState(null, '', `#${id}`);
+    });
+  }
+</script>
+
+<style>
+  .lfm-heading-anchor {
+    /* Hidden until the heading is hovered or the button is focused — the
+       affordance shouldn't compete with the heading it belongs to. */
+    opacity: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 0.4em;
+    cursor: pointer;
+    color: var(--color-text-muted, #999);
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    transition: opacity 120ms ease, color 120ms ease;
+  }
+
+  .lfm-heading-anchor svg {
+    width: 0.72em;
+    height: 0.72em;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6):hover > .lfm-heading-anchor,
+  .lfm-heading-anchor:focus-visible {
+    opacity: 1;
+  }
+
+  .lfm-heading-anchor:hover,
+  .lfm-heading-anchor:focus-visible {
+    color: var(--color-primary, currentColor);
+  }
+
+  .lfm-heading-anchor:focus-visible {
+    outline: 2px solid var(--color-primary, currentColor);
+    outline-offset: 2px;
+    border-radius: 0.2rem;
+  }
+
+  .lfm-heading-anchor.is-copied {
+    opacity: 1;
+    color: var(--color-primary, currentColor);
+  }
+
+  /* Touch devices never hover; keep it permanently visible but quiet. */
+  @media (hover: none) {
+    .lfm-heading-anchor { opacity: 0.45; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lfm-heading-anchor { transition: none; }
+  }
+</style>

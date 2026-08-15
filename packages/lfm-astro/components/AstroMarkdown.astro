@@ -4,6 +4,7 @@ import { toString } from "mdast-util-to-string";
 import CodeBlock from "./CodeBlock.astro";
 import Callout from "./Callout.astro";
 import MarkdownImage from "./MarkdownImage.astro";
+import HeadingAnchor from "./HeadingAnchor.astro";
 
 export interface Props {
   node: Root | Content;
@@ -54,71 +55,24 @@ function childrenOf(n: any): any[] {
 
 {type === "heading" && (() => {
   const heading = node as Heading;
-  const text = toString(heading);
-  const id = text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
+  // id comes from @lossless-group/lfm's remarkHeadingIds — do NOT recompute it
+  // here. One place decides what a fragment URL says; a second implementation
+  // in the render layer is exactly how the fleet's anchors drifted apart.
+  // Fall back to toString only if the plugin is disabled upstream.
+  const hData = (heading as any).data ?? {};
+  const text = hData.headingText ?? toString(heading);
+  const id = hData.id;
 
-  const level = heading.depth ?? 1;
-
-  if (level === 1) {
-    return (
-      <h1 id={id}>
-        {childrenOf(node).map((child) => (
-          <Astro.self node={child} data={data} />
-        ))}
-      </h1>
-    );
-  }
-
-  if (level === 2) {
-    return (
-      <h2 id={id}>
-        {childrenOf(node).map((child) => (
-          <Astro.self node={child} data={data} />
-        ))}
-      </h2>
-    );
-  }
-
-  if (level === 3) {
-    return (
-      <h3 id={id}>
-        {childrenOf(node).map((child) => (
-          <Astro.self node={child} data={data} />
-        ))}
-      </h3>
-    );
-  }
-
-  if (level === 4) {
-    return (
-      <h4 id={id}>
-        {childrenOf(node).map((child) => (
-          <Astro.self node={child} data={data} />
-        ))}
-      </h4>
-    );
-  }
-
-  if (level === 5) {
-    return (
-      <h5 id={id}>
-        {childrenOf(node).map((child) => (
-          <Astro.self node={child} data={data} />
-        ))}
-      </h5>
-    );
-  }
+  const level = Math.min(Math.max(heading.depth ?? 1, 1), 6);
+  const Tag = `h${level}` as any;
 
   return (
-    <h6 id={id}>
+    <Tag id={id}>
       {childrenOf(node).map((child) => (
         <Astro.self node={child} data={data} />
       ))}
-    </h6>
+      {id && <HeadingAnchor id={id} label={text} />}
+    </Tag>
   );
 })()}
 
