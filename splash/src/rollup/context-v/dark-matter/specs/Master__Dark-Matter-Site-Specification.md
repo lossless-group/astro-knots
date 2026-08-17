@@ -1,4 +1,25 @@
 ---
+site_uuid: 31bb9140-3994-4613-92e2-166eecf83ad4
+hex_code: nydy20
+title: Master Dark Matter Site Specification
+lede: The whole front end in one document — theming, mode switching, layout hierarchy, and a porting checklist specific enough that another Astro Knots site can adopt the same system by working down the list.
+summary: The site-level spec of record for Dark Matter's front end. Covers core dependencies, directory structure, the matter-theme CSS variable system, three-mode switching (including the early-init script that prevents a flash), layout hierarchy, header/footer, breakpoints, and Astro config. Ends with a porting checklist naming the files to copy and the customization points to change. Read this first when onboarding to the repo or porting its theme system elsewhere; it is the parent document that the blueprints in context-v/blueprints/ specialize.
+publish: true
+date_created: 2025-12-04
+date_modified: 2025-12-04
+date_authored_initial_draft: 2025-12-04
+date_authored_current_draft: 2025-12-04
+date_authored_final_draft: null
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+status: Shipped
+tags:
+  - Site-Specification
+  - Theme-System
+  - Astro-Knots
+  - Layout
+  - Porting
 from: dark-matter
 from_path: specs/Master__Dark-Matter-Site-Specification.md
 ---

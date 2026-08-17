@@ -26,10 +26,11 @@ authors:
   - Michael Staton
 date_created: 2026-04-27
 date_modified: 2026-04-27
+publish: true
 from: fullstack-vc
-from_path: issue-resolutions/Optimize-for-Local-OpenGraph-Metadata-and-Image-w-Overlay.md
+from_path: issues/Optimize-for-Local-OpenGraph-Metadata-and-Image-w-Overlay.md
 ---
-<!-- Rolled up from fullstack-vc/context-v/issue-resolutions/Optimize-for-Local-OpenGraph-Metadata-and-Image-w-Overlay.md. Edit at the source, not here. Re-run `pnpm rollup:sync` to refresh. -->
+<!-- Rolled up from fullstack-vc/context-v/issues/Optimize-for-Local-OpenGraph-Metadata-and-Image-w-Overlay.md. Edit at the source, not here. Re-run `pnpm rollup:sync` to refresh. -->
 
 # Optimize for Localized OpenGraph Metadata and Banner Image with Overlay
 

@@ -24,6 +24,7 @@ authors:
 image_prompt: A blueprint of a peer learning community's project gallery — a hero banner with a message hierarchy at the top, a grid of working-group project cards beneath it, an archive shelf in the lower margin, and a header dropdown that mirrors the gallery, all rendered as a layered architectural diagram.
 date_created: 2026-04-27
 date_modified: 2026-04-27
+publish: true
 from: fullstack-vc
 from_path: sitemap/pages/Page__projects-index.astro.md
 ---

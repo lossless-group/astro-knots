@@ -27,7 +27,7 @@ function isPublished(data: AnyData): boolean {
 }
 
 function entryDateMs(data: AnyData): number {
-  const d = data.date_modified ?? data.date_updated ?? data.date_created ?? data.date;
+  const d = data.date_modified ?? data.date_updated ?? data.date_created ?? data.date ?? data.date_authored_current_draft ?? data.date_authored_initial_draft;
   if (!d) return 0;
   const t = d instanceof Date ? d.getTime() : new Date(d).getTime();
   return Number.isNaN(t) ? 0 : t;

@@ -84,6 +84,12 @@ const changelogSchema = z
     description: lenientString,
     date: lenientDate,
     date_created: lenientDate,
+    // Editorial pair — declared as lenientDate so they coerce to Date like
+    // every other date field. Without this they arrive as raw strings via
+    // .passthrough(), and any chain falling through to them hands a string
+    // to .toISOString().
+    date_authored_initial_draft: lenientDate,
+    date_authored_current_draft: lenientDate,
     date_modified: lenientDate,
     date_first_published: lenientDate,
     tags: lenientStringArray,
@@ -104,6 +110,12 @@ const contextVSchema = z
     description: lenientString,
     purpose: lenientString,
     date_created: lenientDate,
+    // Editorial pair — declared as lenientDate so they coerce to Date like
+    // every other date field. Without this they arrive as raw strings via
+    // .passthrough(), and any chain falling through to them hands a string
+    // to .toISOString().
+    date_authored_initial_draft: lenientDate,
+    date_authored_current_draft: lenientDate,
     date_modified: lenientDate,
     date_updated: lenientDate,
     last_verified: lenientDate,

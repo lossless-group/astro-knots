@@ -24,8 +24,12 @@ const pageDescription =
   entry.data.lede ?? entry.data.summary ?? entry.data.description ??
   `Ship note from ${entry.data.from ?? 'astro-knots'}.`;
 const siteOg = await getSiteOgImage(entry.data.from);
-const publishedTime = (entry.data.date_first_published ?? entry.data.date_created ?? entry.data.date)?.toISOString();
-const modifiedTime = (entry.data.date_modified ?? entry.data.date_created ?? entry.data.date)?.toISOString();
+const publishedTime = (entry.data.date_first_published ?? entry.data.date_created ?? entry.data.date ??
+        entry.data.date_authored_current_draft ??
+        entry.data.date_authored_initial_draft)?.toISOString();
+const modifiedTime = (entry.data.date_modified ?? entry.data.date_created ?? entry.data.date ??
+        entry.data.date_authored_current_draft ??
+        entry.data.date_authored_initial_draft)?.toISOString();
 const articleAuthor = entry.data.authors?.[0];
 const articleTags = entry.data.tags;
 ---

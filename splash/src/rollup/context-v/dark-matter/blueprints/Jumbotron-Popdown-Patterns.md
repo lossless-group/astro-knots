@@ -1,4 +1,25 @@
 ---
+site_uuid: 5942a8de-4fe1-45a4-a427-088618fe524a
+hex_code: 3a0ud3
+title: Jumbotron Popdown Patterns
+lede: Navigation dropdowns that are big enough to preview real content, and consistent enough that adding a new one is a props change rather than a new component.
+summary: Blueprint for the content-rich hover dropdowns in the Dark Matter header. Fixes the component structure (JumboDropdown plus per-menu variants), the DropdownItem props interface, and the interaction behaviour so navigation menus stay uniform as they multiply. Read before adding a nav menu or restyling the header; the props interface here is the contract those components share.
+publish: true
+date_created: 2025-12-25
+date_modified: 2025-12-25
+date_authored_initial_draft: 2025-12-25
+date_authored_current_draft: 2025-12-25
+date_authored_final_draft: null
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+status: Shipped
+tags:
+  - Navigation
+  - Dropdown
+  - Component-Pattern
+  - Header
+  - Blueprint
 from: dark-matter
 from_path: blueprints/Jumbotron-Popdown-Patterns.md
 ---

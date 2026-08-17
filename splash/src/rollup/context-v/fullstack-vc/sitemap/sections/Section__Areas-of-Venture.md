@@ -1,10 +1,12 @@
 ---
+title: Areas of Venture | A Section with a Grid Layout
+date_created: 2026-04-27
+date_modified: 2026-04-27
+publish: false
 from: fullstack-vc
 from_path: sitemap/sections/Section__Areas-of-Venture.md
 ---
 <!-- Rolled up from fullstack-vc/context-v/sitemap/sections/Section__Areas-of-Venture.md. Edit at the source, not here. Re-run `pnpm rollup:sync` to refresh. -->
-
-
 
 # Areas of Venture | A Section with a Grid Layout
 

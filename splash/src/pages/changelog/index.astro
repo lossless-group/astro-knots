@@ -13,8 +13,8 @@ try {
   entries = (await getCollection('changelog'))
     .filter((e) => e.data.publish !== false)
     .sort((a, b) => {
-      const da = a.data.date_modified ?? a.data.date_created ?? a.data.date ?? new Date(0);
-      const db = b.data.date_modified ?? b.data.date_created ?? b.data.date ?? new Date(0);
+      const da = a.data.date_modified ?? a.data.date_created ?? a.data.date ?? a.data.date_authored_current_draft ?? a.data.date_authored_initial_draft ?? new Date(0);
+      const db = b.data.date_modified ?? b.data.date_created ?? b.data.date ?? b.data.date_authored_current_draft ?? b.data.date_authored_initial_draft ?? new Date(0);
       return new Date(db).getTime() - new Date(da).getTime();
     });
 } catch {
@@ -78,7 +78,7 @@ const filterOptions = [...counts.entries()]
         />
         <ul class="archive-list">
           {entries.map((entry) => {
-            const date = entry.data.date_modified ?? entry.data.date_created ?? entry.data.date;
+            const date = entry.data.date_modified ?? entry.data.date_created ?? entry.data.date ?? entry.data.date_authored_current_draft ?? entry.data.date_authored_initial_draft;
             const from = (entry.data.from as string | undefined) ?? 'astro-knots';
             return (
               <li data-from={from}>

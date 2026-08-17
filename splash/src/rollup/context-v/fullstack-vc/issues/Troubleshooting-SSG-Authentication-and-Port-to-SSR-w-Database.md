@@ -1,10 +1,12 @@
 ---
+title: Troubleshooting SSG Authentication and the Port to SSR with a Database
+date_created: 2026-04-28
+date_modified: 2026-04-28
+publish: true
 from: fullstack-vc
-from_path: issue-resolutions/Troubleshooting-SSG-Authentication-and-Port-to-SSR-w-Database.md
+from_path: issues/Troubleshooting-SSG-Authentication-and-Port-to-SSR-w-Database.md
 ---
-<!-- Rolled up from fullstack-vc/context-v/issue-resolutions/Troubleshooting-SSG-Authentication-and-Port-to-SSR-w-Database.md. Edit at the source, not here. Re-run `pnpm rollup:sync` to refresh. -->
-
-
+<!-- Rolled up from fullstack-vc/context-v/issues/Troubleshooting-SSG-Authentication-and-Port-to-SSR-w-Database.md. Edit at the source, not here. Re-run `pnpm rollup:sync` to refresh. -->
 
 # The Issue needing Resolution
 

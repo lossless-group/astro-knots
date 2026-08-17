@@ -1,4 +1,25 @@
 ---
+site_uuid: e591e7bf-58e8-498d-9925-ab948da2b6cc
+hex_code: sd4lvi
+title: Using Heartbeat Patterns to Save Session Data
+lede: "`beforeunload` lies — especially on mobile — so you never really know when a reader stopped reading. Periodic still-here pings turn session duration into something you can actually measure, with no dependencies."
+summary: "Blueprint for the session-duration tracking used behind the email-gated confidential content. Documents the heartbeat architecture end to end: the temp-access verification endpoint, the NocoDB record holding sessionStartTime, the cookie that carries the record id, and the ping cadence that closes the session. Read before changing anything in the temp-access flow or the NocoDB session schema; the pattern is portable to any Astro Knots site that needs view-duration analytics."
+publish: true
+date_created: 2025-12-25
+date_modified: 2025-12-25
+date_authored_initial_draft: 2025-12-25
+date_authored_current_draft: 2025-12-25
+date_authored_final_draft: null
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+status: Shipped
+tags:
+  - Session-Tracking
+  - Heartbeat-Pattern
+  - NocoDB
+  - Analytics
+  - Blueprint
 from: dark-matter
 from_path: blueprints/Using-Heartbeat-Patterns-to-Save-Session-Data.md
 ---
