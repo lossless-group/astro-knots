@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const date = entry.data.date_modified ?? entry.data.date_updated ?? entry.data.date_created;
+const date = entry.data.date_modified ?? entry.data.date_updated ?? entry.data.date_created ?? entry.data.date_authored_current_draft ?? entry.data.date_authored_initial_draft;
 const base = import.meta.env.BASE_URL;
 const segments = entry.id.split('/');
 const sectionLabel = segments.length > 2 ? segments[1] : 'general';
@@ -28,8 +28,8 @@ const pageDescription =
   entry.data.lede ?? entry.data.description ?? entry.data.purpose ??
   `${sectionLabel.charAt(0).toUpperCase() + sectionLabel.slice(1)} note from ${entry.data.from ?? 'astro-knots'}.`;
 const siteOg = await getSiteOgImage(entry.data.from);
-const publishedTime = (entry.data.date_created)?.toISOString();
-const modifiedTime = (entry.data.date_modified ?? entry.data.date_updated ?? entry.data.date_created)?.toISOString();
+const publishedTime = (entry.data.date_created ?? entry.data.date_authored_initial_draft)?.toISOString();
+const modifiedTime = (entry.data.date_modified ?? entry.data.date_updated ?? entry.data.date_created ?? entry.data.date_authored_current_draft ?? entry.data.date_authored_initial_draft)?.toISOString();
 const articleAuthor = entry.data.authors?.[0];
 const articleTags = entry.data.tags;
 ---
