@@ -8,6 +8,10 @@ category: Prompts
 tags: [Brand-Theme, Index-Page, Components, Dark-Matter, Prompt-Plan]
 authors:
   - Michael Staton
+site_uuid: e268872d-f269-42e6-b0e1-7125a274f40a
+hex_code: ax1miy
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 ## Blueprint: Set Up Index and Basic Components Using Brand Theme

@@ -17,6 +17,8 @@ authors:
 image_prompt: A network diagram showing a central hub (the VC firm website) with spokes radiating out to portfolio company websites, each spoke pulling back job listing cards that funnel into a unified grid display.
 date_created: 2026-04-16
 date_modified: 2026-04-16
+site_uuid: 1cd98a61-0495-4261-8c1e-c21374c70f77
+hex_code: 76f1e6
 ---
 
 # Portfolio-Wide Job Aggregator

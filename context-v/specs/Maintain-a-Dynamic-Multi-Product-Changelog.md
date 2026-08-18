@@ -1,6 +1,7 @@
 ---
 title: "Maintain a Multi-Product Changelog with Git Modules"
-lede: "Organizations increasingly deliver and maintain multiple products, each necessitating its own changelog. However, as an organization its good to display those changelogs in a unified way, so that users can easily see the changes across all products and the team can feel motivation from organization-wide progress."
+lede: >-
+  Each product keeps its own changelog in its own submodule; the org renders them as one feed so progress reads as organization-wide.
 date_authored_initial_draft: 2025-10-14
 date_authored_current_draft: 2025-10-14
 date_authored_final_draft: 2025-10-14
@@ -18,6 +19,8 @@ authors:
 image_prompt: "A busy intersection has convertibles coming from all sides, many in the wrong lanes. Each convertible has their backseat filled with software code, stacked on top of each other, often flying off the back of the car. There is a traffic policeman in the middle of the insersection, trying to direct traffic to assure there is not a wreck."
 slug: maintain-a-dynamic-multi-product-changelog
 tags: [State-Of-The-Art-Practices, CI-CD-Pipelines]
+site_uuid: cad8920a-222a-460b-9c39-4b5699c722fa
+hex_code: 71znuz
 ---
 
 

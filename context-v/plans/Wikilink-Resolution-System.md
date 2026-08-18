@@ -1,6 +1,7 @@
 ---
 title: "Wikilink Resolution System for LFM"
-lede: "A two-layer wikilink rendering system: LFM provides the abstract MDAST plugin that parses [[Obsidian-style]] backlinks; each Astro Knots site provides a config that resolves those wikilinks to local-or-external URLs and gives them visual treatment that signals the destination."
+lede: >-
+  LFM parses `[[Obsidian-style]]` links; each site supplies the config resolving them to local or external URLs and styling the destination.
 status: Proposed
 date_created: 2026-05-08
 date_modified: 2026-05-08
@@ -14,6 +15,10 @@ related:
   - "[[Maintain-Extended-Markdown-Render-Pipeline]]"
   - "[[Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Package]]"
 at_semantic_version: 0.5.0.0
+site_uuid: 0dd2e26c-d8e1-481f-9408-7de67113c24e
+hex_code: 0rta9t
+date_authored_initial_draft: 2026-05-08
+date_authored_current_draft: 2026-05-08
 ---
 
 # Wikilink Resolution System for LFM

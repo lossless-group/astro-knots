@@ -9,6 +9,10 @@ tags: [Design-System, Colors, Tokens, CSS, Themes, Modes]
 authors:
   - Michael Staton
 augmented_with: Claude Code on Opus 4.7
+site_uuid: e2a87c71-fe63-4d1b-9fb5-e8f74b704265
+hex_code: 44exec
+date_authored_initial_draft: 2026-04-20
+date_authored_current_draft: 2026-04-20
 ---
 
 # Don't Improvise Colors — Use the Design System

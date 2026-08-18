@@ -1,3 +1,18 @@
+---
+site_uuid: ce782b73-2c03-4490-a5b8-6ea81859e8b1
+hex_code: 6ir9wz
+title: Dojo Index
+date_created: 2026-04-26
+date_authored_initial_draft: 2026-04-26
+date_authored_current_draft: 2026-04-26
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Sitemap
+lede: "Prompt for the dojo landing page: a 2/3 hero core-message column beside a 1/3 read-our-content CTA, system tokens only, all three modes."
+summary: "Prompt capture for the fullstack-vc dojo landing page, including a rough Astro sketch of the layout and the four-slot message hierarchy (contextSetter, headerTxt, subheaderTxt, supportingTxt) with draft copy. The sketch is illustrative pseudo-code and does not compile. Use it for layout intent and copy; get the component contracts from the design system."
+---
 
 ❯ Let's make the dojo/index.astro page
 

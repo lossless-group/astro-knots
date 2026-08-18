@@ -1,3 +1,19 @@
+---
+site_uuid: 7aa204e9-2aef-4267-ba4f-89da75c256bd
+hex_code: d6gpqy
+title: Dynamic Portfolio Page Specification and Implementation Plan
+date_created: 2026-05-07
+date_authored_initial_draft: 2026-05-07
+date_authored_current_draft: 2026-05-07
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Spec
+lede: "Three clickable levels — logo grid, expanding card, detail page — with a passcode gate that reveals placeholders, not real data."
+summary: "Implementation plan for the clickable-levels-of-detail portion of the portfolio spec. Enumerates the files to add and update, the props and accessibility contract for the expandable card, the data mapping, and the acceptance criteria. Phase 1 deliberately keeps sensitive data out of prerendered HTML entirely — the gate reveals placeholders only — with real private-data fetching deferred to Phase 2. Work the numbered next-steps list in order."
+---
+
 ## Scope
 Implements the “Clickable Levels of Detail” section (lines 54–68):
 - Level 1: Logo-only grid with crisp assets and alt text

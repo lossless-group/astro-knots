@@ -1,6 +1,7 @@
 ---
 title: "Maintain an Interactive `Stack` Display"
-lede: "Professionals have a stack of tools and technologies they use to get their work done. This display should show the tools and technologies in a way that is easy to browse and understand, helping others learn about the tools and technologies used in the industry — built on markdown + JSON, no database, in the spirit of AI-friendliness."
+lede: >-
+  A browsable display of the tools a professional uses to work — markdown plus JSON, no database, in the spirit of AI-friendliness.
 date_authored_initial_draft: 2025-04-26
 date_authored_current_draft: 2026-04-28
 date_authored_final_draft: null
@@ -29,6 +30,8 @@ tags:
   - Kauffman-Fellows
   - Agentic-VC-Dojo
   - FullStack-VC
+site_uuid: 24f96f28-44c4-414e-afcd-341f70905cf8
+hex_code: id3fm5
 ---
 
 # Implementation Status (2026-04-28)

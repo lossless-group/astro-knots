@@ -10,6 +10,10 @@ authors:
   - Michael Staton
 related_blueprint: "[[Managing-Complex-Markdown-Content-at-Build-Time]]"
 related_reminder: "[[YAML-Frontmatter-Parsing-Must-Be-Lenient]]"
+site_uuid: a7458066-d04c-4509-b552-8128ae332fe4
+hex_code: juiwwv
+date_authored_initial_draft: 2026-05-08
+date_authored_current_draft: 2026-05-08
 ---
 
 # Wrap Long String Values in Double Quotes

@@ -1,6 +1,7 @@
 ---
 title: "Astro Frontmatter: Avoid Inline Block Comments and Risky Regex Literals"
-lede: "Astro's `.astro` frontmatter is parsed by esbuild's TS pipeline before reaching the runtime, and the parser sometimes misclassifies `/* */` block comments and certain regex-literal shapes when they appear in expression-adjacent positions. The error message reports a position past EOF on the affected line, which makes the bug feel like a phantom. Workaround: prefer line comments and string methods in `.astro` frontmatter where you'd reach for an inline block comment or a slash-heavy regex."
+lede: >-
+  In `.astro` frontmatter, a `/* */` comment after a statement lexes as a regex literal — the error reports a column past EOF. Use `//`.
 date_created: 2026-05-17
 date_modified: 2026-05-17
 status: Published
@@ -17,6 +18,10 @@ authors:
   - Michael Staton
 related_reminder:
   - "[[YAML-Frontmatter-Parsing-Must-Be-Lenient]]"
+site_uuid: cbfa94ac-15b5-4057-a776-bb4c85d10082
+hex_code: cb0wzx
+date_authored_initial_draft: 2026-05-17
+date_authored_current_draft: 2026-05-17
 ---
 
 # Astro Frontmatter: Avoid Inline Block Comments and Risky Regex Literals

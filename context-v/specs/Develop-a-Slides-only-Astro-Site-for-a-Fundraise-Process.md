@@ -16,6 +16,8 @@ authors:
 image_prompt: A modern professional in causal business attire, giving a presentation to a conference table of hip looking investors who are wearing large 3D glasses and looking as if they are at an action movie premiere on Imax in 3D.  The presentation is popping out of the screen in 3D, and design objects are streamining out towards the investors.
 date_created: 2026-03-25
 date_modified: 2026-03-25
+site_uuid: 6cff1914-8937-46ff-9570-ffd0fb98070e
+hex_code: xtp7z5
 ---
 
 # Workflow Management

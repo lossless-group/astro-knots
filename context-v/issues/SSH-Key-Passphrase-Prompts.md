@@ -1,3 +1,19 @@
+---
+site_uuid: 2c8bc881-b9bb-4f64-9a96-5ac89d6aadda
+hex_code: ingeq1
+title: SSH Key Passphrase Prompts - macOS Keychain Integration
+date_created: 2026-04-21
+date_authored_initial_draft: 2026-04-21
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "The passphrase prompt returned because `~/.ssh/config` had `UseKeychain` only under `Host gitlab.com` — a `Host *` block fixes the rest."
+summary: "Machine-setup fix for repeated SSH passphrase prompts on macOS. Records the diagnosis (keychain directives scoped to a single Host block), the two-step remedy, and what `AddKeysToAgent` and `UseKeychain` each do. Apply verbatim on any new Mac used in this tree; it is environment configuration, not repo code."
+---
+
 # SSH Key Passphrase Prompts - macOS Keychain Integration
 
 **Date:** 2025-12-25

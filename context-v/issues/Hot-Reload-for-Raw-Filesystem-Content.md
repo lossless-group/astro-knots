@@ -1,3 +1,19 @@
+---
+site_uuid: 68e6bff2-4357-4a80-b889-1494507fc54b
+hex_code: qguyj7
+title: Hot Reload for Raw-Filesystem Content (across astro-knots sites)
+date_created: 2026-05-03
+date_authored_initial_draft: 2026-05-03
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "`readFileSync` content never hot-reloads — it sits outside Astro's content layer. Needs a Vite watcher AND a dev cache bypass, not either."
+summary: "Cross-site fix for content that Astro's content layer does not manage. Gives the copy-paste `watchRawContent` Vite plugin, the `!import.meta.env.DEV` cache-bypass one-liner, per-site path filters, and an adoption checklist. Apply to any astro-knots site that reads markdown, YAML, or JSON via `node:fs` or `import.meta.glob`; mpstaton-site is the reference implementation. The document is explicit about what it does not fix — content collections, build-time-fetched content, and config edits."
+---
+
 # Hot Reload for Raw-Filesystem Content (across astro-knots sites)
 
 **Date:** 2026-05-03

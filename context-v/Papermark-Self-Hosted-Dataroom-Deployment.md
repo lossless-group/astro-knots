@@ -8,6 +8,10 @@ category: Blueprints
 tags: [Papermark, Dataroom, Deployment, Railway, Self-Hosted]
 authors:
   - Michael Staton
+site_uuid: 2ddfc5df-e678-44a4-abff-58f67c3ffa5b
+hex_code: klv58w
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 # Papermark Self-Hosted Dataroom Deployment

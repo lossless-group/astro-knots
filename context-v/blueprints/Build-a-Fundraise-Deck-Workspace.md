@@ -1,6 +1,7 @@
 ---
 title: "Build a Fundraise Deck Workspace"
-lede: "Step-by-step playbook for standing up a private, gated, two-surface fundraise/teaser deck workspace from scratch. Captures the patterns proven on sites/calmstorm-decks during the week of 2026-04-30 → 2026-05-03, written as instructions for the next site rather than as a retrospective. Use this when initializing a new client deck site under astro-knots/sites/."
+lede: >-
+  Step-by-step playbook for standing up a private, gated, two-surface fundraise deck workspace, as proven on `sites/calmstorm-decks`.
 date_created: 2026-05-03
 date_modified: 2026-05-03
 status: Published
@@ -17,6 +18,10 @@ tags:
 authors:
   - Michael Staton
 augmented_with: Claude Code (Opus 4.7, 1M context)
+site_uuid: 53536ea3-b0e8-423e-9e1c-fa57ca2c9854
+hex_code: 2hibc6
+date_authored_initial_draft: 2026-05-03
+date_authored_current_draft: 2026-05-03
 ---
 
 ## What This Blueprint Is

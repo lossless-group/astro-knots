@@ -11,6 +11,10 @@ authors:
 related_blueprint: "[[Maintain-Themes-Mode-Across-CSS-Tailwind]]"
 related_reminder: "[[YAML-Frontmatter-Parsing-Must-Be-Lenient]]"
 canonical_source: "packages/lfm-astro/components/"
+site_uuid: 2c40eb76-694c-46e3-ad28-1a7f99d4a21a
+hex_code: vy9fuu
+date_authored_initial_draft: 2026-05-08
+date_authored_current_draft: 2026-05-08
 ---
 
 # Callout System (LFM)

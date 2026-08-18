@@ -13,6 +13,8 @@ tags: [GitHub-Actions, CI-CD, Package-Publishing, JSR, GitHub-Packages, DevOps, 
 authors:
   - Michael Staton
   - AI Labs Team
+site_uuid: 997c3e8e-a075-4317-bdf5-1f741d05024e
+hex_code: vfg91b
 ---
 
 # Exploring GitHub Actions for Package Publishing

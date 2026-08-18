@@ -1,6 +1,7 @@
 ---
 title: Web Research Agents for Content Augmentation
-lede: When a community member adds a tool we haven't authored content for, we want to point an agent at a URL or company name and have it fill out the YAML frontmatter. Here's what shipping that actually looks like in 2026 — and why most of the "agent framework" hype is the wrong tool for the job we have today.
+lede: >-
+  Point an agent at a URL and have it fill out a tool's YAML frontmatter — and why most agent-framework hype is the wrong tool for that job.
 date_authored_initial_draft: "2026-04-28"
 date_authored_current_draft: "2026-04-28"
 date_created: "2026-04-28"
@@ -13,6 +14,8 @@ tags: [Web-Research, Data-Augmentation, AI-Agents, Tool-Use, Structured-Outputs,
 authors:
   - Michael Staton
   - AI Labs Team
+site_uuid: 2a0d83d4-dee5-451b-a41d-375821253f90
+hex_code: ijrohs
 ---
 
 # Web Research Agents for Content Augmentation

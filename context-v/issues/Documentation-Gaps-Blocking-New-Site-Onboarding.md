@@ -1,3 +1,19 @@
+---
+site_uuid: 807b9d30-e67d-43e9-a808-f6427d0a1ba2
+hex_code: je60nb
+title: Documentation Gaps Blocking New Site Onboarding
+date_created: 2026-04-25
+date_authored_initial_draft: 2026-04-25
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "The canonical markdown package has no package.json, and the reference site uses the `workspace:*` pin CLAUDE.md forbids."
+summary: "Audit of the six documentation contradictions that make scaffolding a new astro-knots site impossible without tribal knowledge: the package-less `packages/lfm-astro/`, the reference site that violates the stated `workspace:*` constraint, the missing scaffolding guide, the blueprint describing structures that were never built, the fictional env-driven config pattern, and the misleading `@knots/astro` README. Three fixes were applied in April 2026; the remaining table assigns the rest with priorities. Read before trusting CLAUDE.md or the render-pipeline blueprint as current documentation."
+---
+
 # Documentation Gaps Blocking New Site Onboarding
 
 **Date:** 2026-04-25  

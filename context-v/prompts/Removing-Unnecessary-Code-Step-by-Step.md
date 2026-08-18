@@ -1,6 +1,7 @@
 ---
 title: Removing Unnecessary Code Step-by-Step
-lede: We have developed a number of great patterns, components, and utilities that we use on a regular basis.  To start with a robust set of included functionality, we cloned The Water Foundation site (twf_site), but now need to strip out any code that is not directly related to the Hypernova brand and desired site functionality.
+lede: >-
+  Hypernova was cloned from the Water Foundation site (`twf_site`); this is the step-by-step strip-out of everything not related to its brand.
 date_authored_initial_draft: 2025-11-16
 date_authored_current_draft: 2025-11-16
 date_authored_final_draft: "[]"
@@ -17,6 +18,8 @@ authors:
   - Michael Staton
   - Tugce Ergul
 image_prompt: A jenga tower with Hypernova branding, and a stack of code files with Astro, Svelte, and Tailwind. A robot and a hacker are taking turns removing jenga blocks.
+site_uuid: 5fd61fae-7c87-4162-97c9-2e15d73fdd45
+hex_code: u9jqar
 ---
 
 # Context

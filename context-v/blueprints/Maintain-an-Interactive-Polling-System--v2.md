@@ -5,11 +5,12 @@ date_authored_initial_draft: 2025-04-28
 date_authored_current_draft: 2026-04-28
 date_authored_final_draft:
 date_first_published: null
-site_uuid: e9b53105-c5e3-4c4a-8bb9-e72d88764e0
+site_uuid: cecf568d-3351-4c70-8985-7b47fd0ee6c7
 publish: true
 title: "Maintain an Interactive Polling System"
 slug: maintain-an-interactive-polling-system-v2
-lede: "Implementation blueprint for embeddable, theme-aware interactive polls on Astro SSG sites — covering Session/Poll data model, Astro DB on Turso storage, DB→markdown materialization for archive, live-meeting authoring motions, and Svelte + GSAP UI contracts. v0.0.1 ships four templates and one live session."
+lede: >-
+  Embeddable theme-aware polls on Astro SSG: the Session/Poll model, Astro DB on Turso, DB→markdown archive, Svelte + GSAP UI contracts.
 at_semantic_version: 0.0.0.2
 status: Draft
 category: Blueprints
@@ -21,6 +22,7 @@ image_prompt: "A small robot stands with a small projector on top of a computer 
 banner_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_banner_image_1755815513881_vG9H27ZKx.webp"
 portrait_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_portrait_image_1755815520946_NlMeL6qdl.webp"
 square_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_square_image_1755815527652_HEYKVBKOm.webp"
+hex_code: op4wwh
 ---
 
 # Blueprint for Developing and Maintaining Interactive Polling Systems

@@ -16,6 +16,8 @@ tags: [Flare, Canvas, Animation, Interactive, Concentric-Circles, Noise, Creativ
 authors:
   - Michael Staton
 image_prompt: Topographic map lines radiating from an off-center point, with a cursor hovering between two lines pushing them apart like a magnetic field.
+site_uuid: a4482ca4-bd83-4f03-ae81-ad08cff2e09e
+hex_code: ouws9d
 ---
 
 # Creative Brief

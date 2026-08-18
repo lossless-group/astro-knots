@@ -8,6 +8,10 @@ category: Blueprints
 tags: [GitHub, Secure-Content, SSR, Confidential, Private-Repos]
 authors:
   - Michael Staton
+site_uuid: 56a3240e-45a4-4068-96ae-38b650bc78bc
+hex_code: pwhq2d
+date_authored_initial_draft: 2024-12-01
+date_authored_current_draft: 2024-12-01
 ---
 
 # GitHub Secure Content Pattern

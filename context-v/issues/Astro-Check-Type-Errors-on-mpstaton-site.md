@@ -1,3 +1,19 @@
+---
+site_uuid: 154d83d1-ee12-4d6f-9607-c3959a87bed2
+hex_code: ottwfz
+title: Astro Check Type Errors on mpstaton-site
+date_created: 2026-05-03
+date_authored_initial_draft: 2026-05-03
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "`pnpm build` passes while `astro check` reports 8 errors — five root causes, only one of which lossless-site shares."
+summary: "Triage record for the `pnpm astro check` failures on mpstaton-site, grouped into five root causes with a suggested fix and a predecessor check for each. Use it as the work order — the recommended order of operations at the bottom clears all eight errors — and as the reference for which problems are mpstaton-site-local versus inherited from lossless-monorepo/site. Only the missing `@types/mdast` group has a real predecessor."
+---
+
 # Astro Check Type Errors on mpstaton-site
 
 **Date:** 2026-05-03

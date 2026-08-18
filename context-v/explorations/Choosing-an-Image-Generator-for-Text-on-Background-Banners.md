@@ -1,6 +1,7 @@
 ---
 title: Choosing an Image Generator for Text-on-Background Banners
-lede: A snapshot of the AI image-generation landscape as of April 2026, focused on the specific job of producing release-banner-style images with legible title text and brand-consistent visual style — the kind of asset Anthropic, Windsurf, Linear, and Vercel attach to changelog entries and release announcements.
+lede: >-
+  An April 2026 snapshot of image generators judged on one job: release-banner images with legible title text and a consistent brand feel.
 date_authored_initial_draft: "2026-04-25"
 date_authored_current_draft: "2026-04-26"
 date_created: "2026-04-25"
@@ -13,6 +14,8 @@ tags: [Image-Generation, AI-APIs, Banner-Design, Brand-Consistency, Changelog-Ba
 authors:
   - Michael Staton
   - AI Labs Team
+site_uuid: efc625b6-a4d2-4782-bbee-4657f463a5ae
+hex_code: s4v615
 ---
 
 # Choosing an Image Generator for Text-on-Background Banners

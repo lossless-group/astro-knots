@@ -1,6 +1,7 @@
 ---
 title: "Context-V GitHub Fetcher for Multi-Repo Content Aggregation"
-lede: "A build-time content fetcher that pulls context-v documents (Specs, Blueprints, Prompts, Reminders) from multiple GitHub repositories, enabling lossless.group and mpstaton.com to render current project documentation without manual copying or submodules."
+lede: >-
+  A build-time fetcher that pulls context-v documents from ~20 repos, so lossless.group can render them without copying or submodules.
 date_authored_initial_draft: 2026-03-25
 date_authored_current_draft: 2026-03-25
 date_authored_final_draft:
@@ -17,6 +18,8 @@ authors:
 image_prompt: A network diagram showing multiple GitHub repository nodes each with a context-v directory, with content flowing through a central fetcher into two website nodes — all connected by clean directional arrows on a dark background.
 date_created: 2026-03-25
 date_modified: 2026-03-25
+site_uuid: 0fe38097-9455-40f6-9ac5-bb07d6b20767
+hex_code: pqvypb
 ---
 
 # Context-V GitHub Fetcher for Multi-Repo Content Aggregation

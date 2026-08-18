@@ -10,6 +10,10 @@ category: Blueprints
 tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens, Named-Tokens, BEM-Conventions, Two-Tier-Tokens]
 authors:
   - Michael Staton
+site_uuid: 0607e601-5398-455f-852d-e42dc7caaaea
+hex_code: juf7h6
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 # Maintain Themes & Modes Across CSS and Tailwind (Hypernova Implementation Blueprint)

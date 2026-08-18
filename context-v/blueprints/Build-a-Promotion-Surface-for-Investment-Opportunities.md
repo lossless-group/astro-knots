@@ -1,6 +1,7 @@
 ---
 title: "Build a Promotion Surface for Investment Opportunities"
-lede: "Architecture for a hard-gated, multi-opportunity promotion surface inside mpstaton-site. Each opportunity gets a hub page that conditionally surfaces deck and memo materials behind real authentication, optimised for AI-assisted variant iteration in 3-5 minute cycles."
+lede: >-
+  A hard-gated `/promote` hub per opportunity, surfacing deck and memo behind real auth, built for 3–5 minute variant iteration cycles.
 date_created: 2026-05-03
 date_modified: 2026-05-03
 status: Draft
@@ -16,6 +17,10 @@ tags:
 authors:
   - Michael Staton
 augmented_with: Claude Code (Opus 4.7, 1M context)
+site_uuid: 05396297-33c1-42f6-bea0-601ff6a6dad3
+hex_code: 5oqwxl
+date_authored_initial_draft: 2026-05-03
+date_authored_current_draft: 2026-05-03
 ---
 
 ## What This Blueprint Is

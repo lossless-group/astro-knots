@@ -1,6 +1,7 @@
 ---
 title: Create an Image-Heavy Portfolio Website for Boutique E-Commerce
-lede: A specification for a mobile-first, image-heavy portfolio site with dark and vibrant modes, carousel-driven galleries, tiered pricing cards, WhatsApp CTA, and SEO landing pages — all managed through markdown content and deployable independently from the Astro-Knots pseudomonorepo.
+lede: >-
+  A mobile-first, image-heavy portfolio site: carousel galleries, tiered pricing cards, WhatsApp CTA, all managed through markdown.
 date_authored_initial_draft: 2026-04-21
 date_authored_current_draft: 2026-04-21
 date_authored_final_draft:
@@ -17,6 +18,8 @@ authors:
 image_prompt: A chat interface on a mobile phone is visible with a hand behind it holding the phone. The chat interface shows a conversation between a user and an AI assistant discussing web development and design.  To the right, a monitor shows a website with a portfolio of images.
 date_created: 2026-04-21
 date_modified: 2026-04-21
+site_uuid: edd8f440-3d99-400b-bf30-d2732bc1c4c9
+hex_code: blyj6i
 ---
 
 # Create an Image-Heavy Portfolio Website for Boutique E-Commerce

@@ -1,6 +1,7 @@
 ---
 title: Polish Pass for Arthouse Site
-lede: A scoped polish initiative that takes arthouse-site from scaffold-complete to a client-presentable landing page — locked on dark-mode-first feminine arthouse mystique, with a private imagery convention and an AI photo-to-illustration pipeline for NSFW-sensitive source material.
+lede: >-
+  Takes arthouse-site from scaffold-complete to client-presentable, with an AI photo-to-illustration pipeline for sensitive source material.
 date_created: 2026-05-18
 date_modified: 2026-05-18
 date_authored_initial_draft: 2026-05-18
@@ -17,6 +18,9 @@ tags:
   - Typography
   - Image-Privacy
   - Astro-Knots
+site_uuid: 7b623111-fb6b-4f70-aaaa-788c0e48b000
+hex_code: og64ho
+date_authored_current_draft: 2026-05-18
 ---
 
 # Polish Pass for Arthouse Site

@@ -1,6 +1,7 @@
 ---
 title: "Generate a Pseudomonorepo Rollup of Changelog and Context"
-lede: "How an Astro splash site for a pseudomonorepo aggregates each child submodule's changelog/ and context-v/ into one feed — with provenance, without runtime dependencies on the GitHub API, and without auth token plumbing in CI. The deliberate-sync model: a human runs `pnpm rollup:sync`, content lands in src/rollup/, gets committed, deploys like any other static asset."
+lede: >-
+  Deliberate sync: a human runs `pnpm rollup:sync`, each child's changelog and context-v lands in `src/rollup/`, and the build stays file IO.
 date_created: 2026-05-04
 date_modified: 2026-05-04
 status: Authoritative
@@ -20,6 +21,10 @@ augmented_with:
   - Claude Code on Claude Opus 4.7 (1M context)
 applies_to: Any Astro Knots splash or site for a pseudomonorepo
 reference_implementation: lossless-group/content-farm splash/
+site_uuid: e9c2080c-1b09-43e9-9c92-1c7a6ce920e5
+hex_code: 0tt8ut
+date_authored_initial_draft: 2026-05-04
+date_authored_current_draft: 2026-05-04
 ---
 
 # Generate a Pseudomonorepo Rollup of Changelog and Context

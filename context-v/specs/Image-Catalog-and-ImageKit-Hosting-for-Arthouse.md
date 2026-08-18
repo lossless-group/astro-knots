@@ -1,6 +1,7 @@
 ---
 title: Image Catalog and ImageKit Hosting for Arthouse
-lede: A catalog-and-resolver content model that keeps the arthouse-site code repo public while client photography lives on ImageKit — including a privacy tier that lets NSFW originals exist in the catalog (for lineage) without ever appearing in rendered output.
+lede: >-
+  The repo stays public because it holds metadata only; ImageKit holds the bytes, and a privacy tier keeps NSFW originals out of the output.
 date_created: 2026-05-18
 date_modified: 2026-05-18
 date_authored_initial_draft: 2026-05-18
@@ -17,6 +18,9 @@ tags:
   - Image-Privacy
   - Astro-Content-Collections
   - Sveltia-CMS
+site_uuid: 95582160-c960-42db-a9de-baff6f90c42b
+hex_code: a5qllv
+date_authored_current_draft: 2026-05-18
 ---
 
 # Image Catalog and ImageKit Hosting for Arthouse

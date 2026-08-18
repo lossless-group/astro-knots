@@ -9,6 +9,10 @@ tags: [Frontmatter, Content-Collections, Build-Tolerance, Astro, YAML, Loaders]
 authors:
   - Michael Staton
 related_blueprint: "[[Managing-Complex-Markdown-Content-at-Build-Time]]"
+site_uuid: 2a680b22-24eb-4e6e-a105-c8b6fce210a6
+hex_code: 0j1zg9
+date_authored_initial_draft: 2026-05-08
+date_authored_current_draft: 2026-05-08
 ---
 
 # YAML Frontmatter Parsing Must Be Lenient

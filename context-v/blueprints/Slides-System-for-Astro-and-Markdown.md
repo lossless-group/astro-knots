@@ -8,6 +8,10 @@ category: Blueprints
 tags: [Slides, Presentations, RevealJS, Three.js, Markdown]
 authors:
   - Michael Staton
+site_uuid: 8542f85e-3d20-40dc-8c3e-1621cb748046
+hex_code: tto3n3
+date_authored_initial_draft: 2024-12-01
+date_authored_current_draft: 2024-12-01
 ---
 
 # Slides System Living Specification

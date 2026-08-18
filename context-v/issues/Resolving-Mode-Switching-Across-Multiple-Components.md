@@ -1,3 +1,19 @@
+---
+site_uuid: 9cf3fba8-43b2-455f-b03c-3a09f54a7b26
+hex_code: 5yx3fi
+title: Resolving Mode Switching Across Multiple Components
+date_created: 2026-04-21
+date_authored_initial_draft: 2026-04-21
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "Astro scopes your `[data-mode]` selector to the component, but the attribute lives on `<html>` — it never matches. `:global()` is the fix."
+summary: "Post-mortem on why three-mode (light/dark/vibrant) styling silently failed in Dark Matter's hero components, and the one-wrapper fix. Read before writing any mode-aware CSS inside an Astro `<style>` block anywhere in astro-knots — the scoping trap is universal, not Dark Matter-specific. Also records two secondary lessons: refactor forward from working vibrant code rather than abstracting away from it, and WebGL components need a CSS-variable read plus a MutationObserver instead of CSS."
+---
+
 # Resolving Mode Switching Across Multiple Components
 
 **Date:** 2024-12-04

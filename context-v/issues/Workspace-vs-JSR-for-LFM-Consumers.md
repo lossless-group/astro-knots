@@ -1,3 +1,19 @@
+---
+site_uuid: 47a16169-d8d0-48a8-8c31-28cd8cbb3c4d
+hex_code: pizz54
+title: Workspace vs JSR for LFM Consumers
+date_created: 2026-05-06
+date_authored_initial_draft: 2026-05-06
+date_authored_current_draft: 2026-08-15
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Issue
+lede: "Four sites got flipped to `workspace:*` during the LFM extraction. Only one should be — Vercel never checks out the parent workspace."
+summary: "Uncommitted-mistake record from the LFM repo extraction, written so the deliberate revert can be done later without re-deriving the analysis. Establishes the rule: exactly one site is the LFM dev sandbox on `workspace:*` (mpstaton-site, which already had `lfm-mode.mjs` tooling for exactly this), and every deployable site stays pinned to JSR. Contains the per-site revert values and the verification commands. Read before wiring any future sibling package into the workspace."
+---
+
 # Workspace vs JSR for LFM Consumers
 
 **Date:** 2026-05-05

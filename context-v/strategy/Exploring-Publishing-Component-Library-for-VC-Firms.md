@@ -8,6 +8,10 @@ category: Blueprints
 tags: [Component-Library, Publishing, VC-Firms, Strategy, Distribution]
 authors:
   - Michael Staton
+site_uuid: 54d60fd7-e289-4404-89cb-f895d4d265c9
+hex_code: 9evxzh
+date_authored_initial_draft: 2024-12-18
+date_authored_current_draft: 2024-12-18
 ---
 
 # Exploring Publishing a Component Library for VC Firms

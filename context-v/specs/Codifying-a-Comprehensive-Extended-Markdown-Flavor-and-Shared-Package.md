@@ -1,6 +1,7 @@
 ---
 title: Codifying a Comprehensive Extended Markdown Flavor and Shared Package
-lede: A specification for a named, versioned extended markdown flavor that codifies our existing rendering capabilities, incorporates features from GFM, Obsidian, MDX, and directive-based systems, and defines a wish list for future development — all backed by a shared remark/rehype package.
+lede: >-
+  A named, versioned markdown flavor that codifies what we already render, backed by one shared remark/rehype package.
 date_authored_initial_draft: 2025-01-25
 date_authored_current_draft: 2026-05-03
 date_authored_final_draft:
@@ -17,6 +18,8 @@ authors:
 image_prompt: A layered blueprint showing standard markdown at the base, GFM and Obsidian features in the middle, and custom directive-based extensions at the top — all flowing through a unified rendering pipeline into polished web pages and PDFs.
 date_created: 2026-03-25
 date_modified: 2026-05-03
+site_uuid: 0462fb00-0b30-44e2-8b30-1cccbca780ab
+hex_code: 1ftvxi
 ---
 
 # Codifying a Comprehensive Extended Markdown Flavor and Shared Package

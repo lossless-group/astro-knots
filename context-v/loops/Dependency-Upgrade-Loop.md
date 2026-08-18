@@ -14,6 +14,10 @@ tags:
   - Site-Maintenance
 status: Active
 lede: "Fan out across all active Astro Knots sites, upgrade dependencies, fix breaking changes, verify builds, write changelogs, and push — looping until all sites are clean."
+site_uuid: f48c7315-020b-4cbb-a984-89e00a70a8cf
+hex_code: wbxcc3
+date_authored_initial_draft: 2026-07-06
+date_authored_current_draft: 2026-07-06
 ---
 
 # Dependency Upgrade Loop

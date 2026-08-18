@@ -1,3 +1,18 @@
+---
+site_uuid: 033554b4-3c56-4fe7-9a15-e4b6572035bd
+hex_code: bcakqj
+title: Author a Specification Markdown File in Context V
+date_created: 2026-05-02
+date_authored_initial_draft: 2026-05-02
+date_authored_current_draft: 2026-05-02
+authors:
+  - Michael Staton
+at_semantic_version: 0.0.1.0
+tags:
+  - Prompt
+lede: "The verbatim prompt behind fullstack-vc's projects page spec — and the first time the team specced a page, not a flow or feature."
+summary: "Archived prompt kept as an example of how a page or component spec gets commissioned in this tree: it names the reminders directory to reboot on, points at a known-good spec to copy frontmatter and structure from, and states the output path and filename explicitly. Reuse its shape when asking an agent to author a new spec under `context-v/sitemap/pages/`."
+---
 
 ❯ I'd like to spec a page and the input components
 

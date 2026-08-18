@@ -1,6 +1,7 @@
 ---
 title: Converge on an Animations Playbook
-lede: A short, well-made motion loop can do work that a paragraph and a screenshot can't — but the tooling that produces Lottie files is concentrated in a few mostly proprietary places. This is a tour of the format, the production tools, the honest lock-in, and a tiered playbook for the Astro Knots family.
+lede: >-
+  Lottie the format is open; every tool that produces one is proprietary SaaS. A tiered motion playbook for Astro Knots given that lock-in.
 date_authored_initial_draft: "2026-05-06"
 date_authored_current_draft: "2026-05-06"
 date_created: "2026-05-06"
@@ -13,6 +14,8 @@ tags: [Lottie, Animations, Motion-Design, Bodymovin, After-Effects, Lottielab, R
 authors:
   - Michael Staton
   - AI Labs Team
+site_uuid: 7107ab5e-ad9f-4914-a4ce-198c7438361d
+hex_code: 847gu6
 ---
 
 # Converge on an Animations Playbook

@@ -8,6 +8,10 @@ category: Specifications
 tags: [Media-Coverage, Articles, Portfolio, Press, Layout]
 authors:
   - Michael Staton
+site_uuid: 485d7251-d59c-40f0-98bf-370834fdbd69
+hex_code: 9816tz
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 Closable sidebar, expandable to full page.  

@@ -8,6 +8,10 @@ category: Reminders
 tags: [Tech-Stack, Astro, Svelte, Tailwind, Preferences]
 authors:
   - Michael Staton
+site_uuid: a5b51b12-3cca-4e72-857e-2da55212cabe
+hex_code: s84up0
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 To the extent possible, we like to default to HTML & CSS, and plain JavaScript. 

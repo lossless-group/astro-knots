@@ -16,6 +16,8 @@ tags: [Astro-Knots, New-Site, Quickstart, Onboarding, LFM]
 authors:
   - Michael Staton
 image_prompt: "A clean architectural blueprint showing the skeleton of a website being assembled piece by piece"
+site_uuid: 18e81c3c-a2e9-4172-a7f6-966702b24bc3
+hex_code: 1xl90c
 ---
 
 # Troublehsooting 2026-04-25

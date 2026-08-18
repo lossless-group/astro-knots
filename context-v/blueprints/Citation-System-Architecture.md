@@ -8,6 +8,10 @@ category: Blueprints
 tags: [Citations, Markdown, Content-Rendering, Hex-Codes]
 authors:
   - Michael Staton
+site_uuid: 62154965-1454-4584-9181-4d239bce7dcd
+hex_code: ewrhzo
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 # Citation System Architecture

@@ -1,6 +1,7 @@
 ---
 title: "Maintain Confidential Access with Persistent Sessions and Auth Telemetry"
-lede: "A server-gated, DB-backed access pattern for client-content workspaces: signed pre-authed links for direct stakeholders, two-role passcodes for everyone else, durable telemetry on every attempt, and a downstream-sharing attribution hack — designed so a busy client clicks once and stays in, and so every silent failure leaves a row we can investigate."
+lede: >-
+  Signed pre-authed links for named stakeholders, passcodes for everyone else, and telemetry so every silent auth failure leaves a row.
 date_created: 2026-05-11
 date_modified: 2026-05-12
 authors:
@@ -21,6 +22,10 @@ tags:
   - SSR-Gating
   - Client-Content-Workspaces
   - Cross-Site-Pattern
+site_uuid: 59588038-bc4e-49b9-b34a-03b470ebc711
+hex_code: m1gjtk
+date_authored_initial_draft: 2026-05-12
+date_authored_current_draft: 2026-05-12
 ---
 
 # Maintain Confidential Access with Persistent Sessions and Auth Telemetry

@@ -8,6 +8,10 @@ category: Blueprints
 tags: [CSS, Tailwind, Theming, Dark-Matter, Design-Tokens]
 authors:
   - Michael Staton
+site_uuid: 3d4514c9-f5bc-47f7-a65e-ac8d20f4b535
+hex_code: medb9h
+date_authored_initial_draft: 2025-11-15
+date_authored_current_draft: 2025-11-15
 ---
 
 # Styles Architecture Blueprint for Dark Matter

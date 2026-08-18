@@ -12,6 +12,10 @@ authors:
   - Michael Staton
 augmented_with: "Windsurf Cascade on GPT-5.1"
 tags: [Astro-Knots, Markdown, Content-Architecture, Build-Pipeline]
+site_uuid: be28137a-f767-45ac-b1c9-0131544cb549
+hex_code: hq9e5l
+date_authored_initial_draft: 2025-12-15
+date_authored_current_draft: 2025-12-15
 ---
 
 # Managing Complex Markdown Content at Build Time
