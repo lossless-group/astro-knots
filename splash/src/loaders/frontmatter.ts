@@ -20,6 +20,44 @@
  * - Multi-line block scalars (`|`, `>`)
  */
 
+/**
+ * YAML block scalar header: `|`, `>`, with optional chomping (`-`/`+`) and an
+ * optional explicit indent digit — e.g. `>-`, `|2`, `>2-`.
+ */
+const BLOCK_SCALAR_RE = /^([|>])([0-9]*)([-+]?)$/;
+
+/**
+ * Read an indented text block beneath a block-scalar header and fold it per the
+ * YAML rules we actually use.
+ *
+ *   `|`  literal — newlines preserved
+ *   `>`  folded  — lines joined with a single space
+ *   `-`  strip   — no trailing newline (what every lede/summary in this tree uses)
+ *
+ * Returns null when there is no indented body, so the caller can fall through.
+ */
+function readIndentedBlock(
+  lines: string[],
+  start: number,
+  style: string,
+  chomp: string,
+): { text: string | null; consumed: number } {
+  const collected: string[] = [];
+  let i = start;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.trim() === '') { collected.push(''); i++; continue; }
+    if (!/^[ \t]/.test(line)) break;   // dedent ends the block
+    collected.push(line.replace(/^[ \t]+/, ''));
+    i++;
+  }
+  while (collected.length && collected[collected.length - 1] === '') collected.pop();
+  if (collected.length === 0) return { text: null, consumed: 0 };
+  let text = style === '|' ? collected.join('\n') : collected.join(' ').replace(/\s+/g, ' ').trim();
+  if (chomp === '+') text += '\n';
+  return { text, consumed: i - start };
+}
+
 const FENCE_RE = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?([\s\S]*)$/;
 
 export interface ParsedFrontmatter {
@@ -62,12 +100,23 @@ function parseYamlSubset(text: string): Record<string, unknown> {
     const key = line.slice(0, colonIdx).trim();
     const rest = line.slice(colonIdx + 1).trim();
 
-    if (rest === '' || rest === '|' || rest === '>') {
+    if (rest === '' || BLOCK_SCALAR_RE.test(rest)) {
       const { items, consumed } = readIndentedArray(lines, i + 1);
       if (items !== null) {
         data[key] = items;
         i += 1 + consumed;
         continue;
+      }
+      // Not a list. If a block-scalar header was given, the indented body is
+      // text — fold it rather than dropping the value on the floor.
+      const bs = rest.match(BLOCK_SCALAR_RE);
+      if (bs) {
+        const { text, consumed: used } = readIndentedBlock(lines, i + 1, bs[1], bs[3]);
+        if (text !== null) {
+          data[key] = text;
+          i += 1 + used;
+          continue;
+        }
       }
       data[key] = null;
       i++;
