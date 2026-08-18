@@ -2,28 +2,30 @@
 title: Versatile Component Library for Video Players
 lede: Videos links can come from various sources, and include metadata, playlists, and other information that handled to maximize the value of video content, all from simple markdown triggers.
 date_authored_initial_draft: 2026-05-07
-date_authored_current_draft: 2026-05-07
+date_authored_current_draft: 2026-08-18
 date_authored_final_draft:
 date_first_published:
-date_last_updated: 2026-05-07
-at_semantic_version: 0.0.0.1
+date_last_updated: 2026-08-18
+at_semantic_version: 0.1.0.0
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with: Claude Code (Opus 4.7); Claude Code on Claude Opus 5
 category: Specification
-tags: [Markdown, Video-Embeds, YouTube, Vimeo, Loom, Components, Astro, Render-Pipeline, LFM, Link-Previews, Bare-Links]
+tags: [Markdown, Video-Embeds, YouTube, Vimeo, Loom, Components, Astro, Render-Pipeline, LFM, Link-Previews, Bare-Links, Curated-Surfaces, Channels, Serverless, Build-Artifacts]
 authors:
   - Michael Staton
   - AI Labs Team
 image_prompt: A taxonomy diagram showing a single bare YouTube URL fanning out into five rendering surfaces — full-bleed embedded player, row card, vertical card, thumbnail, and gallery grid — with provider matchers in the middle and theme-token-neutral component shells on the right.
 date_created: 2026-05-07
-date_modified: 2026-05-07
+date_modified: 2026-08-18
 parent_spec: "[[Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Package]]"
+site_uuid: e62a76a4-2ff3-4eb5-a142-f0d6fbeda339
+hex_code: nt3wvs
 ---
 
 # Versatile Component Library for Video Players
 
-**Status**: Draft (v0.0.0.1)
-**Date**: 2026-05-07
+**Status**: Draft (v0.1.0.0)
+**Date**: 2026-05-07 · **Last updated**: 2026-08-18
 **Author**: Michael Staton
 **Parent spec**: [[Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Package]] — this document extracts and supersedes §4.12 (Zero-Friction Media Embeds) and the video-flavored portion of §4.23.6 (Inline Link Substitutions).
 
@@ -39,6 +41,10 @@ parent_spec: "[[Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Pa
 - [x] `YouTubePlaylistEmbed` — wired but **needs visual polish and playlist-aware UX** (current focus)
 - [x] `VimeoEmbed` — covers `/{id}`, `/{hash}`, `/channels/...`, `player.vimeo.com`
 - [x] `LinkPreview__Video--FullPlayer` — name reserved for the bare-URL embed path; today the per-provider components fill this role
+- [x] Curated playlist surfaces — `/playlists` and `/channels` on mpstaton-site, the first Tier E consumers (§4.5)
+- [x] Per-item channel identity — fetcher records `videoOwnerChannel*` rather than the playlist owner (§4.1.3.8)
+- [x] Build-artifact availability under `output: 'server'` — cache reaches the function bundle (§5.10)
+- [x] Mobile sidebar scroll-container resolution — the panel's scroller is found after it opens (§5.9)
 
 ### In Progress
 - [ ] Playlist component improvements — see §4.1.3 below
@@ -420,6 +426,20 @@ The `align` attribute on directive form mirrors the Shorts pattern (§4.1.2 — 
 3. **Private/deleted items** show as inactive sidebar entries with a struck-through title and no click handler. Not skipped — the position numbering matters for parity with YouTube's own list.
 4. **Sidebar at narrow widths.** Use the cross-cutting mobile-sidebar pattern (§5.9): in-article a compact "feature placeholder" card shows a thumbnail strip + title + count + a "Browse playlist →" CTA. Tapping the CTA (or swiping left) slides the sidebar in as a full-screen panel; swipe right (or tap a back button) returns the reader to the article. The iframe player remains in the article view; the full-screen sidebar is browse-only. This pattern applies to *every* sidebar-positioned component in LFM, not just playlists — playlist is the first consumer.
 
+##### 4.1.3.8 Per-item channel identity
+
+Each cached item records the channel the **video lives on**, from `playlistItems`' `videoOwnerChannelTitle` and `videoOwnerChannelId`.
+
+This is not the obvious field and the obvious field is wrong. `snippet.channelTitle` / `snippet.channelId` on the same response identify the account that **added the item to the playlist** — on an owner-curated playlist that is the owner on every row, which the playlist-level entry already records. Reading it per-item produces a library where every video appears to belong to one channel. Implementations must read the `videoOwner*` pair.
+
+Both fields are absent on private and deleted videos, so both are optional and consumers treat a missing channel as "no channel", not as an empty one.
+
+**Store the id, not just the title.** A display name cannot survive a rename and cannot separate two channels that share one — a condition already present in the reference library, which holds 2,196 channels by id against 2,195 by title. Anything that groups, counts, or links by channel keys on `videoOwnerChannelId` and treats the title as a label.
+
+No quota cost: the fields ride along on `playlistItems` pages the fetcher already pages through.
+
+***
+
 ### 4.2 Tier B — Directive-Form Players
 
 Authors who need to control embed behavior (start time, autoplay, dimensions) write the directive form. Tier-B and Tier-A **share the same component** per provider — Tier-A is just sugar that produces the same `leafDirective` node Tier-B writes by hand.
@@ -481,6 +501,30 @@ The container itself is **type-agnostic** — `LinkRollup__Gallery` works for `t
 2. **Honor the `columns` attribute** for Gallery (1–6, default 3, narrows to 1 on mobile via container query).
 3. **Honor the `aside` attribute** with the same compatibility matrix as single previews (Column + aside = vertical list in margin track; Gallery + escape-aside = collapse to 1 column).
 4. **Handle URL parsing failures gracefully** — a single broken child renders as an autolink without breaking the container layout.
+
+***
+
+### 4.5 Tier E — Curated Surfaces (no markdown trigger)
+
+Tiers A–D all begin with something an author wrote in a document. Tier E does not: these are destination pages assembled from the same cache, for a library that exists whether or not any document mentions it. `/playlists` and `/channels` on mpstaton-site are the reference implementations.
+
+**A registry, because content-scraping cannot see a page.** `discoverPlaylistIds()` walks `src/content/` for playlist URLs, which is exactly right for a playlist an author pasted into prose and useless for a curated page under `src/pages/`. A site with curated surfaces declares them in `src/config/playlists.ts` — an ordered, labelled, explicit set the fetcher seeds from *before* it scans content. Without it a curated playlist renders in facade mode forever, because no markdown file mentions it.
+
+**Counts come from the cache, never from the registry.** The registry carries labels and order; it must not carry a video count. A hand-written number is a claim the page cannot verify and YouTube will eventually disagree with.
+
+**Runtime count refresh.** Under `output: 'server'` the build-time count is correct at deploy and drifts from then on. Sites may layer a stale-while-revalidate read on top: `playlists.list` takes comma-separated ids and costs one quota unit for the whole set however many videos they contain. Rules — the read never awaits the network, a stale value returns immediately while a refresh runs in the background, and an empty response leaves the previous value in place rather than zeroing the page. A slow or failing API delays the *next* correct number; it can never delay or break a render.
+
+> A deliberate non-goal: a cron job. A scheduled function on a read-only, discarded filesystem has nowhere to write the refreshed number, so cron means adding a KV or Blob store — real infrastructure for one integer. Refreshing in the request path gets the same "checks daily, never rebuilds" outcome with no new services.
+
+**Derived surfaces (`/channels`).** A channel view is a roll-up of cached items keyed by `videoOwnerChannelId` (§4.1.3.8), ranked by how many of that channel's videos the library keeps. It is **derived at build time, never hand-listed** — a written-down top-N is wrong the moment a playlist grows, and is a second claim about the library that can contradict the first. Deriving from the cache both surfaces read makes contradiction impossible.
+
+**Editorial overlay.** Volume is a proxy for "favourite", not the thing itself; it cannot say *this one is excellent, I have kept three*. Judgement lives in a small committed file keyed by channel id, holding only the channels with something to say about them — never a copy of the derived data. Three properties matter:
+
+1. **Seeded, not hand-authored.** A script writes every channel above the threshold at `favorite: false`. The judgement is the human's; looking up a hundred `UC...` ids is not.
+2. **Additive on re-run.** Existing flags and notes survive; new channels arrive unpicked.
+3. **Never destructive.** A channel that falls below the threshold stays in the file. Deleting curation because a playlist shifted is the one move here that cannot be undone.
+
+**Ranking spans every channel, not the displayed ones.** A pick below the display cutoff must still surface — expressing something the counts do not is the entire reason the overlay exists.
 
 ***
 
@@ -635,6 +679,36 @@ The component handles the panel slide-in/-out, swipe gestures (touch events with
 The desktop sidebar render is wrapped in a `<MobileFeaturePlaceholder>` boundary by every consuming component. CSS `@media` rules and the placeholder's internal logic decide which surface (inline placeholder vs. always-visible sidebar vs. full-screen panel) is active at the current viewport.
 
 **Implementation track:** Phase 1a builds this for the playlist as the first consumer, then any future sidebar-positioned component reuses the same `MobileFeaturePlaceholder` boundary. The pattern is documented here, not deferred to per-component implementation, so subsequent components inherit the contract instead of inventing their own.
+
+**The scroll container must be re-resolved, not cached at mount.** Any control inside the panel that scrolls it — "up N", "down N", scroll-to-active — has to locate the scrolling element at the moment it acts, or when the panel's open state changes. Resolving once on mount is wrong on mobile and fails silently: at mount the panel is `display: none` and the panel body has no `overflow-y`, so a walk up the ancestor chain finds nothing scrollable and settles on the inline desktop container instead. The controls then drive an element the reader cannot see, and any state derived from a scroll listener on it — "am I at the top", which gates a disabled attribute — never updates either. Consumers watch the open-state attribute on the placeholder wrapper and re-resolve when it flips.
+
+**Panel controls are not exempt from the scroll-position trap.** Sticky bars *look* pinned but their layout position is wherever they sit in the flow — for a bottom bar, after every item. Anything that scrolls an element into view by reference (including a test harness clicking a button) will drag the container to that layout position. When verifying these controls, drive them at real screen coordinates or programmatically, and be aware that a dev-toolbar overlay anchored to the same edge will absorb coordinate taps aimed at them.
+
+***
+
+### 5.10 Build-time artifacts under `output: 'server'` (cross-cutting)
+
+**A build-time cache read from disk at request time is not there.** This applies to every artifact in this spec's data path — the playlist cache, the OG cache, any gitignored JSON a component reads — on any site running server output on a serverless host.
+
+Two independent failures, both silent:
+
+1. The artifact is gitignored, so nothing traces it into the function bundle. The compiled chunk ships; the data does not.
+2. `import.meta.url` inside a bundled chunk resolves to the build output directory, not to source. A path relative to the module misses even where the file was copied.
+
+Neither raises. `existsSync` returns `false`, the loader returns `{}`, every lookup returns `null`, and the component renders its facade — on a deploy whose fetcher logged complete success. **The build log is not evidence that the data reached the renderer.**
+
+Load such artifacts through a bundler-visible import so the data is inlined into the chunk:
+
+```ts
+const modules = import.meta.glob<{ default: Cache }>('../data/cache.json', { eager: true });
+const cache: Cache = Object.values(modules)[0]?.default ?? {};
+```
+
+A glob rather than a static import specifically because the file is gitignored: on a clone that has not run the fetcher, a static import is a hard build failure, while a glob matching nothing yields `{}` and degrades to the facade the component already knows how to render.
+
+**Diagnostic route.** Facade mode has several possible causes — no key, no cache, cache present but unreadable — and they are indistinguishable from the rendered page. Surfaces with a build-time cache should expose a small JSON route reporting key presence, per-id build counts, and live values. `hasKey: true` beside `buildCount: 0` identifies this failure in one request.
+
+**A partial recovery is not a fix.** Where a runtime layer (§4.5) supplies some values, it will mask exactly the part of the failure it covers — counts return while items stay missing. Confirm the artifact reached the bundle rather than inferring it from a symptom clearing.
 
 ***
 
