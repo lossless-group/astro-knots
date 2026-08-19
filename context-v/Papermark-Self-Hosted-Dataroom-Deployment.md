@@ -12,6 +12,7 @@ site_uuid: 2ddfc5df-e678-44a4-abff-58f67c3ffa5b
 hex_code: klv58w
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
+publish: true
 ---
 
 # Papermark Self-Hosted Dataroom Deployment

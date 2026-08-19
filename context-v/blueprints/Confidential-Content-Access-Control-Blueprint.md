@@ -12,6 +12,7 @@ site_uuid: 63d7579c-7b21-4a73-8cd9-261e0d53781a
 hex_code: vnc2iw
 date_authored_initial_draft: 2024-12-01
 date_authored_current_draft: 2024-12-01
+publish: true
 ---
 
 # Confidential Content Access Control Blueprint

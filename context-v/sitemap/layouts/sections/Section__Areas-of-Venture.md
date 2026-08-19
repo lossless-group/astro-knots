@@ -12,6 +12,7 @@ tags:
   - Sitemap
 lede: "Build the grid section by lifting the 9-11 areas-of-venture headings straight out of the old Voodoo Handbook draft in `context-v/extra/`."
 summary: "Short directive for building the areas-of-venture grid section: the content already exists in the Voodoo Handbook draft under `context-v/extra/background-content/`, in both HTML and markdown, and its headings and subheadings are the section's source. Read the handbook first — this file names the source, it does not specify the design."
+publish: false
 ---
 
 

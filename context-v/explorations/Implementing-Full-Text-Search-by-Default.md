@@ -15,6 +15,7 @@ authors:
   - AI Labs Team
 site_uuid: 12eee6e7-f0ed-427d-b8af-4929a0ad14b4
 hex_code: 32nxn5
+publish: true
 ---
 
 # Implementing Full-Text Search by Default

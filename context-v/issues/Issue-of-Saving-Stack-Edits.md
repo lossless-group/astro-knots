@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "Saving stack edits as an authenticated user throws `error:1E08010C:DECODER routines::unsupported` — parked to finish polls first."
 summary: "Verbatim capture of a bug report raised mid-session and deliberately deferred: saving stack edits on fullstack-vc fails with an OpenSSL decoder error, which points at key or PEM handling in the commit path. No investigation was done. Treat it as an open lead to pick up once the polls work it interrupted is finished."
+publish: false
 ---
 
 

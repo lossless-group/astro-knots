@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "Astro scopes your `[data-mode]` selector to the component, but the attribute lives on `<html>` — it never matches. `:global()` is the fix."
 summary: "Post-mortem on why three-mode (light/dark/vibrant) styling silently failed in Dark Matter's hero components, and the one-wrapper fix. Read before writing any mode-aware CSS inside an Astro `<style>` block anywhere in astro-knots — the scoping trap is universal, not Dark Matter-specific. Also records two secondary lessons: refactor forward from working vibrant code rather than abstracting away from it, and WebGL components need a CSS-variable read plus a MutationObserver instead of CSS."
+publish: true
 ---
 
 # Resolving Mode Switching Across Multiple Components

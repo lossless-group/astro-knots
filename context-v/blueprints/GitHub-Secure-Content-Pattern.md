@@ -12,6 +12,7 @@ site_uuid: 56a3240e-45a4-4068-96ae-38b650bc78bc
 hex_code: pwhq2d
 date_authored_initial_draft: 2024-12-01
 date_authored_current_draft: 2024-12-01
+publish: true
 ---
 
 # GitHub Secure Content Pattern

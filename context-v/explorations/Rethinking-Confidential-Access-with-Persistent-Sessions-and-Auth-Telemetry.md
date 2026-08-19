@@ -18,6 +18,7 @@ date_created: 2026-05-10
 date_modified: 2026-05-10
 site_uuid: 82559aaa-ca0b-4af2-af6c-0e8b855c895a
 hex_code: pl12yg
+publish: true
 ---
 
 # Rethinking Confidential Access with Persistent Sessions and Auth Telemetry

@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "Four sites got flipped to `workspace:*` during the LFM extraction. Only one should be — Vercel never checks out the parent workspace."
 summary: "Uncommitted-mistake record from the LFM repo extraction, written so the deliberate revert can be done later without re-deriving the analysis. Establishes the rule: exactly one site is the LFM dev sandbox on `workspace:*` (mpstaton-site, which already had `lfm-mode.mjs` tooling for exactly this), and every deployable site stays pinned to JSR. Contains the per-site revert values and the verification commands. Read before wiring any future sibling package into the workspace."
+publish: true
 ---
 
 # Workspace vs JSR for LFM Consumers

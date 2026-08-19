@@ -20,6 +20,7 @@ site_uuid: 410f1086-8b08-4e68-ba5b-641642d88c03
 hex_code: mi9f31
 date_authored_initial_draft: 2026-05-18
 date_authored_current_draft: 2026-05-18
+publish: true
 ---
 
 # AI Photo-to-Illustration Transform for Arthouse

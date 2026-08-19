@@ -22,6 +22,7 @@ authors:
 augmented_with: Claude Code (Opus 5, 1M context)
 date_authored_initial_draft: 2026-08-17
 date_authored_current_draft: 2026-08-17
+publish: true
 ---
 
 # A Standard Table of Contents for Every Markdown Collection

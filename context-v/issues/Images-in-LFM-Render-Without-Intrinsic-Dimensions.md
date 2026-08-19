@@ -20,6 +20,7 @@ site_uuid: 88a81b9c-cade-47af-a6ac-089670169dde
 hex_code: 8d8z49
 date_authored_initial_draft: 2026-08-15
 date_authored_current_draft: 2026-08-15
+publish: true
 ---
 
 ## Why care?

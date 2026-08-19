@@ -26,6 +26,7 @@ site_uuid: 59588038-bc4e-49b9-b34a-03b470ebc711
 hex_code: m1gjtk
 date_authored_initial_draft: 2026-05-12
 date_authored_current_draft: 2026-05-12
+publish: true
 ---
 
 # Maintain Confidential Access with Persistent Sessions and Auth Telemetry

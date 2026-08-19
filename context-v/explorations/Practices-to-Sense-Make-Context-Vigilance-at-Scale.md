@@ -13,6 +13,7 @@ site_uuid: 0198c9ea-bb8e-488a-88ed-fc1badecb123
 hex_code: tvqwxe
 date_authored_initial_draft: 2026-04-29
 date_authored_current_draft: 2026-04-29
+publish: true
 ---
 
 # Practices to Sense-Make Context Vigilance at Scale

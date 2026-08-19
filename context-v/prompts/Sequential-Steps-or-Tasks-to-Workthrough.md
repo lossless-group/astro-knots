@@ -18,6 +18,7 @@ authors:
 image_prompt: "An airplane engineer at the airport walking up to a sophisticated looking plane. He is doing a safety check, examining the aircraft systems. He is carrying an obscenely large clipboard with a really long checklist."
 site_uuid: 2bdb7585-8a75-4611-81aa-1e12439f8c9a
 hex_code: qijllf
+publish: false
 ---
 
 # Today's sequence:

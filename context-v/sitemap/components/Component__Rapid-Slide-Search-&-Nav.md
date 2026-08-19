@@ -12,6 +12,7 @@ tags:
   - Sitemap
 lede: "Shorthand notes for a slide navigator: hover pops out the title list, and feedback runs -3 to +3 with zero deliberately omitted."
 summary: "Raw capture of an idea for slide-deck navigation and reviewer feedback in a deck site — a hover-revealed slide title list, a search-and-nav header, and a -3 to +3 rating scale alongside four actions (Iterate, Select, Hold, Archive). Not yet a spec; treat it as the seed to expand when slide review tooling gets built."
+publish: false
 ---
 
 

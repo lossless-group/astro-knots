@@ -12,6 +12,7 @@ site_uuid: 62154965-1454-4584-9181-4d239bce7dcd
 hex_code: ewrhzo
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
+publish: true
 ---
 
 # Citation System Architecture

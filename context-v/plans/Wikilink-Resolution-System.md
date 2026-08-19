@@ -19,6 +19,7 @@ site_uuid: 0dd2e26c-d8e1-481f-9408-7de67113c24e
 hex_code: 0rta9t
 date_authored_initial_draft: 2026-05-08
 date_authored_current_draft: 2026-05-08
+publish: true
 ---
 
 # Wikilink Resolution System for LFM

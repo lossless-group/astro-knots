@@ -20,6 +20,7 @@ authors:
 image_prompt: A jenga tower with Hypernova branding, and a stack of code files with Astro, Svelte, and Tailwind. A robot and a hacker are taking turns removing jenga blocks.
 site_uuid: 5fd61fae-7c87-4162-97c9-2e15d73fdd45
 hex_code: u9jqar
+publish: false
 ---
 
 # Context

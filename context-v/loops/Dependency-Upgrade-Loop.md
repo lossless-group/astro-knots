@@ -18,6 +18,7 @@ site_uuid: f48c7315-020b-4cbb-a984-89e00a70a8cf
 hex_code: wbxcc3
 date_authored_initial_draft: 2026-07-06
 date_authored_current_draft: 2026-07-06
+publish: true
 ---
 
 # Dependency Upgrade Loop

@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "`pnpm build` passes while `astro check` reports 8 errors — five root causes, only one of which lossless-site shares."
 summary: "Triage record for the `pnpm astro check` failures on mpstaton-site, grouped into five root causes with a suggested fix and a predecessor check for each. Use it as the work order — the recommended order of operations at the bottom clears all eight errors — and as the reference for which problems are mpstaton-site-local versus inherited from lossless-monorepo/site. Only the missing `@types/mdast` group has a real predecessor."
+publish: true
 ---
 
 # Astro Check Type Errors on mpstaton-site

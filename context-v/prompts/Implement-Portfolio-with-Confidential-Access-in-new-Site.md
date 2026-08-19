@@ -12,6 +12,7 @@ site_uuid: bab955ab-70a4-4e88-9a20-28271a0befe3
 hex_code: cwht1w
 date_authored_initial_draft: 2025-12-15
 date_authored_current_draft: 2025-12-15
+publish: true
 ---
 
 # Implementation Plan: Portfolio with Confidential Access in Dark-Matter

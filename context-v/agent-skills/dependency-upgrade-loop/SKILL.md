@@ -6,6 +6,7 @@ description: >
   changes, verify builds with `pnpm build` + `pnpm exec astro check`, write changelog
   entries, and push submodules. Loops until every site is current. Invoke via `/loop`
   to self-pace across all sites, or pass a specific site name to target one.
+publish: true
 ---
 
 # Dependency Upgrade Loop — Astro Knots Sites

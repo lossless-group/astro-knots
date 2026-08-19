@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "Links emailAccess rows to Organizations by email domain, minting orgs as needed — via the `[linkField.id]: [{id}]` update syntax."
 summary: "Paste-ready NocoDB Scripts recipe for domain-matching `emailAccess` rows against `organizations` and creating the missing orgs. Doubles as the reference for the NocoDB Scripts API surface this tree uses — `selectRecordsAsync` pagination, `getCellValueAsString`, and the link-field update shape that is easy to get wrong. Adapt the table IDs and the link field name; the customization and troubleshooting sections cover the usual failure modes."
+publish: true
 ---
 
 # Scripting Across Multiple Tables in NocoDB

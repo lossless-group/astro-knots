@@ -12,6 +12,7 @@ tags:
   - Sitemap
 lede: "Default copy for the FullStack VC projects hero — contextSetter through supportingTxt, plus the Propose-a-project CTA."
 summary: "Fragment of the fullstack-vc projects-page spec, holding only the default copy values for the bare message-hierarchy component. No props, markup, or styling are defined here. Use it as the copy source when implementing that hero; the component contract itself lives in the projects page spec."
+publish: false
 ---
 
 

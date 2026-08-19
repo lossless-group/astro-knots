@@ -12,6 +12,7 @@ tags:
   - Prompt
 lede: "The verbatim prompt behind fullstack-vc's projects page spec — and the first time the team specced a page, not a flow or feature."
 summary: "Archived prompt kept as an example of how a page or component spec gets commissioned in this tree: it names the reminders directory to reboot on, points at a known-good spec to copy frontmatter and structure from, and states the output path and filename explicitly. Reuse its shape when asking an agent to author a new spec under `context-v/sitemap/pages/`."
+publish: false
 ---
 
 ❯ I'd like to spec a page and the input components

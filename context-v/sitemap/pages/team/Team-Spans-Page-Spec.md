@@ -12,6 +12,7 @@ site_uuid: c28fb081-a994-4ec7-832a-a231f9226c9c
 hex_code: a4ult6
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
+publish: true
 ---
 
 # Team Spans Page - Specification

@@ -18,6 +18,7 @@ authors:
 image_prompt: "A small lighthouse with a single beam, sitting on its own island, lit by a beacon labeled LFM."
 site_uuid: 425dcba5-751c-42aa-8ded-a7ebd8c5982f
 hex_code: 6lnra9
+publish: true
 ---
 
 # Set up a Splash Page with Changelog and Context-V Rendering

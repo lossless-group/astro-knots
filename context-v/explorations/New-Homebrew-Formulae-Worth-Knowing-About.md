@@ -15,6 +15,7 @@ authors:
   - AI Labs Team
 site_uuid: f329ab92-e0cc-41bd-a05f-30b67358f4ae
 hex_code: hzvsj5
+publish: true
 ---
 
 # New Homebrew Formulae Worth Knowing About

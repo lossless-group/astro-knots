@@ -22,6 +22,7 @@ site_uuid: cbfa94ac-15b5-4057-a776-bb4c85d10082
 hex_code: cb0wzx
 date_authored_initial_draft: 2026-05-17
 date_authored_current_draft: 2026-05-17
+publish: true
 ---
 
 # Astro Frontmatter: Avoid Inline Block Comments and Risky Regex Literals

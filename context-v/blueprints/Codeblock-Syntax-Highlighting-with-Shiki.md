@@ -12,6 +12,7 @@ site_uuid: a0640946-8fc5-4bfd-b248-f9ec1aea3093
 hex_code: 9owxqb
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
+publish: true
 ---
 
 # Codeblock Syntax Highlighting with Shiki (Astro-Knots Pattern)

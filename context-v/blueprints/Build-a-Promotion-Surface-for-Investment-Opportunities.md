@@ -21,6 +21,7 @@ site_uuid: 05396297-33c1-42f6-bea0-601ff6a6dad3
 hex_code: 5oqwxl
 date_authored_initial_draft: 2026-05-03
 date_authored_current_draft: 2026-05-03
+publish: true
 ---
 
 ## What This Blueprint Is

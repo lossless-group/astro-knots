@@ -12,6 +12,7 @@ tags:
   - Prompt
 lede: "Starlight, mdBook, and Quartz all lose to hand-rolling with LFM — because the 1,751-line handbook forces LFM's wishlist forward."
 summary: "A prompt plus the full option analysis it produced. Compares the Lossless Reader, Astro Starlight, mdBook, hand-rolling with LFM, and Quartz 4 against one concrete artifact, and recommends hand-rolling. Includes the six-step build plan for a `book` content collection and `BookReaderLayout`, the specific LFM features the project would push forward (image directive, heading slugs and per-chapter TOC, wikilinks), and four open questions the author wants pushed back on. Read before choosing a publishing stack for any long-form piece in astro-knots."
+publish: true
 ---
 
 # Context

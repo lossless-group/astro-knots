@@ -12,6 +12,7 @@ tags:
   - Issue
 lede: "The canonical markdown package has no package.json, and the reference site uses the `workspace:*` pin CLAUDE.md forbids."
 summary: "Audit of the six documentation contradictions that make scaffolding a new astro-knots site impossible without tribal knowledge: the package-less `packages/lfm-astro/`, the reference site that violates the stated `workspace:*` constraint, the missing scaffolding guide, the blueprint describing structures that were never built, the fictional env-driven config pattern, and the misleading `@knots/astro` README. Three fixes were applied in April 2026; the remaining table assigns the rest with priorities. Read before trusting CLAUDE.md or the render-pipeline blueprint as current documentation."
+publish: true
 ---
 
 # Documentation Gaps Blocking New Site Onboarding

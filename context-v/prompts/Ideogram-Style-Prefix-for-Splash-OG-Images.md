@@ -15,6 +15,7 @@ site_uuid: a15b071b-a9db-4c0c-8ef4-1cee2ef74e68
 hex_code: q0o25o
 date_authored_initial_draft: 2026-05-05
 date_authored_current_draft: 2026-05-05
+publish: true
 ---
 
 # Ideogram Style Prefix for Splash OG Images
