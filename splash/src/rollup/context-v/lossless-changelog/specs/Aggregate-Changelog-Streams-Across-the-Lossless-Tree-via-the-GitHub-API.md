@@ -2,7 +2,7 @@
 date_created: 2026-08-08
 date_modified: 2026-08-08
 title: Aggregate Changelog Streams Across the Lossless Tree via the GitHub API
-lede: The group-wide changelog stops being one hand-maintained collection and becomes a live aggregation over 38 explicitly-declared changelog streams arranged in a three-deep tree, each pulled from its own repo at its own branch — with rolled-up content structurally excluded and new entries ingested incrementally on push.
+lede: One hand-maintained collection becomes a live aggregation over 38 changelog streams, each pulled from its own repo at its own branch.
 publish: true
 version: 0.1.0.0
 status: draft
@@ -18,6 +18,10 @@ tags:
   - Incremental-Ingest
   - Webhooks
   - Lossless-Site-Rebuild
+site_uuid: 7ddf29ec-6428-4f2e-962b-9edfded21203
+hex_code: 3fl7to
+date_authored_initial_draft: 2026-08-08
+date_authored_current_draft: 2026-08-08
 from: lossless-changelog
 from_path: specs/Aggregate-Changelog-Streams-Across-the-Lossless-Tree-via-the-GitHub-API.md
 ---

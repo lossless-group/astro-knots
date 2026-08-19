@@ -13,6 +13,10 @@ agent_hints:
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 56d42a56-3e75-48b0-8f0c-fea8cc9413f0
+hex_code: 3q2vtr
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/07-track-internal-to-ic.md
 ---

@@ -12,6 +12,10 @@ tracks_teaser:
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 910ee441-fc4b-4c27-a49c-41b3b9a99b97
+hex_code: 190jk6
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/05c_from-yes-to-win.md
 ---

@@ -14,6 +14,11 @@ tags:
   - Trademarks
   - Mode-Aware
   - LearnStart
+site_uuid: 2fab79d9-e65c-40ea-97b9-7baf185fee97
+hex_code: h3x0kq
+date_authored_initial_draft: 2026-08-04
+date_authored_current_draft: 2026-08-04
+publish: true
 from: learnstart-site
 from_path: plans/Wire-Portfolio-Trademarks-Into-Logo-Surfaces.md
 ---

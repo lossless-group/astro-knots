@@ -12,4 +12,4 @@ git add src/rollup
 git commit -m "sync(rollup): refresh from <reason>"
 ```
 
-Last sync: 2026-08-17 — 74 changelog files, 41 context-v files.
+Last sync: 2026-08-19 — 81 changelog files, 42 context-v files.

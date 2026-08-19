@@ -8,6 +8,10 @@ partner: Kauffman Fellows
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 5f0e9507-b195-4ec9-b92f-f8de1fc6572b
+hex_code: iu9ef9
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/01-cover.md
 ---

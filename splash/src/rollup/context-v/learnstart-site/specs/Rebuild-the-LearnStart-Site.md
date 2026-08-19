@@ -14,6 +14,11 @@ tags:
   - VC-Site
   - New-Site
 status: Signed-Off
+site_uuid: e7609a83-8f13-4564-a4bd-d9cb72132955
+hex_code: tz0dlo
+date_authored_initial_draft: 2026-08-02
+date_authored_current_draft: 2026-08-02
+publish: true
 from: learnstart-site
 from_path: specs/Rebuild-the-LearnStart-Site.md
 ---
