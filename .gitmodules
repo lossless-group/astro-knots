@@ -46,3 +46,6 @@
 	path = sites/lossless-changelog
 	url = https://github.com/lossless-group/lossless-changelog.git
 	branch = main
+[submodule "sites/lossless-toolkit-site"]
+	path = sites/lossless-toolkit-site
+	url = https://github.com/lossless-group/lossless-toolkit-site.git
