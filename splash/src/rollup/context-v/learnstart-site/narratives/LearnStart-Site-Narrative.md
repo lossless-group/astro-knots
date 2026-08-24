@@ -14,6 +14,11 @@ tags:
   - VC-Site
   - Brand-Story
 status: Signed-Off
+site_uuid: 7c6f6865-66b9-445f-ba27-c50f84a03899
+hex_code: 8kpu8u
+date_authored_initial_draft: 2026-08-02
+date_authored_current_draft: 2026-08-02
+publish: true
 from: learnstart-site
 from_path: narratives/LearnStart-Site-Narrative.md
 ---

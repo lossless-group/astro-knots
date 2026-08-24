@@ -31,6 +31,8 @@ authors:
 date_created: 2026-06-22
 date_modified: 2026-06-22
 publish: true
+site_uuid: f72b43d6-fcda-467e-836c-a7c3e3ce2fae
+hex_code: hnsunm
 from: fullstack-vc
 from_path: specs/Two-Perspective-How-To-Docs-Engine-on-LFM.md
 ---

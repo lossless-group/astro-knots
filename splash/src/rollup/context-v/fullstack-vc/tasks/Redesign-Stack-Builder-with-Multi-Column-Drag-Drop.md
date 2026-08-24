@@ -28,6 +28,8 @@ authors:
 date_created: 2026-05-21
 date_modified: 2026-05-21
 publish: true
+site_uuid: 3051bb32-cf66-43a4-9ac2-168132da21b6
+hex_code: sqittb
 from: fullstack-vc
 from_path: tasks/Redesign-Stack-Builder-with-Multi-Column-Drag-Drop.md
 ---

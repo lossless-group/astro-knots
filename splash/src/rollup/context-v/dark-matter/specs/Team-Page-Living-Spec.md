@@ -2,7 +2,7 @@
 site_uuid: 8e73a752-e101-44be-91fb-a265f5e4e459
 hex_code: fgbhu7
 title: Team Page Living Spec
-lede: null
+lede: Six Person-Card variants named — vertical and horizontal, in small, large, and default — and not one of the boxes is checked yet.
 summary: "Working checklist for the team-page person cards: six planned components (vertical and horizontal, in small/large/default) plus the hover, modal, and link behaviours each needs. Every box is still unchecked — treat this as a scope note, not a design. Read before building any Person-Card variant so the naming convention holds."
 publish: false
 date_created: 2025-12-04

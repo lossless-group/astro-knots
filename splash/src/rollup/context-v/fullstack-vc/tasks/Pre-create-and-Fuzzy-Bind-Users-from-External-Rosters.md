@@ -27,6 +27,8 @@ authors:
 date_created: 2026-05-21
 date_modified: 2026-05-21
 publish: false
+site_uuid: 410540b6-2759-4dad-96a8-7a07bf2507cf
+hex_code: bwkmpo
 from: fullstack-vc
 from_path: tasks/Pre-create-and-Fuzzy-Bind-Users-from-External-Rosters.md
 ---

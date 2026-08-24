@@ -7,7 +7,7 @@ demo_focus: Two tools, one workflow. Watch the triage happen in real time.
 presenter: null
 key_systems:
   - "name: \"OpenClaw\""
-workflow_summary: null
+workflow_summary: "Companies show up (via intake, news, intros, manual entry). OpenClaw ingests + classifies + routes them. Obsidian becomes the durable knowledge graph: notes, links, follow-ups, the \"watch this\" list. The result is a dealflow pipeline that doesn't go stale because the agent + the graph keep each other current."
 topics_covered:
   - Live ingest from multiple sources (intake forms, news, etc.) into a single graph
   - Deal triage — which companies surface as 'look now' vs. 'watch' vs. 'archive'
@@ -22,6 +22,10 @@ why_a_founder_demoing_to_vcs: Toby's been wiring these tools up from the founder
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 0e3262ac-8516-4dbe-b02b-17bf8da87a88
+hex_code: dd1coj
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/06b_toby-openclaw-obsidian.md
 ---

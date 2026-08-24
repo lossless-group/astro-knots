@@ -3,6 +3,10 @@ title: Troubleshooting SSG Authentication and the Port to SSR with a Database
 date_created: 2026-04-28
 date_modified: 2026-04-28
 publish: true
+site_uuid: c5010b09-0e56-4f09-8ab1-a04276755bd7
+hex_code: ojw879
+date_authored_initial_draft: 2026-04-28
+date_authored_current_draft: 2026-04-28
 from: fullstack-vc
 from_path: issues/Troubleshooting-SSG-Authentication-and-Port-to-SSR-w-Database.md
 ---

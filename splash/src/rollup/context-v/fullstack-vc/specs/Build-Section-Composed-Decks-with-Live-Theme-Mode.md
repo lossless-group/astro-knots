@@ -29,6 +29,8 @@ authors:
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: false
+site_uuid: 15f819e2-a34b-41c7-9550-6591cb1e65bc
+hex_code: sgd4y8
 from: fullstack-vc
 from_path: specs/Build-Section-Composed-Decks-with-Live-Theme-Mode.md
 ---

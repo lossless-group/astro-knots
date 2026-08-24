@@ -13,6 +13,10 @@ agent_hints:
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: ec60c828-043f-4309-8ea1-18dfc406db79
+hex_code: pe9sbz
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/08-track-syndicate-to-vcs.md
 ---

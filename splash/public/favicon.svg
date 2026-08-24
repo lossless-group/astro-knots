@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <defs>
-    <!-- Ribbon A — indigo-electric → chartreuse (matches --color-accent → --color-thread in dark mode) -->
+    <!-- Ribbon A — indigo-electric → chartreuse (matches color-accent → color-thread in dark mode) -->
     <linearGradient id="ka" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#5b6fff"/>
       <stop offset="100%" stop-color="#c8ff2e"/>
     </linearGradient>
-    <!-- Ribbon B — chartreuse → amber (matches --color-thread → --color-accent-warm in dark mode) -->
+    <!-- Ribbon B — chartreuse → amber (matches color-thread → color-accent-warm in dark mode) -->
     <linearGradient id="kb" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#c8ff2e"/>
       <stop offset="100%" stop-color="#ffb84d"/>

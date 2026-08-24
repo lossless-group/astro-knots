@@ -13,6 +13,10 @@ next_session_date: Wednesday · June 24, 2026
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 77741a1c-0074-4545-966d-12b04c198199
+hex_code: fsxi5e
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/11-willing-and-able.md
 ---

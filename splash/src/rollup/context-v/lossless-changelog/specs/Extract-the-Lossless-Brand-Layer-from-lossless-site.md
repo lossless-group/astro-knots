@@ -2,7 +2,7 @@
 date_created: 2026-08-08
 date_modified: 2026-08-08
 title: Extract the Lossless Brand Layer from lossless-site
-lede: "The house brand's visual identity is real and worth keeping, but it lives in a legacy token system with duplicated definitions, a syntax error, a font-face that breaks in production, and 14 Google fonts loaded to use none of them. This is the extraction plan: pull the durable brand layer forward into two-tier tokens, dark-only by decision rather than by omission."
+lede: The brand is worth keeping; its token system isn't — 14 Google fonts loaded to use none. Extract it into two-tier tokens, dark by decision.
 publish: true
 version: 0.1.0.0
 status: draft
@@ -17,6 +17,10 @@ tags:
   - Dark-Mode
   - Lossless-Site-Rebuild
   - Design-System
+site_uuid: a02ec728-5125-4e44-a579-cf8a2c23af1c
+hex_code: hjtxct
+date_authored_initial_draft: 2026-08-08
+date_authored_current_draft: 2026-08-08
 from: lossless-changelog
 from_path: specs/Extract-the-Lossless-Brand-Layer-from-lossless-site.md
 ---

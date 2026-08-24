@@ -9,7 +9,7 @@ oauth_providers:
 demo_profile: null
 value_props:
   - "heading: \"Stacks\""
-working_groups_context: null
+working_groups_context: "All currently-listed Working Groups + Projects are STRAWMEN — Michael's thinking out loud, written down.\nThe color-coding tells you what:\n• Green / Active = Michael is personally willing to convene, if no one else has the time.\n• Others = ideas Michael's bumped into and thinks add value — looking for a facilitator.\nThe dojo's real bet is EMERGENT COOPERATION. The strawmen seed the surface; the point is for the audience to propose their own (or enlist in someone else's) and run with it. The platform is scaffolding; the cooperation is the product."
 also_more_to_come: Things we haven't cooked up yet — once accounts exist, the next surface costs us nothing to add.
 privacy_posture: Data will never be used for any reason other than better curating experiences for the Dojo.
 cta_short: Top-right → Log in → pick a provider → done.
@@ -17,6 +17,10 @@ disclaimer_vibe_coded: We're vibe-coding / agentic-engineering this whole thing 
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: 8069d08d-d7e9-4eae-8aa5-c134405b53ef
+hex_code: bfx203
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/05a_create-your-account.md
 ---

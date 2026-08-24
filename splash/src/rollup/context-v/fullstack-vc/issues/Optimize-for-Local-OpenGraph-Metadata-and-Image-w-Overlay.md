@@ -27,6 +27,8 @@ authors:
 date_created: 2026-04-27
 date_modified: 2026-04-27
 publish: true
+site_uuid: 15050fa6-b9c2-4c63-9793-f43797c55fa3
+hex_code: db9n8l
 from: fullstack-vc
 from_path: issues/Optimize-for-Local-OpenGraph-Metadata-and-Image-w-Overlay.md
 ---

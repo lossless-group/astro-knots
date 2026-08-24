@@ -14,6 +14,10 @@ ties_to_slide_05: true
 date_created: 2026-05-27
 date_modified: 2026-05-27
 publish: true
+site_uuid: b48eb2f4-a4c0-4b1d-98f2-e23dfe2aeedc
+hex_code: z84pty
+date_authored_initial_draft: 2026-05-27
+date_authored_current_draft: 2026-05-27
 from: fullstack-vc
 from_path: narratives/2026-05-27_monthly-all-hands/09-track-offer-to-lps.md
 ---
