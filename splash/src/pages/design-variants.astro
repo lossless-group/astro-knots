@@ -1,0 +1,278 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import KnotMark from '@components/KnotMark.astro';
+import ModeToggle from '@components/ModeToggle.astro';
+import SiteCard from '@components/SiteCard.astro';
+import { STATIC_SEO } from '@lib/seo';
+
+const base = import.meta.env.BASE_URL;
+
+const VARIANT_SLUGS = ['multiphasic-site', 'gth-site', 'dominocielo-site'];
+
+let spikes: Awaited<ReturnType<typeof getCollection<'site-highlights'>>> = [];
+try {
+  const all = await getCollection('site-highlights');
+  spikes = VARIANT_SLUGS
+    .map((slug) => all.find((s) => s.id === slug || s.data.title === slug))
+    .filter(Boolean) as typeof spikes;
+} catch {
+  spikes = [];
+}
+
+const totalVariants = spikes.length * 3;
+
+const claims = [
+  { value: '1–3', label: 'prompts, start to finish' },
+  { value: '15–30', label: 'minutes per loop' },
+  { value: '3–5', label: 'complete variants per run' },
+];
+
+/* The invariants that make parallel generation produce comparable output
+   rather than three unrelated products. Ordered as the loop runs them. */
+const invariants = [
+  {
+    n: '01',
+    h: 'Spine before pixels',
+    p: 'The argument is written down as content — beats, sections, orientation — before a single component exists. That is what lets N agents build N designs concurrently without any of them quietly rewriting the pitch.',
+  },
+  {
+    n: '02',
+    h: 'One content layer, N directions',
+    p: 'Every direction reads the same collections. Same articles, same beats, same tiers, same cart. Only form differs, so the comparison is honest — you are choosing a design, not a product.',
+  },
+  {
+    n: '03',
+    h: 'Variants are themes, not forks',
+    p: 'A direction costs one Tier 2 theme file, not a copy of the component tree. Tier 1 named tokens hold raw values; components only ever read Tier 2. Re-pointing a brand is one new token and one re-aimed semantic token.',
+  },
+  {
+    n: '04',
+    h: 'Three modes, every direction',
+    p: 'Light, dark and vibrant on every direction — three directions means nine combinations, and all nine get verified. Vibrant is dark-based and sets its own ground explicitly rather than inheriting.',
+  },
+  {
+    n: '05',
+    h: 'Themed image assets, one family',
+    p: 'Not a light set and a dark set per direction. One family off a single locked seed, dissolved with a blend mode and tinted toward the active primary — so it re-colours with the brand. Better still, drawn in SVG and CSS so there is no raster to keep in sync at all.',
+  },
+  {
+    n: '06',
+    h: 'Retiring is a delete',
+    p: 'Per-direction components never cross-import. Narrowing three directions to one is: delete two folders, delete two routes, promote the winner. Not a refactor under deadline.',
+  },
+];
+
+const constraints = [
+  {
+    h: 'A word budget the build enforces',
+    p: 'WORD_BUDGET is checked against each direction’s built HTML. Over budget means copy was invented — the constraint is executable, not a note in a document nobody opens.',
+    src: 'dominocielo-site',
+  },
+  {
+    h: 'Orientation enforced by schema',
+    p: 'Articles carry a required plain_question, and index cards render it above the clinical title. “Orient before you introduce a term of art” cannot be forgotten, because the data model will not let it.',
+    src: 'gth-site',
+  },
+  {
+    h: 'Strict-superset tiers',
+    p: 'Each tier a superset of the one below is what lets a cart show a delta instead of swapping in a whole new cart. A content constraint that buys an interaction.',
+    src: 'gth-site',
+  },
+];
+---
+
+<BaseLayout title={STATIC_SEO.designVariants.title} description={STATIC_SEO.designVariants.description}>
+  <header class="topbar">
+    <a href={base} class="topbar__brand">
+      <KnotMark size={28} />
+      <span class="mono">astro-knots</span>
+    </a>
+    <nav class="topbar__nav">
+      <a href={`${base}#sites`}>Sites</a>
+      <a href={`${base}changelog/`}>Changelog</a>
+      <a href={`${base}context-v/`}>Notes</a>
+      <ModeToggle />
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Our systems keep getting better</p>
+        <h1 class="hero__title">
+          <span class="display">Redesign a site as</span><br />
+          <span class="display gradient-text">three real directions.</span>
+        </h1>
+        <p class="hero__lede">
+          Working code, proper two-tier theming, themed image assets, one consistent stack —
+          built in parallel against a single shared content layer, so a stakeholder can compare
+          them like-for-like instead of squinting at a mood board.
+        </p>
+
+        <div class="claims">
+          {claims.map((c) => (
+            <div class="claim">
+              <span class="claim__value display gradient-text">{c.value}</span>
+              <span class="claim__label mono">{c.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <p class="hero__hint mono">
+          ↑ try the mode toggle — every variant below ships all three modes.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2 class="display">Three spikes. {totalVariants} complete variants.</h2>
+        <p class="section__lede">
+          Three different prospective clients, three different problems, the same method. Each repo
+          holds a chooser at <code>/</code>, one direction per sibling route, and its own
+          <code>/brand-kit</code> and <code>/design-system</code>.
+        </p>
+        <div class="spikes-grid">
+          {spikes.map((s) => (
+            <SiteCard
+              title={s.data.title ?? s.id}
+              slug={s.id}
+              lede={s.data.lede}
+              status={s.data.status}
+              repo={s.data.repo}
+              liveUrl={s.data.live_url}
+              icon={s.data.icon}
+              tags={s.data.tags}
+              threadColor={s.data.thread_color}
+              maintainedBy={s.data.maintained_by}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt">
+      <div class="wrap">
+        <h2 class="display">Why the variants are actually <span class="gradient-text">comparable</span></h2>
+        <p class="section__lede">
+          Generating three designs is easy. Generating three that share a spine, a token system and a
+          mode contract — and that can be narrowed to one without a refactor — is the part that needed
+          a method.
+        </p>
+        <ol class="invariants">
+          {invariants.map((i) => (
+            <li class="invariant">
+              <span class="invariant__n mono">{i.n}</span>
+              <div>
+                <h3 class="invariant__h">{i.h}</h3>
+                <p class="invariant__p">{i.p}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2 class="display">Creative latitude, <span class="gradient-text">executable constraints</span></h2>
+        <p class="section__lede">
+          An agent given room to be creative will fill space with invented copy unless the constraint
+          is something the build can check. So the discipline lives in the code.
+        </p>
+        <div class="constraints">
+          {constraints.map((c) => (
+            <article class="constraint">
+              <h3 class="constraint__h">{c.h}</h3>
+              <p class="constraint__p">{c.p}</p>
+              <p class="constraint__src mono">{c.src}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt">
+      <div class="wrap narrow">
+        <h2 class="display">The loop</h2>
+        <ol class="loop">
+          <li>
+            <strong>Prompt one — the spine.</strong> Point at the source: a deck, the live site, a PDF.
+            Out comes the content layer and a brief in <code>context-v/specs/</code>. Nothing visual yet.
+          </li>
+          <li>
+            <strong>Prompt two — the fan-out.</strong> One agent per direction, each handed the shared
+            content layer, the Tier 1 tokens, the mode contract, its own stance, and the
+            no-cross-imports rule. They build concurrently, because the argument is already fixed.
+          </li>
+          <li>
+            <strong>Prompt three — the surfaces.</strong> Chooser, brand kit, design system, the imagery
+            family, <code>astro check</code>, README.
+          </li>
+        </ol>
+        <p class="loop__note">
+          Each direction gets a <em>stance</em> rather than a mood — “closest to the source deck”,
+          “furthest from it”, “reinterprets it” — so they diverge on purpose instead of converging on
+          the same safe layout.
+        </p>
+        <p class="loop__note">
+          The method is written down as an agent skill,
+          <code>context-v/agent-skills/generate-site-design-variants</code>, so the next run starts
+          from it rather than from memory.
+        </p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+  .wrap.narrow { max-width: 760px; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; padding: 1rem 1.5rem; max-width: 1100px; margin: 0 auto;
+  }
+  .topbar__brand { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; color: inherit; }
+  .topbar__nav { display: flex; align-items: center; gap: 1.25rem; }
+  .topbar__nav a { text-decoration: none; opacity: .8; font-size: .95rem; }
+  .topbar__nav a:hover { opacity: 1; }
+
+  .hero { padding: 3rem 0 2.5rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; opacity: .7; margin: 0 0 1rem; }
+  .hero__title { margin: 0 0 1.25rem; line-height: 1.05; }
+  .hero__lede { max-width: 62ch; font-size: 1.12rem; line-height: 1.6; opacity: .88; margin: 0 0 2rem; }
+  .hero__hint { font-size: .85rem; opacity: .6; margin-top: 1.75rem; }
+
+  .claims { display: flex; flex-wrap: wrap; gap: 2.5rem; }
+  .claim { display: flex; flex-direction: column; gap: .3rem; }
+  .claim__value { font-size: clamp(2rem, 5vw, 3rem); line-height: 1; }
+  .claim__label { font-size: .82rem; opacity: .7; }
+
+  .section { padding: 3.5rem 0; }
+  .section__lede { max-width: 66ch; line-height: 1.65; opacity: .85; margin: .75rem 0 2rem; }
+
+  .spikes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  @media (max-width: 900px) { .spikes-grid { grid-template-columns: 1fr; } }
+
+  .invariants { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 2.5rem; }
+  @media (max-width: 820px) { .invariants { grid-template-columns: 1fr; } }
+  .invariant { display: flex; gap: 1rem; align-items: flex-start; }
+  .invariant__n { font-size: .8rem; opacity: .5; padding-top: .25rem; }
+  .invariant__h { margin: 0 0 .4rem; font-size: 1.05rem; }
+  .invariant__p { margin: 0; line-height: 1.6; opacity: .82; font-size: .95rem; }
+
+  .constraints { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  @media (max-width: 900px) { .constraints { grid-template-columns: 1fr; } }
+  .constraint { padding: 1.25rem; border: 1px solid color-mix(in srgb, currentColor 14%, transparent); border-radius: 12px; }
+  .constraint__h { margin: 0 0 .5rem; font-size: 1rem; }
+  .constraint__p { margin: 0 0 .85rem; line-height: 1.6; opacity: .82; font-size: .93rem; }
+  .constraint__src { font-size: .78rem; opacity: .55; }
+
+  .loop { line-height: 1.7; padding-left: 1.1rem; }
+  .loop li { margin-bottom: .85rem; }
+  .loop__note { opacity: .78; line-height: 1.65; margin-top: 1.25rem; }
+
+  code { font-size: .9em; padding: .12em .4em; border-radius: 4px; background: color-mix(in srgb, currentColor 10%, transparent); }
+</style>

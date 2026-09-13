@@ -75,6 +75,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
       </a>
       <nav class="topbar__nav" aria-label="Primary">
         <a href="#sites">Sites</a>
+        <a href={`${base}design-variants/`}>Design variants</a>
         <a href="#tokens">Tokens</a>
         <a href="#candor">Candor</a>
         <a href={`${base}changelog`}>Changelog</a>
@@ -102,7 +103,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
         </div>
 
         <p class="hero__lede">
-          Thirteen Astro sites + four splash pages. One workspace. A shared context layer, a single published package, and
+          {sites.length} Astro sites + four splash pages. One workspace. A shared context layer, a single published package, and
           a strict three-mode color contract. Not a true monorepo — never tried to be — but tied
           together by patterns the team actually uses.
         </p>
@@ -161,6 +162,25 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
     </section>
 
     <!-- TOKEN DEMO -->
+    <section id="variants" class="section">
+      <div class="wrap">
+        <div class="section__head">
+          <h2 class="display">Redesign a site as <span class="gradient-text">three real directions.</span></h2>
+        </div>
+        <p class="variants__lede">
+          Our systems keep getting better. A redesign now arrives as three complete, genuinely
+          different designs — working code, two-tier theming, themed image assets, one consistent
+          stack — generated in parallel against a single shared content layer, so a stakeholder can
+          compare them like-for-like. One to three prompts; a fifteen-to-thirty minute loop produces
+          three to five variants.
+        </p>
+        <div class="variants__row">
+          <a href={`${base}design-variants/`} class="btn btn--primary">How it works →</a>
+          <p class="variants__hint mono">three spikes · nine variants · all three modes each</p>
+        </div>
+      </div>
+    </section>
+
     <section id="tokens" class="section section--alt">
       <div class="container">
         <header class="section__head">
@@ -492,6 +512,10 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
   .section__footnote code { color: var(--color-accent); }
 
   /* SITES GRID — featured spans wide on large screens */
+  .variants__lede { max-width: 68ch; line-height: 1.65; opacity: .88; margin: .75rem 0 1.75rem; }
+  .variants__row { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; }
+  .variants__hint { font-size: .82rem; opacity: .6; }
+
   .sites-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);

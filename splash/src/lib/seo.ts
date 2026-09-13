@@ -77,6 +77,11 @@ export const STATIC_SEO = {
     description:
       'Ship notes from across the astro-knots workspace — what each site landed and when.',
   } satisfies SeoEntry,
+  designVariants: {
+    title: 'Design variants',
+    description:
+      'Redesign a site as three complete directions — working code, two-tier theming, themed image assets, one stack — built in parallel against a single shared content layer.',
+  } satisfies SeoEntry,
   contextVIndex: {
     title: 'Notes (context-v)',
     description:
