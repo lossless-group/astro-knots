@@ -58,3 +58,6 @@
 	path = sites/multiphasic-site
 	url = https://github.com/lossless-group/multiphasic-site.git
 	branch = main
+[submodule "sites/lossless-toolkit-site"]
+	path = sites/lossless-toolkit-site
+	url = https://github.com/lossless-group/lossless-toolkit-site.git
