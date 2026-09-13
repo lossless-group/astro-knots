@@ -46,3 +46,15 @@
 	path = sites/lossless-changelog
 	url = https://github.com/lossless-group/lossless-changelog.git
 	branch = main
+[submodule "sites/dominocielo-site"]
+	path = sites/dominocielo-site
+	url = https://github.com/lossless-group/dominocielo-site.git
+	branch = main
+[submodule "sites/gth-site"]
+	path = sites/gth-site
+	url = https://github.com/lossless-group/gth-site.git
+	branch = main
+[submodule "sites/multiphasic-site"]
+	path = sites/multiphasic-site
+	url = https://github.com/lossless-group/multiphasic-site.git
+	branch = main
