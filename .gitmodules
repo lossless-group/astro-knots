@@ -61,3 +61,7 @@
 [submodule "sites/lossless-toolkit-site"]
 	path = sites/lossless-toolkit-site
 	url = https://github.com/lossless-group/lossless-toolkit-site.git
+[submodule "sites/lossless-slides-site"]
+	path = sites/lossless-slides-site
+	url = https://github.com/lossless-group/lossless-slides-site.git
+	branch = main
