@@ -65,3 +65,7 @@
 	path = sites/lossless-slides-site
 	url = https://github.com/lossless-group/lossless-slides-site.git
 	branch = main
+[submodule "sites/twf-next"]
+	path = sites/twf-next
+	url = https://github.com/TilmanGriesel/twf-next.git
+	branch = main
