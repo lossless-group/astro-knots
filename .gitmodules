@@ -69,3 +69,7 @@
 	path = sites/twf-next
 	url = https://github.com/TilmanGriesel/twf-next.git
 	branch = main
+[submodule "sites/client-portals-site"]
+	path = sites/client-portals-site
+	url = https://github.com/lossless-group/client-portals-site.git
+	branch = development

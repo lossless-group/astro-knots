@@ -449,21 +449,25 @@ collections, and it has become unmanageable. This site starts the pattern we
 want to move to:
 
 - **Each collection is a folder under `src/collections/`, with its own
-  `config.ts`** exporting `collection` (its loader, its loose schema, and its
-  path rules).
+  `config.ts`** exporting `collection` as a plain `{ loader, schema }` object,
+  plus its path rules.
 - **`src/live.config.ts` is only an aggregator.** Astro requires the file to
   exist at that path. It just collects each folder's export:
 
   ```ts
-  const mods = import.meta.glob('./collections/*/config.ts', { eager: true });
+  const modules = import.meta.glob('./collections/*/config.ts', { eager: true });
   export const collections = Object.fromEntries(
-    Object.entries(mods).map(([p, m]) => [p.split('/').at(-2), m.collection]),
+    Object.entries(modules).map(([path, mod]) => [
+      path.split('/').at(-2), defineLiveCollection(mod.collection),
+    ]),
   );
   ```
 
-  Step 1 checks that Astro's live-config loader accepts `import.meta.glob`. If
-  it doesn't, the aggregator falls back to one import line per folder, and a
-  test fails when a folder is not registered.
+  **Verified in Step 1 (2026-10-06):** `import.meta.glob` works in
+  `live.config.ts`. But `defineLiveCollection` throws `LiveContentConfigError`
+  when it is called from any file other than `live.config.ts` (it checks the
+  importer's filename). So the folders export plain objects, and only the
+  aggregator calls it.
 - **Changing a `config.ts` is the rebuild boundary.** Nothing else in content
   work requires a deploy.
 - Once this has proven out here, it is the template for breaking up
@@ -498,6 +502,13 @@ Build on the latest release of every dependency, Astro and Svelte above all.
 
 - Scaffold with `pnpm create astro@latest`, and add every package as
   `pnpm add <pkg>@latest`. Use caret ranges.
+- **pnpm's one-day minimum release age stays on.** pnpm 12 skips releases
+  younger than a day, as a supply-chain guard, so "latest" means the newest
+  release at least a day old. On 2026-10-06 that installed Astro 7.3.5 and
+  Svelte 5.57.1, because 7.3.6 and 5.57.2 were only hours old. Don't disable it.
+- **Pinned so far:** `typescript@^6`, because `astro check` refuses
+  TypeScript 7.0 and its replacement needs 7.1. The site's
+  `context-v/issues/TypeScript-7-Breaks-Astro-Check.md` tracks it.
 - **LFM comes from JSR at latest, as in the other Lossless sites.** It is
   installed through the npm alias, with the JSR registry in `.npmrc`:
 
@@ -676,8 +687,9 @@ malformed-frontmatter sample. Tests never push to `lossless-content` or
 `content-areas`, and fixtures don't live in the site repo, because a push there
 would trigger a deploy and hide whether the no-rebuild path works.
 
-1. **Scaffold.**
-   - Create the `client-portals-site` repo, mount it under `astro-knots/sites/`,
+1. **Scaffold.** *(Done 2026-10-06, except the Vercel deploy.)*
+   - Create the `client-portals-site` repo (private; `main`, with work on
+     `development`), mount it under `astro-knots/sites/`,
      and run `/cv:init`.
    - `pnpm create astro@latest`, then add `@astrojs/vercel`, `@astrojs/svelte`,
      `svelte`, `tailwindcss` and `@tailwindcss/vite` at `@latest`. Copy the
