@@ -2,9 +2,9 @@
 title: "Maintain Themes and Modes Across CSS and Tailwind"
 lede: "Implementation blueprint for dual-axis theme and mode control using Tailwind CSS v4 custom properties, with runtime utilities and Vitest verification."
 date_created: 2025-11-15
-date_modified: 2026-04-25
+date_modified: 2026-10-06
 use_index: 2
-date_last_updated: 2026-04-25
+date_last_updated: 2026-10-06
 status: Published
 category: Blueprints
 tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens, Named-Tokens, BEM-Conventions, Two-Tier-Tokens]
@@ -26,6 +26,32 @@ The original spec lived at:
 - `content/projects/Astro-Knots/Specs/Maintain-Themes-Mode-Across-CSS-Tailwind.md`
 
 This document is the **implementation-grounded** version of that idea.
+
+> **Current three-mode references (verified 2026-10-06).** Hypernova is no
+> longer the reference. Its `mode-switcher.js` handles **two** modes only: it
+> always defaults to dark, and anything stored that isn't `dark` is applied as
+> light, so `vibrant` is lost. The token and theme architecture described below
+> still holds. For the mode *mechanics*, copy from these instead:
+>
+> - **`sites/lossless-toolkit-site`**: `data-mode` with plain CSS and no
+>   Tailwind. It has three designed modes in `src/styles/theme.css` (dark
+>   `:62-87`, light `:90-116`, vibrant `:119-146`) and an inline pre-paint
+>   script at the top of `<head>` (`src/layouts/Base.astro:46-61`).
+> - **`splash/`** (the astro-knots splash): `data-mode`, an inline pre-paint
+>   script (`src/layouts/BaseLayout.astro:45-60`), and a labeled radiogroup
+>   toggle (`src/components/ModeToggle.astro`).
+> - **`sites/lossless-slides-site`**: the only correct Tailwind v4 wiring for
+>   three modes. `src/styles/globals.css` has `@custom-variant dark/light/vibrant`
+>   at `:8-10` and `@theme inline` at `:12-35`, and `src/styles/tokens.css`
+>   switches effects off by token. It uses `data-theme` instead of `data-mode`
+>   (a site deviation), so rename it when copying.
+> - **`sites/fullstack-vc/src/styles/theme.css:162-211`**: the vibrant block,
+>   with the `--fx-*` intensities, neon borders and per-mode code tokens.
+>
+> **Pre-paint rule.** The mode must be applied by an inline `<script is:inline>`
+> at the top of `<head>`. A module script, a `DOMContentLoaded` handler or a
+> hydrated island all run after first paint, and they flash. The SSR default on
+> `<html data-mode>` and the script's fallback must be the same value.
 
 ---
 
@@ -324,6 +350,10 @@ At the end of `mode-switcher.js`:
    </script>
    ```
 4. Render `<ModeToggle />` from a `Header` (or `Footer`) component that `BaseThemeLayout` renders for every page.
+5. **Add an inline pre-paint script at the top of `<head>`.** Step 3 boots the
+   switchers from a module, which runs *after* first paint, so on its own it
+   flashes. See the pre-paint rule and the reference implementations at the top
+   of this blueprint (for example `sites/lossless-toolkit-site/src/layouts/Base.astro:46-61`).
 
 **Migration motion:** sites with the legacy inline-switcher `ModeToggle.astro` (banner-site `STORAGE_KEY = 'emblem-mode'`, etc.) should be replaced with copies of the canonical version on next contact. Safe — the canonical version uses the standard `'mode'` localStorage key and the same `data-mode` attribute, so existing CSS keeps working.
 
@@ -706,7 +736,7 @@ The same principle applies across all Astro-Knots sites: the token names are the
 
 For future refinement and for alignment with the original spec’s ambitions:
 
-- Add clearer **system preference detection** for mode (currently hard-coded to dark).
+- Add clearer **system preference detection** for mode (hypernova hard-codes dark). Make it a per-site choice: the toolkit and the astro-knots splash use `prefers-color-scheme`, while the Lossless brand sites default to vibrant and ignore it (see `context-v/explorations/Implement-Three-Mode-Theme-System-for-Lossless-Brand-Site-Decouplings.md`).
 - Consider naming for additional themes beyond `default` and `water` (e.g. client codes or descriptive theme IDs).
 - Introduce a small **configuration map** (e.g. JSON/TS object) describing available themes and their roles, while still keeping CSS as the source of truth for actual colors.
 - Document how to integrate this system into other Astro-Knots sites, including dark-matter, with minimal friction.

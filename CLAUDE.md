@@ -516,7 +516,13 @@ cp ../twf_site/src/lib/parse-content.ts src/lib/
 - **LFM + markdown rendering:** `sites/twf_site` — cleanest implementation, includes `parseContent` utility with citation/callout polyfills
 - **Content rendering + DocCards + OG images:** `sites/mpstaton-site`
 - **SEO/OG meta + environment config + content collections architecture:** `sites/cilantro-site`
-- **Theme + Mode (3-mode: light/dark/vibrant) switcher:** `sites/hypernova-site` — canonical ThemeSwitcher + ModeSwitcher utilities and Brand Kit page
+- **Theme + Mode (3-mode: light/dark/vibrant):**
+  - `sites/lossless-toolkit-site`: `data-mode`, plain CSS, head pre-paint script
+  - `splash/`: radiogroup toggle
+  - `sites/lossless-slides-site`: Tailwind v4 `@custom-variant` wiring; uses `data-theme`, so rename it when copying
+  - `sites/fullstack-vc/src/styles/theme.css:162-211`: the vibrant block
+
+  `sites/hypernova-site` is two-mode only: still a Brand Kit page reference, not a mode reference. See the blueprint `context-v/blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md`.
 - **Design System catalog:** `sites/dark-matter/src/pages/design-system/` — most expansive sub-page structure
 
 ### CSS Token Convention (Two-Tier System)

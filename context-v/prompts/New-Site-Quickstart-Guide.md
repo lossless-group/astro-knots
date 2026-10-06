@@ -5,12 +5,12 @@ date_authored_initial_draft: 2026-04-25
 date_authored_current_draft: 2026-04-25
 date_authored_final_draft: "[]"
 date_first_published: "[]"
-date_last_updated: "[]"
+date_last_updated: 2026-10-06
 at_semantic_version: 0.1.0.0
 augmented_with: Claude Code (Claude Opus 4.6)
 category: Prompts
 date_created: 2026-04-25
-date_modified: 2026-04-25
+date_modified: 2026-10-06
 status: Draft
 tags: [Astro-Knots, New-Site, Quickstart, Onboarding, LFM]
 authors:
@@ -34,7 +34,12 @@ This guide walks through creating a new Astro SSG website in the astro-knots _ps
 **Reference implementations:**
 - **twf_site** — current reference for LFM integration with `parseContent` utility and strategies collection
 - **mpstaton-site** — reference for full content rendering (DocCard index pages, OG image generation)
-- **hypernova-site** — reference for team pages, responsive design patterns, branded exports, and the canonical Theme + Mode switcher implementation
+- **hypernova-site** — reference for team pages, responsive design patterns, and branded exports. **Not** for modes: its switcher handles two modes only.
+- **Three-mode (light / dark / vibrant) references:**
+  - `lossless-toolkit-site`: `data-mode` with plain CSS; head pre-paint at `src/layouts/Base.astro:46-61`
+  - `splash/`: `data-mode`, head pre-paint, radiogroup toggle
+  - `lossless-slides-site`: Tailwind v4 `@custom-variant` + `@theme inline`; uses `data-theme`, so rename it when copying
+  - `fullstack-vc`: the vibrant block at `src/styles/theme.css:162-211`
 
 **Companion blueprints (read before/during the relevant phase):**
 - [Maintain Themes & Modes Across CSS and Tailwind](../blueprints/Maintain-Themes-Mode-Across-CSS-Tailwind.md) — required reading for Phase 6
@@ -426,7 +431,24 @@ In `BaseThemeLayout.astro` (or equivalent), accept a `themeClass` prop and apply
 </script>
 ```
 
-Importing the modules runs their `DOMContentLoaded` handlers, which read `localStorage` and apply the saved theme/mode before first paint. Add a `theme-transition` class on `<html>` to avoid FOUC.
+Importing the modules runs their `DOMContentLoaded` handlers. **This happens after first paint**, so on its own a stored non-default mode flashes. Add an inline pre-paint script as the first thing in `<head>`, with a fallback that matches the SSR `data-mode` default:
+
+```astro
+<html lang="en" data-mode="dark">
+  <head>
+    <script is:inline>
+      (function () {
+        try {
+          var m = localStorage.getItem('<site>:mode');
+          if (m === 'light' || m === 'dark' || m === 'vibrant') {
+            document.documentElement.setAttribute('data-mode', m);
+          }
+        } catch (e) {}
+      })();
+    </script>
+```
+
+Working copies are at `sites/lossless-toolkit-site/src/layouts/Base.astro:46-61` and `splash/src/layouts/BaseLayout.astro:45-60`. The `theme-transition` class only smooths *later* mode changes; it does not prevent the first-paint flash.
 
 ### 6.4.1 Mandatory: Render `<ModeToggle />` in Site Chrome
 
@@ -482,7 +504,9 @@ After implementing Phase 6, **verify vibrant mode is distinct** from light mode:
 
 **If light and vibrant look the same:** vibrant mode didn't set `--color-surface` / `--color-text`. See §6.2 above.
 
-**Reference implementation:** `sites/fullstack-vc/src/styles/theme.css` lines 90-130 (vibrant mode block).
+**Reference implementations:**
+- `sites/fullstack-vc/src/styles/theme.css` lines 162-211 (the vibrant mode block)
+- `sites/lossless-toolkit-site/src/styles/theme.css` lines 119-146 (a vibrant built on a dark palette)
 
 ## 6.8 Mode-Aware Brand Mark
 
