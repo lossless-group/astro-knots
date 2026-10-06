@@ -834,6 +834,12 @@ would trigger a deploy and hide whether the no-rebuild path works.
   it, don't fix it.** `lossless-site` is not touched as part of this plan.
   Revisit when deciding whether to retire `/client/*` once each portal moves
   over.
+- **Search:** held back on purpose. Client-content is never searchable or
+  indexed. A public Pagefind index would leak it past the gate, and
+  `astro-pagefind` can't index request-time pages anyway. Cross-repo search
+  for shared content is unsolved. See the site's
+  `context-v/issues/Nuances-of-Search-and-Privacy-Courtesy.md` and
+  `Allowing-Full-Content-Search-across-Repos.md`.
 - **MOC prose:** some MOCs have notes below the directives ("Current
   Direction", "Opportunities"). Never render them (the default), or render a
   marked section such as `## For you`?
