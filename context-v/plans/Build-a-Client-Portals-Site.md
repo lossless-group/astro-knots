@@ -255,7 +255,7 @@ client-portals-site/
 │   ├── layouts/Portal.astro
 │   ├── components/kinds/        # one component per kind
 │   └── pages/
-│       ├── index.astro          # public, says nothing about clients
+│       ├── index.astro          # public: the codename carousel (see *The home page*)
 │       ├── robots.txt.ts, llms.txt.ts
 │       ├── c/[id]/[...page].astro   # prerender = false
 │       ├── c/[id]/_report.astro     # per-portal diagnostics, gated like the portal
@@ -300,6 +300,100 @@ it shows up in the portal on the next push, with no deploy.
 
 The registry is site code, so **adding a portal is a deploy.** Adding content
 to an existing portal never is.
+
+## The home page: a codename carousel
+
+Copied from `lossless-site`'s home and about pages, and improved. It has two
+jobs: show that we have **lots of clients** (most of them inactive), and let a
+client find **their own portal**.
+
+### What lossless-site does today (2026-10-06)
+
+- **The carousel:** `ClientListHorizontalScroller--stealth.astro` and
+  `ClientCard--sm--stealth.astro` in `site/src/components/basics/messages/`,
+  used at `MainContent.astro:72` ("Current Work") and `about.astro:248`
+  ("Who We're Working With").
+  - It is plain CSS scroll-snap: no library and no autoplay. Padding of
+    `calc(50% - 160px)` centres the end cards, and two glass nav buttons step
+    one card at a time.
+  - **Each card shows:** a stealth logo (a generic tool or app icon), a stealth
+    name, the industry, the engagement dates, a stealth description, and an
+    "Access Portal" link.
+- **The data:** `site/src/content/people/clients.json` has 11 entries:
+  `id, name, logo, description, industry, engagement, website, stealth-name,
+  stealth-logo, stealth-description, stealth-passcode`.
+
+### Worth copying
+
+- the stealth card: codename, generic icon, industry, engagement dates and a
+  one-line description;
+- horizontal scroll-snap with the end cards centred;
+- showing inactive clients at all. The volume is the message.
+
+### Not worth copying (and noted, not fixed, in lossless-site)
+
+- **Two sources that disagree.** Cards come from the JSON, but routes come from
+  folder names. 3 cards link to portals that 404, and 4 portals have no card.
+- **The codename leaks.** The card hides the name, but the link `/client/<id>`
+  uses the real name as a slug. The portal titles ("Client Portal: X",
+  "Welcome, X") are real names too, and every portal page is in the public
+  sitemap.
+- **Plaintext passcodes** (`stealth-passcode`) are in the repo JSON. They are
+  never read, so nothing is actually gated.
+- **The folder-name hack:** the folder name is rebuilt by capitalising the
+  slug's first letter, which breaks on mixed case or hyphens.
+- **Fragile scroll JS:** `onClick` strings call `window` globals, only the first
+  carousel on a page works, and the step adds a hardcoded 24px gap that
+  overshoots on mobile (where the gap is 12px or 8px).
+- **Hardcoded styling:** `#f1f5f9` and fixed 300px heights instead of theme
+  tokens.
+
+### How this site does it
+
+- **One source: `portals.yaml`.** Every client gets an entry, **including
+  inactive ones with no vault content**. The card and the portal come from the
+  same row, so they can't disagree. The added fields:
+
+  ```yaml
+  - id: zs5emi
+    name: Edviro                 # never rendered on the home page
+    codename: "<Stealth Name>"   # what the card shows
+    codename_icon: /clients/icons/<generic>.svg   # a generic icon, never the client's logo
+    industry: "<Industry>"
+    engagement: { from: 2026-09, to: }            # an empty `to` means active
+    blurb: "<one line, nothing written for the client>"
+    on_home: true                # default true; false hides the card
+    status: active               # active | inactive (inactive = card only, no portal)
+  ```
+
+  The generic icons are copied from lossless-site's `public/visuals/` into
+  this site's `public/clients/icons/`.
+- **Linking that respects the gate:**
+  - **Passcode portals:** the card links to the portal, which shows its unlock
+    page. Reaching it from the carousel still needs the code.
+  - **Unlisted portals:** **the card has no link.** An unlisted portal is
+    private only because its URL is unknown, and a public link would undo
+    that. The card says "Ask us for your link", and the link we send directly
+    keeps working.
+  - **Inactive clients:** the card has no link, and shows its engagement dates.
+  - So a client who wants their portal reachable from the home page switches
+    to `gate: passcode`. That is a one-line change.
+- **The page itself stays `noindex`.** It is never in a sitemap (there isn't
+  one), and its title and unfurl metadata are about The Lossless Group, not
+  any client.
+- **The component** is a Svelte 5 island, `ClientCarousel.svelte`, alongside a
+  copied `ClientCard.astro`:
+  - scroll-snap carries the layout, so it works with JS off;
+  - JS only adds the nav buttons and keyboard support (arrow keys,
+    `aria-roledescription="carousel"`), and is scoped to its own instance;
+  - the step size is read from the computed `gap`, so nothing is hardcoded;
+  - all colors and sizes are theme tokens, and it renders correctly in vibrant,
+    light and dark;
+  - it lands in `/design-system` with every variant: active, inactive,
+    passcode and unlisted.
+- **Content changes** (a codename, the engagement dates) live in
+  `portals.yaml`, which is site code, so they take a deploy. That fits the
+  rule that the registry is code.
 
 ## MOCs: the curated reading list
 
@@ -645,7 +739,8 @@ pointed than a client would want a colleague to stumble on.
 - `vercel.json` sends
   `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai`
   on every path. There is also a meta robots tag on every page, and no sitemap.
-- **No index of clients** anywhere, and no client name in page titles or unfurl
+- **No list of real client names** anywhere (the home page shows codenames
+  only), and no client name in page titles or unfurl
   metadata. Display names can be codenames.
 
 ### The optional passcode (mpstaton-site's gate, with three fixes)
@@ -735,10 +830,18 @@ would trigger a deploy and hide whether the no-rebuild path works.
      every named note. Test it against a fixture MOC that covers every item
      shape, and read one real MOC (Laerdal's, the largest at 105 lines) in dev.
      Once that works, a `moc/Edviro.md` is Michael's to write.
+   - **The home page carousel** (see *The home page*): copy every client from
+     `clients.json` into `portals.yaml`, with codename fields, and mint an
+     opaque id for each. Copy the generic icons. Inactive clients get cards
+     only.
    - Files: `lib/kinds.ts`, `lib/content-api.ts`, `components/kinds/*`,
-     `layouts/Portal.astro`, and the `/design-system` entries.
+     `components/ClientCarousel.svelte`, `components/ClientCard.astro`,
+     `layouts/Portal.astro`, `pages/index.astro`, and the `/design-system`
+     entries.
    - **Done when:**
      - Edviro's portal renders its home, report, profiles and concepts;
+     - the home page shows every client's card by codename, with no real name,
+       logo or link to an unlisted portal anywhere in its HTML;
      - every item in the fixture MOC renders in the portal, the `tag:` item
        links to the lossless.group tag page, and the malformed item is plain
        text and in `_report`;
@@ -821,6 +924,8 @@ would trigger a deploy and hide whether the no-rebuild path works.
 - [ ] A passcode-gated portal is not reachable with another portal's cookie,
       and is never served from the CDN cache.
 - [ ] `robots.txt`, `llms.txt` and `X-Robots-Tag` all refuse crawlers and LLMs.
+- [ ] The home page shows every client, active and inactive, by codename only,
+      and never links to an unlisted portal.
 - [ ] `pnpm outdated` is empty at every step's close.
 
 ## Open decisions
@@ -874,6 +979,7 @@ would trigger a deploy and hide whether the no-rebuild path works.
 - `ai-labs/dididecks-ai/client-sites/calmstorm-decks/src/middleware.ts`: deny-by-default
 - `ai-labs/dididecks-ai/changelog/2026-05-17_02.md`: the prerendered-gated-route incident
 - `content/client-content/Edviro/` and `content/content-areas/AI-Factories-Datacenters/`: the first portal's content
+- `site/src/components/basics/messages/ClientListHorizontalScroller--stealth.astro`, `ClientCard--sm--stealth.astro`, `site/src/content/people/clients.json`: the carousel this site's home page improves on
 - `content/moc/*.md`: the 11 MOCs (Laerdal's is the largest); `site/src/content.config.ts:419` is the old site's `moc` collection
 - `https://www.lossless.group/sitemap-index.xml`: the routing authority for outbound links
 - `sites/lossless-changelog/.npmrc` and `package.json`: the JSR alias setup for LFM
