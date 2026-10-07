@@ -330,16 +330,10 @@ client find **their own portal**.
 - horizontal scroll-snap with the end cards centred;
 - showing inactive clients at all. The volume is the message.
 
-### Not worth copying (and noted, not fixed, in lossless-site)
+### Not worth copying
 
 - **Two sources that disagree.** Cards come from the JSON, but routes come from
   folder names. 3 cards link to portals that 404, and 4 portals have no card.
-- **The codename leaks.** The card hides the name, but the link `/client/<id>`
-  uses the real name as a slug. The portal titles ("Client Portal: X",
-  "Welcome, X") are real names too, and every portal page is in the public
-  sitemap.
-- **Plaintext passcodes** (`stealth-passcode`) are in the repo JSON. They are
-  never read, so nothing is actually gated.
 - **The folder-name hack:** the folder name is rebuilt by capitalising the
   slug's first letter, which breaks on mixed case or hyphens.
 - **Fragile scroll JS:** `onClick` strings call `window` globals, only the first
@@ -368,16 +362,9 @@ client find **their own portal**.
 
   The generic icons are copied from lossless-site's `public/visuals/` into
   this site's `public/clients/icons/`.
-- **Linking that respects the gate:**
-  - **Passcode portals:** the card links to the portal, which shows its unlock
-    page. Reaching it from the carousel still needs the code.
-  - **Unlisted portals:** **the card has no link.** An unlisted portal is
-    private only because its URL is unknown, and a public link would undo
-    that. The card says "Ask us for your link", and the link we send directly
-    keeps working.
-  - **Inactive clients:** the card has no link, and shows its engagement dates.
-  - So a client who wants their portal reachable from the home page switches
-    to `gate: passcode`. That is a one-line change.
+- **Every active card links to its portal.** A passcode portal shows its
+  unlock page; an unlisted one opens directly. Inactive clients show their
+  engagement dates, with no link. `on_home: false` hides a card.
 - **The page itself stays `noindex`.** It is never in a sitemap (there isn't
   one), and its title and unfurl metadata are about The Lossless Group, not
   any client.
@@ -389,8 +376,7 @@ client find **their own portal**.
   - the step size is read from the computed `gap`, so nothing is hardcoded;
   - all colors and sizes are theme tokens, and it renders correctly in vibrant,
     light and dark;
-  - it lands in `/design-system` with every variant: active, inactive,
-    passcode and unlisted.
+  - it lands in `/design-system` with every variant: active and inactive.
 - **Content changes** (a codename, the engagement dates) live in
   `portals.yaml`, which is site code, so they take a deploy. That fits the
   rule that the registry is code.
@@ -840,8 +826,8 @@ would trigger a deploy and hide whether the no-rebuild path works.
      entries.
    - **Done when:**
      - Edviro's portal renders its home, report, profiles and concepts;
-     - the home page shows every client's card by codename, with no real name,
-       logo or link to an unlisted portal anywhere in its HTML;
+     - the home page shows every client's card by codename, and each active
+       card opens its portal;
      - every item in the fixture MOC renders in the portal, the `tag:` item
        links to the lossless.group tag page, and the malformed item is plain
        text and in `_report`;
@@ -924,8 +910,8 @@ would trigger a deploy and hide whether the no-rebuild path works.
 - [ ] A passcode-gated portal is not reachable with another portal's cookie,
       and is never served from the CDN cache.
 - [ ] `robots.txt`, `llms.txt` and `X-Robots-Tag` all refuse crawlers and LLMs.
-- [ ] The home page shows every client, active and inactive, by codename only,
-      and never links to an unlisted portal.
+- [ ] The home page shows every client, active and inactive, by codename, and
+      each active card opens its portal.
 - [ ] `pnpm outdated` is empty at every step's close.
 
 ## Open decisions
