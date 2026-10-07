@@ -301,6 +301,26 @@ it shows up in the portal on the next push, with no deploy.
 The registry is site code, so **adding a portal is a deploy.** Adding content
 to an existing portal never is.
 
+## Portal landings: MOC or custom
+
+Each portal's home (`/c/<id>/`) is one of two kinds, chosen in `portals.yaml`:
+
+- **`landing: moc`** (the default): the standard landing. It is built from the
+  portal's MOC (a markdown Map of Content, parsed with LFM) and from its
+  sections (reports, recommendations, area folders). It needs no code.
+- **`landing: custom`**: a hand-designed page at `src/landings/<id>.astro`.
+  The layout is code, but it pulls its words **live** out of the portal's
+  notes (`lib/landing.ts`: `section()`, `subsections()`, `lead()`), so edits in
+  the vault still reach it on push. Each block hides itself if its source
+  section disappears, and the page falls back to the MOC landing when its
+  source note is missing.
+
+Edviro (`zs5emi`) is the first custom landing. It is built around the
+positioning recommendations in its report: the posture as the hero, the
+bottom line as cards, options A to D, the suggested sequence as a timeline,
+the area's organizations as a market map by segment tag, and a table of
+contents into the full report.
+
 ## The home page: a codename carousel
 
 Copied from `lossless-site`'s home and about pages, and improved. It has two
