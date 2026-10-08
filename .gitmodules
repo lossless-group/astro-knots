@@ -73,3 +73,6 @@
 	path = sites/client-portals-site
 	url = https://github.com/lossless-group/client-portals-site.git
 	branch = development
+[submodule "sites/humain-web"]
+	path = sites/humain-web
+	url = https://github.com/aneilbaboo/humain-web.git
