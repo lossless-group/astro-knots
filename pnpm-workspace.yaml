@@ -3,6 +3,15 @@ packages:
   - ../lfm
   - design-system-viewer
 
+# pnpm 11+ fails the install on any build script not approved here (same
+# reasoning as sites/mpstaton-site/pnpm-workspace.yaml). onlyBuiltDependencies
+# below stays for pnpm 10.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  esbuild: true
+  inotify: true
+  sharp: true
+
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild

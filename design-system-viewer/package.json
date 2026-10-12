@@ -8,14 +8,14 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^6.0.0",
+    "astro": "^7.3.8",
     "@knots/tokens": "workspace:*",
     "@knots/icons": "workspace:*",
     "@knots/brand-config": "workspace:*",
     "@knots/astro": "workspace:*"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.0",
-    "tailwindcss": "^4.1.0"
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3"
   }
 }
