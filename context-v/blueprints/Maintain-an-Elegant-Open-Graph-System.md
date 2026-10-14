@@ -1,14 +1,14 @@
 ---
 date_created: 2025-10-10
-date_modified: 2025-12-27
+date_modified: 2026-10-14
 title: Maintain an Elegant Open Graph System
 lede: A scalable, consistent architecture for Open Graph metadata optimized for the messaging-first share economy.
 date_authored_initial_draft: 2025-10-10
-date_authored_current_draft: 2025-12-27
+date_authored_current_draft: 2026-10-14
 date_authored_final_draft: null
 date_first_published: 2025-10-10
-date_last_updated: 2025-12-27
-at_semantic_version: 0.2.0
+date_last_updated: 2026-10-14
+at_semantic_version: 0.3.0
 status: In-Progress
 publish: true
 authors:
@@ -85,6 +85,8 @@ Different platforms render previews differently. Design for the lowest common de
 - **Description:** Uses `og:description`. Truncates around 100 characters
 - **Cache busting:** Nearly impossible. Change the URL or wait. Adding query params like `?v=2` can help force re-fetch.
 - **Requirement:** `og:image` MUST be an absolute URL with HTTPS
+- **File size:** Keep `og:image` well under **300 KB**. Over that, WhatsApp commonly shows the card with no image at all, and nothing tells you why. A 1200x630 PNG of a photographic background easily passes it (humain-web's was 367 KB); the same image as JPEG at quality ~85 is ~45 KB.
+- **Small previews crop to a centred square.** Keep the wordmark and headline in the middle third so the thumbnail still reads.
 
 ### iMessage (iOS/macOS)
 - **Image:** Uses `og:image`. Large preview on iOS 17+
@@ -92,6 +94,7 @@ Different platforms render previews differently. Design for the lowest common de
 - **Description:** Uses `og:description`
 - **Behavior:** Generally respects meta tags well; caches moderately
 - **Fallback:** Will attempt to generate preview from page content if OG tags missing
+- **Testing:** Previews are cached per conversation. To see a changed image, paste the link into a conversation it has never been sent to.
 
 ### LinkedIn
 - **Primary use case:** B2B content, professional sharing, company pages
@@ -629,11 +632,12 @@ export const COLLECTION_DEFAULTS = {
 - **Primary:** 1200x630 (1.91:1 ratio) — Works everywhere
 - **Minimum:** 600x315 — Below this, some platforms won't show image
 - **Square fallback:** 1200x1200 for platforms that crop to square (rare)
+- **Portrait companion:** 1200x1500 (4:5). Not an `og:image`: it's the version people post *as an image* in a chat, a WhatsApp status, or Instagram, where a tall image takes more of the screen than a 1.91:1 card. Render it from the same template as the banner (see *Hero-Derived Share Images* below).
 
 ### Format
 - **Preferred:** JPEG or WebP
 - **Avoid:** PNG with transparency (some platforms render black background)
-- **File size:** Keep under 5MB; ideally under 1MB for fast unfurling
+- **File size:** Under 300 KB for WhatsApp (see above), so in practice JPEG. Platforms accept up to 5 MB, but the messaging apps are the binding constraint.
 
 ### Location
 - Store in `public/` for stable, predictable URLs
@@ -759,6 +763,18 @@ export default defineConfig({
 });
 ```
 
+**Before the domain points at the new site.** A rebuild often goes live on a `*.vercel.app` address while the real domain still serves the old site. Hardcoding `site: 'https://real-domain.com'` then makes every `og:image` point at a domain that doesn't have the file, so every preview shows no image. Derive it instead (humain-web's `astro.config.mjs`):
+
+```js
+site:
+  process.env.SITE_URL ??
+  (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'https://www.real-domain.com'),
+```
+
+`VERCEL_PROJECT_PRODUCTION_URL` is the project's shortest production domain, so once the custom domain is attached the tags follow it with no code change. `SITE_URL` overrides both.
+
 ### Usage
 
 ```ts
@@ -802,6 +818,57 @@ GitHub solved this elegantly. Every repository has a recognizable OG image:
 | **Build-time** | Finite, known content (blog, docs) | `satori`, `@vercel/og`, `puppeteer` |
 | **Runtime API** | Dynamic/user-generated content | `/api/og?title=...` endpoint |
 | **Hybrid** | Pre-generate key pages, runtime for long-tail | Combination |
+
+### Hero-Derived Share Images (headless Chrome, site-wide)
+
+For a site that needs one excellent share card rather than one per page (a firm's site, a landing page, a fund), the fastest route to on-brand is to render **the hero itself**: same background art, gradient, shade, wordmark and headline. It needs no new dependency, because it's an HTML page photographed by the Chrome already on the machine.
+
+Reference: `sites/humain-web/scripts/share-image/`.
+
+```
+scripts/share-image/
+├── template.html   # the hero, restated at fixed pixel sizes; #banner / #tall pick the layout
+└── render.sh       # headless Chrome → PNG → ImageMagick → JPEG in public/og/
+public/og/
+├── share-banner.jpg   # 1200x630 — the og:image on every page
+└── share-tall.jpg     # 1200x1500 — for posting as an image
+```
+
+```bash
+render() { # name width height
+  "$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+    --allow-file-access-from-files --virtual-time-budget=5000 \
+    --window-size="$2,$3" --screenshot="$TMP/$1.png" "$TEMPLATE#$1"
+  magick "$TMP/$1.png" -strip -quality 86 -sampling-factor 4:2:0 -interlace JPEG "public/og/share-$1.jpg"
+}
+render banner 1200 630
+render tall 1200 1500
+```
+
+**Why Chrome rather than Satori here.** Satori supports a subset of CSS: no `mask`, no `color-mix()`, limited `background-size: cover`, no layered absolutely-positioned art. A hero is usually exactly those things. Chrome renders the real CSS, so the template can reuse the hero's own rules almost verbatim and the card can't drift from the page. Satori stays the right tool for **per-page** cards generated at build or request time (below).
+
+**Rules that made it work:**
+
+- **One template, a hash per layout.** `template.html#banner` and `#tall` set a class on `<body>`; each size gets its own type scale. Two files would drift.
+- **The wordmark as a mask,** loaded from the site's own SVG in `public/marks/`, painted in the hero's foreground colour. Same file the header uses.
+- **Reference the site's assets by relative path** (`../../public/images/hero-bg.png`) and pass `--allow-file-access-from-files`, so the card always uses the current art.
+- **Fonts:** load the brand faces from Google Fonts with `display=block`, and give Chrome `--virtual-time-budget` so they arrive before the screenshot. A fallback face in a share card is the most common silent failure.
+- **JPEG out,** for the 300 KB WhatsApp limit. humain-web's are 44 KB and 93 KB.
+- **Centre everything.** WhatsApp's small preview is a centred square crop of the banner.
+- **Show both in `/brand-kit`** with the regenerate command, so the next person changing the tagline knows the cards exist.
+
+Wire the banner into the layout with absolute URLs and the size hints, which let platforms lay out the card before downloading the image:
+
+```astro
+<meta property="og:image" content={shareImage} />
+<meta property="og:image:secure_url" content={shareImage} />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Brand: headline." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={shareImage} />
+```
 
 ### Template Philosophy
 
@@ -1239,8 +1306,10 @@ test('homepage has required OG tags', async ({ page }) => {
 - [ ] Tested with Twitter Card Validator
 - [ ] JSON-LD validated with Schema.org validator
 - [ ] WhatsApp preview manually checked
+- [ ] `og:image` under 300 KB (JPEG)
+- [ ] iMessage checked in a conversation the link has never been sent to
 
 ### Production
-- [ ] `site` configured in `astro.config.mjs`
+- [ ] `site` configured in `astro.config.mjs`, derived from the Vercel production domain until the real domain points at the site
 - [ ] OG images served via CDN with proper caching
 - [ ] CI checks for OG tag presence (optional but recommended)
