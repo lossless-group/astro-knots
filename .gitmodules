@@ -76,3 +76,6 @@
 [submodule "sites/humain-web"]
 	path = sites/humain-web
 	url = https://github.com/aneilbaboo/humain-web.git
+[submodule "mcps/astro-knots-mcp"]
+	path = mcps/astro-knots-mcp
+	url = https://github.com/lossless-group/astro-knots-mcp.git
