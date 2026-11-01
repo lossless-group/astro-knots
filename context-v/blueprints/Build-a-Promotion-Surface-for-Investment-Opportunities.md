@@ -13,10 +13,10 @@ tags:
   - Variant-Iteration
   - Investment-Memo
   - Multi-Material-Hub
-  - mpstaton-site
 authors:
   - Michael Staton
-augmented_with: Claude Code (Opus 4.7, 1M context)
+augmented_with:
+  - Claude Code (Opus 4.7, 1M context)
 site_uuid: 05396297-33c1-42f6-bea0-601ff6a6dad3
 hex_code: 5oqwxl
 date_authored_initial_draft: 2026-05-03

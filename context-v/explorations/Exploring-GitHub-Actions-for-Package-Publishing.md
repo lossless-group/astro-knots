@@ -7,7 +7,8 @@ date_created: "2026-04-23"
 date_modified: "2026-04-23"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Explorations
 tags: [GitHub-Actions, CI-CD, Package-Publishing, JSR, GitHub-Packages, DevOps, Automation]
 authors:

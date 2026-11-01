@@ -9,7 +9,8 @@ date_first_published:
 date_last_updated: 2026-04-21
 at_semantic_version: 0.0.0.3
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Specification
 tags: [Portfolio, E-Commerce, Mobile-First, Image-Gallery, Carousel, Dark-Mode, Vibrant-Mode, WhatsApp, Astro, Svelte, Tailwind]
 authors:

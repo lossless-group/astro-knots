@@ -8,7 +8,8 @@ date_created: "2026-05-06"
 date_modified: "2026-05-06"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 category: Explorations
 tags: [Lottie, Animations, Motion-Design, Bodymovin, After-Effects, Lottielab, Rive, SVG, Astro, Svelte, Open-Format, Design-Tooling, Symbolic-Illustration, Astro-Knots]
 authors:

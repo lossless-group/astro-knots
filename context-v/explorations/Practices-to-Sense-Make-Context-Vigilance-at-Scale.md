@@ -8,7 +8,8 @@ category: Explorations
 tags: [Context-Vigilance, Documentation, Knowledge-Management, AI-Collaboration, Indices, Templates, Tooling, Folder-Hygiene]
 authors:
   - Michael Staton
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 site_uuid: 0198c9ea-bb8e-488a-88ed-fc1badecb123
 hex_code: tvqwxe
 date_authored_initial_draft: 2026-04-29

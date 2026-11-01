@@ -17,7 +17,8 @@ tags:
   - Pattern-Library
 authors:
   - Michael Staton
-augmented_with: Claude Code (Opus 4.7, 1M context)
+augmented_with:
+  - Claude Code (Opus 4.7, 1M context)
 site_uuid: 53536ea3-b0e8-423e-9e1c-fa57ca2c9854
 hex_code: 2hibc6
 date_authored_initial_draft: 2026-05-03

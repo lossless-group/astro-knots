@@ -14,6 +14,7 @@ lede: "Three clickable levels — logo grid, expanding card, detail page — wit
 summary: "Implementation plan for the clickable-levels-of-detail portion of the portfolio spec. Enumerates the files to add and update, the props and accessibility contract for the expandable card, the data mapping, and the acceptance criteria. Phase 1 deliberately keeps sensitive data out of prerendered HTML entirely — the gate reveals placeholders only — with real private-data fetching deferred to Phase 2. Work the numbered next-steps list in order."
 publish: true
 type: Specs
+date_modified: 2026-08-18
 ---
 
 ## Scope

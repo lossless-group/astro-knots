@@ -10,7 +10,8 @@ status: Draft
 category: Specification
 authors:
   - Michael Staton
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 tags:
   - Arthouse-Site
   - Content-Model

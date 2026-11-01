@@ -11,7 +11,8 @@ category: Blueprints
 tags: [Design-System, Brand-Kit, Reference-Pages, Pattern-Library, Theme-Modes, Documentation-Motions]
 authors:
   - Michael Staton
-augmented_with: Claude Code on Opus 4.7
+augmented_with:
+  - Claude Code on Opus 4.7
 site_uuid: 456c5528-3bbd-4abe-89c6-42f5a68e0505
 hex_code: 6tj75h
 date_authored_initial_draft: 2026-04-25

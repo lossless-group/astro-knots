@@ -6,11 +6,13 @@ last_verified: 2026-08-21
 applies_to: every splash, site, changelog renderer, and content collection under `~/code/lossless-monorepo/`
 authors:
   - Michael Staton
-augmented_with: Claude Code on Claude Opus 5 (1M context)
+augmented_with:
+  - Claude Code on Claude Opus 5 (1M context)
 site_uuid: fc71171c-3603-4031-991f-bc948b7c8ea7
 hex_code: 7a3esr
 date_created: 2026-08-21
 publish: true
+date_modified: 2026-08-21
 type: Reminders
 ---
 

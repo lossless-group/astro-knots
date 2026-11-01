@@ -7,7 +7,8 @@ date_created: "2026-03-26"
 date_modified: "2026-03-26"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Explorations
 tags: [JavaScript, Node, Deno, Bun, pnpm, npm, Vite, Package-Management, Runtimes, Build-Tools, Developer-Experience]
 authors:

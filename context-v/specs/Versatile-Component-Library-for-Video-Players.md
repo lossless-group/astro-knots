@@ -8,7 +8,8 @@ date_first_published:
 date_last_updated: 2026-08-18
 at_semantic_version: 0.1.0.0
 status: Draft
-augmented_with: Claude Code (Opus 4.7); Claude Code on Claude Opus 5
+augmented_with:
+  - Claude Code (Opus 4.7); Claude Code on Claude Opus 5
 category: Specification
 tags: [Markdown, Video-Embeds, YouTube, Vimeo, Loom, Components, Astro, Render-Pipeline, LFM, Link-Previews, Bare-Links, Curated-Surfaces, Channels, Serverless, Build-Artifacts]
 authors:

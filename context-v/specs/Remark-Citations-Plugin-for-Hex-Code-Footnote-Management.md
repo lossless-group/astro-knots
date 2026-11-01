@@ -8,7 +8,8 @@ date_first_published:
 date_last_updated: 2026-04-22
 at_semantic_version: 0.0.0.1
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Specification
 tags: [Citations, Remark, Unified, Footnotes, Hex-Codes, Markdown, Open-Source]
 authors:

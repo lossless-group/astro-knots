@@ -5,6 +5,7 @@ title: Workspace vs JSR for LFM Consumers
 date_created: 2026-05-06
 date_authored_initial_draft: 2026-05-06
 date_authored_current_draft: 2026-08-15
+date_modified: 2026-08-18
 authors:
   - Michael Staton
 at_semantic_version: 0.0.1.0

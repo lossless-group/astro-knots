@@ -6,7 +6,7 @@ date_generated: 2026-05-08
 date_modified: 2026-05-08
 status: Generated
 category: Audits
-tags: [LFM, Wikilinks, Audit, Generated, mpstaton-site]
+tags: [LFM, Wikilinks, Audit, Generated]
 related:
   - "[[Wikilink-Resolution-System]]"
 total_unique_paths: 354
@@ -16,6 +16,8 @@ site_uuid: 53914074-4574-4b5c-9cb2-2b8af0f7899b
 hex_code: vzxyb1
 publish: false
 type: Plans
+authors:
+  - Michael Staton
 ---
 
 # Wikilink Path Audit — mpstaton-site

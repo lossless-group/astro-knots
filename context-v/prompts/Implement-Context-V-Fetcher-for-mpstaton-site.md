@@ -8,9 +8,10 @@ date_first_published:
 date_last_updated: 2026-03-25
 at_semantic_version: 0.0.0.1
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Prompt
-tags: [Context-V, GitHub-API, mpstaton-site, Implementation, Build-Time]
+tags: [Context-V, GitHub-API, Implementation, Build-Time]
 authors:
   - Michael Staton
   - AI Labs Team

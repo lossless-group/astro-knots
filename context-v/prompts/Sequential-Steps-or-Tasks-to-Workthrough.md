@@ -7,7 +7,8 @@ date_authored_final_draft: "[]"
 date_first_published: "[]"
 date_last_updated: "[]"
 at_semantic_version: 0.1.0.0
-augmented_with: Claude Code (Claude Opus 4.6)
+augmented_with:
+  - Claude Code (Claude Opus 4.6)
 category: Recurring-Prompts
 date_created: 2026-04-25
 date_modified: 2026-04-25

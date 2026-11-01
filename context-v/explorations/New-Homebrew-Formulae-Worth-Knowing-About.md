@@ -7,7 +7,8 @@ date_created: "2026-03-30"
 date_modified: "2026-03-30"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Explorations
 tags: [Homebrew, Developer-Tools, CLI, JSON, Proxy, Cryptography, Timestamps, Qt]
 authors:

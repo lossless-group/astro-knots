@@ -16,7 +16,8 @@ status: Draft
 category: Blueprints
 authors:
   - Michael Staton
-augmented_with: "Oz on auto"
+augmented_with:
+  - "Oz on auto"
 tags: [Polling, Interactive, Live-Meetings, Astro-Islands, Svelte, GSAP, Realtime, OAuth, Astro-DB, Turso, Content-Materialization]
 image_prompt: "A small robot stands with a small projector on top of a computer desk, behind the monitor.  He is projecting like old movies were projected, but on the computer monitor is a Keynote slide deck."
 banner_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_banner_image_1755815513881_vG9H27ZKx.webp"

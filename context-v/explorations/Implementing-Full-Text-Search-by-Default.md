@@ -7,7 +7,8 @@ date_created: "2026-05-06"
 date_modified: "2026-05-06"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 category: Explorations
 tags: [Full-Text-Search, Pagefind, Rust, Astro, Static-Sites, Search-UX, Vercel-Constraints, Pseudomonorepo, Copy-Pattern, New-Site-Quickstart]
 authors:

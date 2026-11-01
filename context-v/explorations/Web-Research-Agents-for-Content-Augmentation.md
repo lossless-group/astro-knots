@@ -8,7 +8,8 @@ date_created: "2026-04-28"
 date_modified: "2026-04-28"
 at_semantic_version: "0.0.0.1"
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 category: Explorations
 tags: [Web-Research, Data-Augmentation, AI-Agents, Tool-Use, Structured-Outputs, Vercel-Constraints, Content-Collections, Hosted-APIs, Self-Hosted-Tradeoffs, Anthropic-Web-Search, Jina-Reader, Firecrawl]
 authors:

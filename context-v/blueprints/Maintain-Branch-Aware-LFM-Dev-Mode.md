@@ -10,7 +10,8 @@ status: Draft
 category: Blueprints
 authors:
   - Michael Staton
-augmented_with: "Claude Opus 4.7"
+augmented_with:
+  - "Claude Opus 4.7"
 tags: [Astro-Knots, LFM, JSR, Workspace, Vercel, Branch-Aware]
 site_uuid: 6ee6602f-3454-41b9-9092-3ee94c20a03b
 hex_code: kysd25

@@ -7,7 +7,8 @@ date_authored_final_draft: "[]"
 date_first_published: "[]"
 date_last_updated: "[]"
 at_semantic_version: 0.1.0.0
-augmented_with: Pi on Claude Sonnet 4.5
+augmented_with:
+  - Pi on Claude Sonnet 4.5
 category: Prompts
 tags: [Theme, Tokens, Brand, Client, Fetch, CSS]
 authors:
@@ -15,6 +16,8 @@ authors:
 site_uuid: 5b4eb835-8420-4289-a40c-05054e415a7e
 hex_code: 7hojjx
 publish: true
+date_created: 2026-05-04
+date_modified: 2026-08-18
 type: Prompts
 ---
 

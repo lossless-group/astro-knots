@@ -8,7 +8,8 @@ date_created: "2026-04-25"
 date_modified: "2026-04-26"
 at_semantic_version: "0.0.0.3"
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 category: Explorations
 tags: [Image-Generation, AI-APIs, Banner-Design, Brand-Consistency, Changelog-Banners, Ideogram, OpenAI-Image, Flux, Tooling-Decisions, Theme-Tokens, Single-Source-of-Truth, Build-Time-Tooling]
 authors:

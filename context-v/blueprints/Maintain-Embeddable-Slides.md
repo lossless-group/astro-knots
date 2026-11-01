@@ -12,7 +12,8 @@ slug: maintain-embeddable-slides
 at_semantic_version: 0.0.0.1
 authors:
   - Michael Staton
-augmented_with: "Claude Code on Claude Sonnet 4"
+augmented_with:
+  - "Claude Code on Claude Sonnet 4"
 tags: [Slides-as-Code, Slide-Decks, Deck-Generators]
 image_prompt: "A small robot stands with a small projector on top of a computer desk, behind the monitor.  He is projecting like old movies were projected, but on the computer monitor is a Keynote slide deck."
 banner_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_banner_image_1755815513881_vG9H27ZKx.webp"

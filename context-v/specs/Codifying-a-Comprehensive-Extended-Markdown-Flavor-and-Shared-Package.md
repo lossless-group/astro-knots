@@ -9,7 +9,8 @@ date_first_published:
 date_last_updated: 2026-05-03
 at_semantic_version: 0.0.1.1
 status: Draft
-augmented_with: Claude Code (Opus 4.6)
+augmented_with:
+  - Claude Code (Opus 4.6)
 category: Specification
 tags: [Markdown, Extended-Markdown, Remark, Rehype, Unified, Astro, Render-Pipeline, Content-Authoring]
 authors:

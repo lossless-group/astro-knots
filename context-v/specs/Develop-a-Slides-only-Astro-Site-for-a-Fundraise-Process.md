@@ -8,7 +8,8 @@ date_first_published:
 date_last_updated: 2026-04-29
 at_semantic_version: 0.0.0.1
 status: Draft
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 category: Specification
 tags: [Astro-Framework, Slides-as-Code, Fundraise-Materials]
 authors:

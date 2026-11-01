@@ -8,7 +8,8 @@ status: Draft
 category: Exploration
 authors:
   - Michael Staton
-augmented_with: Claude Code (Opus 4.7)
+augmented_with:
+  - Claude Code (Opus 4.7)
 tags:
   - Image-Generation
   - Photo-Transformation

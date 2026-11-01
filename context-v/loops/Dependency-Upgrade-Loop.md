@@ -4,7 +4,8 @@ date_created: 2026-07-06
 date_modified: 2026-07-06
 authors:
   - mpstaton
-augmented_with: "Claude Sonnet 4.6"
+augmented_with:
+  - "Claude Sonnet 4.6"
 semantic_version: 0.1.0.0
 tags:
   - Dependency-Management

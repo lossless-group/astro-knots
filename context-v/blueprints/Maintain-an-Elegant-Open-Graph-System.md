@@ -13,7 +13,8 @@ status: In-Progress
 publish: true
 authors:
   - Michael Staton
-augmented_with: Claude Code
+augmented_with:
+  - Claude Code
 category: Blueprints
 tags: [Open-Graph, SEO, Metadata, Social-Sharing, Messaging]
 image_prompt: A robot conducting a symphony.  Each musician is playing a social media branded instrument.  Above them, shares are going to Facebook, LinkedIn, and X
