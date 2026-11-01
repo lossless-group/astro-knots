@@ -4,7 +4,7 @@ lede: >-
   Deliberate sync: a human runs `pnpm rollup:sync`, each child's changelog and context-v lands in `src/rollup/`, and the build stays file IO.
 date_created: 2026-05-04
 date_modified: 2026-05-04
-status: Authoritative
+status: Active
 category: Blueprints
 semantic_version: 0.0.0.1
 tags:

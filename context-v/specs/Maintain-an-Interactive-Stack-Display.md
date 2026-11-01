@@ -9,7 +9,7 @@ date_first_published: null
 date_last_updated: 2026-04-28
 at_semantic_version: 0.0.5.0
 publish: false
-status: In-Progress
+status: Implementing
 augmented_with:
   - "Claude Code with Opus 4.7"
 category: Information-Design

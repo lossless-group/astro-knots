@@ -1,7 +1,7 @@
 ---
 title: "Dates are UTC at rest, viewer-local at render"
 purpose: "Store and emit dates in UTC. Localize in the viewer's browser, never at build time — formatting a date during a static build bakes whichever timezone the build machine happened to be in into the HTML every reader sees."
-status: Authoritative
+status: Active
 last_verified: 2026-08-21
 applies_to: every splash, site, changelog renderer, and content collection under `~/code/lossless-monorepo/`
 authors:

@@ -9,7 +9,7 @@ date_authored_final_draft: null
 date_first_published: 2025-10-10
 date_last_updated: 2026-10-14
 at_semantic_version: 0.3.0
-status: In-Progress
+status: Implementing
 publish: true
 authors:
   - Michael Staton
