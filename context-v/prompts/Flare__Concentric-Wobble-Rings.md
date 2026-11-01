@@ -3,9 +3,9 @@ title: "Flare: Concentric Wobble Rings"
 lede: "Creative brief and technical spec for an interactive concentric-rings animation — imperfect circles radiating from an off-center origin with mouse hover repulsion and click ripple effects. Inspired by greenoaks.com."
 date_authored_initial_draft: 2026-04-20
 date_authored_current_draft: 2026-04-20
-date_authored_final_draft: "[]"
-date_first_published: "[]"
-date_last_updated: "[]"
+date_authored_final_draft:
+date_first_published:
+date_last_updated:
 at_semantic_version: 0.0.1.0
 generated_with: Claude Opus 4.6
 category: Prompts

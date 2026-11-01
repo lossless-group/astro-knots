@@ -3,9 +3,9 @@ title: "Introducing Features and UI Components"
 lede: "Prompt for introducing features and UI components to the Hypernova site, including team pages, responsive design patterns, and branded exports."
 date_authored_initial_draft: 2025-11-16
 date_authored_current_draft: 2025-11-16
-date_authored_final_draft: "[]"
-date_first_published: "[]"
-date_last_updated: "[]"
+date_authored_final_draft:
+date_first_published:
+date_last_updated:
 at_semantic_version: 0.0.1.0
 augmented_with:
   - Claude Code (Claude Sonnet 4.5)

@@ -3,9 +3,9 @@ title: "Set up a Splash Page with Changelog and Context-V Rendering"
 lede: "Brief prompt for scaffolding a small standalone repo (its own GitHub project, deployed to GitHub Pages) that renders its own changelog and context-v markdown through @lossless-group/lfm."
 date_authored_initial_draft: 2026-05-03
 date_authored_current_draft: 2026-05-03
-date_authored_final_draft: "[]"
-date_first_published: "[]"
-date_last_updated: "[]"
+date_authored_final_draft:
+date_first_published:
+date_last_updated:
 at_semantic_version: 0.1.0.0
 augmented_with:
   - Claude Code (Claude Opus 4.7)

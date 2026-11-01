@@ -3,9 +3,9 @@ title: "Sequential Steps or Tasks to Workthrough"
 lede: "You can prompt your AI Assistant via chat, but it's hard to manage a complex series of tasks that way. Even harder to retrace your steps or share your work.  Thus, this recurring prompt."
 date_authored_initial_draft: 2026-04-25
 date_authored_current_draft: 2026-04-25
-date_authored_final_draft: "[]"
-date_first_published: "[]"
-date_last_updated: "[]"
+date_authored_final_draft:
+date_first_published:
+date_last_updated:
 at_semantic_version: 0.1.0.0
 augmented_with:
   - Claude Code (Claude Opus 4.6)

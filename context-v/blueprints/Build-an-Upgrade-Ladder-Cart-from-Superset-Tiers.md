@@ -6,7 +6,7 @@ date_created: 2026-09-11
 date_modified: 2026-09-11
 date_authored_initial_draft: 2026-09-11
 date_authored_current_draft: 2026-09-11
-date_authored_final_draft: "[]"
+date_authored_final_draft:
 authors:
   - Michael Staton
 augmented_with:

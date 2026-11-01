@@ -3,8 +3,8 @@ title: "New Site Quickstart Guide"
 lede: "Step-by-step guide for scaffolding a new Astro site in the astro-knots monorepo, from empty directory to working markdown rendering."
 date_authored_initial_draft: 2026-04-25
 date_authored_current_draft: 2026-04-25
-date_authored_final_draft: "[]"
-date_first_published: "[]"
+date_authored_final_draft:
+date_first_published:
 date_last_updated: 2026-10-06
 at_semantic_version: 0.1.0.0
 augmented_with:

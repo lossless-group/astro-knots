@@ -3,9 +3,9 @@ title: "Fetch Brand and Tokens from Client Site"
 lede: "Extract colors, fonts, and design tokens from a client's existing website to bootstrap theme.css with brand-aligned values. Uses curl/fetch to grab CSS and design assets."
 date_authored_initial_draft: 2026-05-04
 date_authored_current_draft: 2026-05-04
-date_authored_final_draft: "[]"
-date_first_published: "[]"
-date_last_updated: "[]"
+date_authored_final_draft:
+date_first_published:
+date_last_updated:
 at_semantic_version: 0.1.0.0
 augmented_with:
   - Pi on Claude Sonnet 4.5
