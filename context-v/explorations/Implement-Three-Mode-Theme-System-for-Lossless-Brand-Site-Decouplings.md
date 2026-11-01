@@ -16,7 +16,7 @@ authors:
 augmented_with:
   - Claude Code on Claude Opus 5.5
 at_semantic_version: 0.0.1.0
-status: Open
+status: Draft
 tags:
   - Exploration
   - Theme-System

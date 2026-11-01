@@ -3,7 +3,7 @@ title: "Codeblock Syntax Highlighting with Shiki"
 lede: "Blueprint for implementing syntax-highlighted code blocks across astro-knots sites using Shiki with the tokyo-night theme and reusable wrapper components."
 date_created: 2025-11-15
 date_modified: 2025-12-15
-status: Published
+status: Reference
 category: Blueprints
 tags: [Shiki, Syntax-Highlighting, Code-Blocks, Astro, Tokyo-Night]
 authors:

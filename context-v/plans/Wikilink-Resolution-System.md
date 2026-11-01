@@ -2,7 +2,7 @@
 title: "Wikilink Resolution System for LFM"
 lede: >-
   LFM parses `[[Obsidian-style]]` links; each site supplies the config resolving them to local or external URLs and styling the destination.
-status: Proposed
+status: Partially-Shipped
 date_created: 2026-05-08
 date_modified: 2026-05-08
 category: Plans

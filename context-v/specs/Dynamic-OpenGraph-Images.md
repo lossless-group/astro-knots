@@ -9,7 +9,8 @@ date_first_published: null
 date_last_updated: 2025-10-13
 at_semantic_version: 0.0.1.1
 publish: false
-status: Attempted
+status: Deferred
+deferral_note: "From the doc's own status line: core functionality implemented, Vercel deployment pending resolution."
 augmented_with:
   - "Claude Sonnet 4 on Claude Code"
 category: Marketing-Site

@@ -3,7 +3,7 @@ title: "Team Pages Specification"
 lede: "Agency-wide specification defining how astro-knots sites should implement data-driven team pages with role-based grouping, shared data models, and brand theming."
 date_created: 2025-11-15
 date_modified: 2025-12-15
-status: Published
+status: Reference
 category: Specifications
 tags: [Team-Pages, Components, Data-Model, Responsive-Design]
 authors:

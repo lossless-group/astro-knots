@@ -3,7 +3,7 @@ title: "Confidential Content Access Control Blueprint"
 lede: "A tiered pattern for protecting privileged or confidential content across astro-knots sites, from simple passcodes to full OAuth integration."
 date_created: 2024-12-01
 date_modified: 2024-12-15
-status: Published
+status: Reference
 category: Blueprints
 tags: [Authentication, Access-Control, Confidential-Content, Security, Portfolio]
 authors:

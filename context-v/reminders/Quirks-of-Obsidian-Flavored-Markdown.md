@@ -3,7 +3,7 @@ title: "Quirks of Obsidian Flavored Markdown"
 lede: "A quick reference for the quirks of Obsidian Flavored Markdown."
 date_created: 2026-04-26
 date_modified: 2026-04-26
-status: Published
+status: Active
 category: Reminders
 tags: [Tech-Stack, Astro, Svelte, Tailwind, Preferences]
 authors:

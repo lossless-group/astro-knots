@@ -3,7 +3,7 @@ title: "Tags Must Use Train-Case"
 lede: "All tags in YAML frontmatter must use Train-Case — capitalize each word, hyphens between words, no spaces, no underscores, no all-lowercase."
 date_created: 2026-03-26
 date_modified: 2026-03-26
-status: Published
+status: Active
 category: Reminders
 tags: [Tags, Frontmatter, Conventions, Obsidian, Train-Case]
 authors:

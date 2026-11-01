@@ -4,7 +4,7 @@ lede: >-
   Every wikilink in mpstaton-site's content, grouped by prefix — resolve each one and the mappings become `EXTERNAL_DESTINATIONS`.
 date_generated: 2026-05-08
 date_modified: 2026-05-08
-status: Generated
+status: Reference
 category: Audits
 tags: [LFM, Wikilinks, Audit, Generated]
 related:

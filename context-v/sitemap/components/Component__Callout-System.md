@@ -3,7 +3,7 @@ title: "Callout System (LFM)"
 lede: "Three-file split for rendering Lossless Flavored Markdown callouts — structure, type registry, and mode-aware styles. Every type obeys the light/dark/vibrant mode switcher."
 date_created: 2026-05-08
 date_modified: 2026-05-08
-status: Published
+status: Reference
 category: Components
 tags: [LFM, Callouts, Markdown-Rendering, Component-System, Mode-Aware, Two-Tier-Tokens]
 authors:

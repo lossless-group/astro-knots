@@ -3,7 +3,7 @@ title: "Team Spans Page Spec"
 lede: "Specification for a responsive grid layout displaying team members grouped by roles in contiguous spans with CSS Grid and consistent card styling."
 date_created: 2025-11-15
 date_modified: 2025-12-15
-status: Published
+status: Reference
 category: Specifications
 tags: [Team-Pages, CSS-Grid, Responsive-Layout, Components]
 authors:

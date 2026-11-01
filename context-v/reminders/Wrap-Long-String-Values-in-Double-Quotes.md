@@ -3,7 +3,7 @@ title: "Wrap Long String Values in Double Quotes"
 lede: "Long YAML string values — descriptions, titles with punctuation, URLs with query strings, ledes — should always be wrapped in double quotes. Cheap insurance against the entire class of YAML-syntax-collision bugs."
 date_created: 2026-05-08
 date_modified: 2026-05-08
-status: Published
+status: Active
 category: Reminders
 tags: [Frontmatter, YAML, Conventions, Property-Conventions, Content-Collections]
 authors:

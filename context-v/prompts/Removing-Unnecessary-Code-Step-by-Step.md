@@ -12,7 +12,7 @@ generated_with: Claude Code (Claude Sonnet 4.5)
 category: Prompts
 date_created: 2025-11-15
 date_modified: 2025-11-16
-status: Proposed
+status: Draft
 tags: [Refactor, Code-Cleanup, Hypernova, Site-Migration]
 authors:
   - Michael Staton

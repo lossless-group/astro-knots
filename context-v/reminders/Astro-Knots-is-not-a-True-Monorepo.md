@@ -3,7 +3,7 @@ title: "Astro Knots is not a True Monorepo"
 lede: "A reminder that Astro-Knots is organized like a monorepo but functions as a collection of independent Astro projects for convenient pattern porting."
 date_created: 2025-11-15
 date_modified: 2025-12-15
-status: Published
+status: Active
 category: Reminders
 tags: [Monorepo, Architecture, Astro-Knots, Patterns]
 authors:

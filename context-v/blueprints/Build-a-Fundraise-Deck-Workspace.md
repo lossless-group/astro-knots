@@ -4,7 +4,7 @@ lede: >-
   Step-by-step playbook for standing up a private, gated, two-surface fundraise deck workspace, as proven on `sites/calmstorm-decks`.
 date_created: 2026-05-03
 date_modified: 2026-05-03
-status: Published
+status: Reference
 category: Blueprints
 tags:
   - Fundraise-Deck-Workspace

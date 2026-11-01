@@ -4,7 +4,7 @@ lede: >-
   In `.astro` frontmatter, a `/* */` comment after a statement lexes as a regex literal — the error reports a column past EOF. Use `//`.
 date_created: 2026-05-17
 date_modified: 2026-05-17
-status: Published
+status: Active
 category: Reminders
 tags:
   - Astro

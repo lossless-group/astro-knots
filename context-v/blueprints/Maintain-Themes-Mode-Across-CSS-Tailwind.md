@@ -5,7 +5,7 @@ date_created: 2025-11-15
 date_modified: 2026-10-06
 use_index: 2
 date_last_updated: 2026-10-06
-status: Published
+status: Reference
 category: Blueprints
 tags: [Themes, Dark-Mode, Tailwind, CSS-Variables, Design-Tokens, Named-Tokens, BEM-Conventions, Two-Tier-Tokens]
 authors:

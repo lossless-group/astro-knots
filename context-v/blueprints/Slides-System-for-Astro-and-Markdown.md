@@ -3,7 +3,7 @@ title: "Slides System for Astro and Markdown"
 lede: "A comprehensive specification for building presentation slide systems in Astro-Knots sites with RevealJS, Three.js, and full theme/mode integration."
 date_created: 2024-12-01
 date_modified: 2024-12-15
-status: Published
+status: Reference
 category: Blueprints
 tags: [Slides, Presentations, RevealJS, Three.js, Markdown]
 authors:

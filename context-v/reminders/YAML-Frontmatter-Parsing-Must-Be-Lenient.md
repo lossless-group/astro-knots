@@ -3,7 +3,7 @@ title: "YAML Frontmatter Parsing Must Be Lenient"
 lede: "Across every Astro Knots site, content frontmatter parsing must tolerate messy YAML — log a warning and skip the file, never fail the whole build. No strict YAML parsers, ever."
 date_created: 2026-05-08
 date_modified: 2026-05-08
-status: Published
+status: Active
 category: Reminders
 tags: [Frontmatter, Content-Collections, Build-Tolerance, Astro, YAML, Loaders]
 authors:

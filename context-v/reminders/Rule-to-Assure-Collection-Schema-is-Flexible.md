@@ -5,7 +5,7 @@ title: "Rule to Assure Collection Schema is Flexible"
 lede: >-
   A lenient Zod schema doesn't remove the failure, it moves it — the build goes green and the date renders blank instead.
 summary: "The Zod-layer companion to [[YAML-Frontmatter-Parsing-Must-Be-Lenient]], which covers the parse layer. Establishes permissive-by-default collection schemas across every Astro Knots site, the canonical `lenient*` helper set, the drop-the-property-not-the-document rule, and — critically — the failure mode leniency introduces: a schema that requires nothing cannot protect a consumer that reads a field the document doesn't have. Read before writing or touching any `src/content.config.ts`."
-status: Published
+status: Active
 category: Reminders
 tags:
   - Frontmatter

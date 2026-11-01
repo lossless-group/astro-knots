@@ -11,7 +11,7 @@ generated_with: Claude Code (Claude Sonnet 4.5)
 category: Specifications
 date_created: 2025-11-15
 date_modified: 2025-11-16
-status: Proposed
+status: Draft
 tags: [Content-Automation, Digital-Footprint, Social-Media, API-Integration]
 authors:
   - Michael Staton

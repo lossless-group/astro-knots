@@ -6,7 +6,7 @@ site_uuid: 582fcb03-bad5-43b0-9e5d-6eb4bbb468ce
 hex_code: ce6anu
 date_created: 2026-08-17
 date_modified: 2026-08-17
-status: Published
+status: Active
 category: Blueprints
 tags:
   - Responsive-Design

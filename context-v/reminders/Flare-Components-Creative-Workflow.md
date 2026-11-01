@@ -3,7 +3,7 @@ title: "Flare Components — Creative Workflow"
 lede: "Flare is our naming convention for design-oriented components — images, illustrations, and animations as code. This reminder covers naming, preferred tech, and the creative brief workflow."
 date_created: 2026-04-20
 date_modified: 2026-04-20
-status: Published
+status: Active
 category: Reminders
 tags: [Flare, Design-System, Creative-Brief, SVG, D3, GSAP, Lottie, Three-JS, Workflow]
 authors:

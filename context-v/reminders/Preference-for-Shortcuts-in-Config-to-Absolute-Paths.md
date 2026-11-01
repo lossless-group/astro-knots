@@ -5,7 +5,7 @@ title: "Preference for Shortcuts in Config to Absolute Paths"
 lede: >-
   `../../../components/basics/DeckHeader.astro` breaks the moment you move the importer; `@components/…` reads the same from anywhere.
 summary: "Establishes tsconfig `paths` aliases as the standard import style for Astro Knots sites, records the canonical eight-alias set the splashes share, and names the competing `vite.resolve.alias` pattern in use on mpstaton-site along with the editor-resolution cost of choosing it. Includes the current per-site adoption counts. Read when scaffolding a site's tsconfig or when a file move breaks a pile of imports."
-status: Published
+status: Active
 category: Reminders
 publish: true
 date_created: 2026-05-05

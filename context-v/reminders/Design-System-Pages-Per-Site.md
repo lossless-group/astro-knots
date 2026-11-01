@@ -3,7 +3,7 @@ title: "Design System Pages Per Site"
 lede: "Every site should have a design-system route with browsable pages for components, flare, and layouts — built with zero-friction by Code Assistants, not a third-party documentation tool."
 date_created: 2026-04-20
 date_modified: 2026-04-20
-status: Published
+status: Active
 category: Reminders
 tags: [Design-System, Site-Convention, Components, Flare, Layouts]
 authors:

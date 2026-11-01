@@ -13,7 +13,7 @@ authors:
 augmented_with:
   - Claude Code on Opus 5 (1M context)
 semantic_version: 0.0.1.0
-status: Unproven
+status: Draft
 proven_on: "Not yet run end to end. Authored immediately after publishing 0.6.0 to JSR, with lossless-toolkit-site as the intended first subject."
 tags:
   - Loop

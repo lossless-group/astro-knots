@@ -3,7 +3,7 @@ title: "GitHub Secure Content Pattern"
 lede: "A pattern enabling Astro sites to fetch confidential content from a private GitHub repository at runtime, keeping sensitive documents out of static assets."
 date_created: 2024-12-01
 date_modified: 2024-12-15
-status: Published
+status: Reference
 category: Blueprints
 tags: [GitHub, Secure-Content, SSR, Confidential, Private-Repos]
 authors:

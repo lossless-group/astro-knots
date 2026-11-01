@@ -9,7 +9,7 @@ date_first_published: null
 date_last_updated: 2025-10-14
 at_semantic_version: 0.0.1.1
 publish: false
-status: Idea
+status: Draft
 augmented_with:
   - "Claude Sonnet 4 on Claude Code"
 category: Marketing-Site

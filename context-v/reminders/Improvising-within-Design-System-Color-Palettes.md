@@ -3,7 +3,7 @@ title: "Improvising within Design System Color Palettes"
 lede: "A reminder to AI code assistants and developers: use named colors and design tokens; when improvising raw hex or rgba values, reintegrate them into the system."
 date_created: 2026-04-20
 date_modified: 2026-04-20
-status: Published
+status: Active
 category: Reminders
 tags: [Design-System, Colors, Tokens, CSS, Themes, Modes]
 authors:

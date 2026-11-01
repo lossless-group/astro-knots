@@ -3,7 +3,7 @@ title: "Set Up Index and Basic Components Using Brand Theme"
 lede: "A prompt plan for evolving index pages and basic components to use the brand theme system instead of hard-coded colors, with step-by-step instructions for Cascade/Windsurf."
 date_created: 2025-11-15
 date_modified: 2025-12-15
-status: Published
+status: Partially-Shipped
 category: Prompts
 tags: [Brand-Theme, Index-Page, Components, Dark-Matter, Prompt-Plan]
 authors:

@@ -6,7 +6,7 @@ site_uuid: b64ab0c4-53c7-4e8f-ab59-f2fd55cd03fb
 hex_code: dt9uc8
 date_created: 2026-08-17
 date_modified: 2026-08-17
-status: Proposed
+status: Active
 category: Blueprints
 tags:
   - Table-Of-Contents

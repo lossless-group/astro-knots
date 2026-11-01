@@ -6,11 +6,11 @@ hex_code: 9kzkyr
 date_authored_initial_draft: 2026-08-17
 date_authored_current_draft: 2026-08-17
 date_authored_final_draft: null
-date_first_published: null
+date_first_published: 2026-08-17
 date_last_updated: 2026-08-17
 at_semantic_version: 0.0.1.0
 publish: false
-status: Proposed
+status: Partially-Shipped
 augmented_with:
   - "Claude Code on Opus 5"
 category: Information-Design

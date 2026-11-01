@@ -9,7 +9,7 @@ authors:
 augmented_with:
   - Claude Code on Claude Opus 4.7 (1M context)
 semantic_version: 0.0.0.2
-status: Implemented (calmstorm-decks)
+status: Reference
 tags:
   - Blueprint
   - Confidential-Access
