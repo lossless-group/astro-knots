@@ -19,6 +19,7 @@ date_modified: 2026-03-25
 site_uuid: 8b073729-9d08-4268-82db-c9e013c6da31
 hex_code: 0rud0l
 publish: true
+type: Prompts
 ---
 
 # Implement Context-V Fetcher for mpstaton-site

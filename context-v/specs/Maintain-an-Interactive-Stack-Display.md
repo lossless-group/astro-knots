@@ -32,6 +32,7 @@ tags:
   - FullStack-VC
 site_uuid: 24f96f28-44c4-414e-afcd-341f70905cf8
 hex_code: id3fm5
+type: Specs
 ---
 
 # Implementation Status (2026-04-28)

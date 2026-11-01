@@ -13,6 +13,7 @@ hex_code: 9evxzh
 date_authored_initial_draft: 2024-12-18
 date_authored_current_draft: 2024-12-18
 publish: true
+type: Strategy
 ---
 
 # Exploring Publishing a Component Library for VC Firms

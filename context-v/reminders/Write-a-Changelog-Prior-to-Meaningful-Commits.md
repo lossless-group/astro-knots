@@ -13,6 +13,7 @@ hex_code: 9vgr9q
 date_authored_initial_draft: 2026-04-28
 date_authored_current_draft: 2026-04-28
 publish: true
+type: Reminders
 ---
 
 # Our Commit and Ship Workflow

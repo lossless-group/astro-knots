@@ -19,6 +19,7 @@ image_prompt: Topographic map lines radiating from an off-center point, with a c
 site_uuid: a4482ca4-bd83-4f03-ae81-ad08cff2e09e
 hex_code: ouws9d
 publish: true
+type: Prompts
 ---
 
 # Creative Brief

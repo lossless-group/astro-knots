@@ -16,6 +16,7 @@ authors:
 site_uuid: 09d3c9aa-1f01-4ea2-8b98-295e4d70278e
 hex_code: mwkdso
 publish: true
+type: Explorations
 ---
 
 # Understanding the JavaScript Runtime and Package Manager Landscape

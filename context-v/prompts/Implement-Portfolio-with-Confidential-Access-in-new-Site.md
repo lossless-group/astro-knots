@@ -13,6 +13,7 @@ hex_code: cwht1w
 date_authored_initial_draft: 2025-12-15
 date_authored_current_draft: 2025-12-15
 publish: true
+type: Prompts
 ---
 
 # Implementation Plan: Portfolio with Confidential Access in Dark-Matter

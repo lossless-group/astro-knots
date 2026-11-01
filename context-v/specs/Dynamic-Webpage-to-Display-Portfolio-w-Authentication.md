@@ -20,6 +20,7 @@ image_prompt: A nice portfolio page with logos.
 site_uuid: fa61384a-21a1-4466-8de5-fb0f02215d90
 hex_code: r8goje
 publish: true
+type: Specs
 ---
 
 # Context

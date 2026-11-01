@@ -15,6 +15,7 @@ authors:
 site_uuid: 5b4eb835-8420-4289-a40c-05054e415a7e
 hex_code: 7hojjx
 publish: true
+type: Prompts
 ---
 
 # Fetch Brand and Tokens from Client Site

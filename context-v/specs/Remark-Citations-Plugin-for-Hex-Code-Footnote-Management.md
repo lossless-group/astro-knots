@@ -20,6 +20,7 @@ date_modified: 2026-04-22
 site_uuid: 985606ea-e86c-4658-bc37-a46828c68140
 hex_code: bk0dks
 publish: true
+type: Specs
 ---
 
 # Remark-Citations: A Unified Plugin for Hex-Code Footnote Management

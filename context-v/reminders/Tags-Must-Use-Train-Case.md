@@ -13,6 +13,7 @@ hex_code: f6p4v9
 date_authored_initial_draft: 2026-03-26
 date_authored_current_draft: 2026-03-26
 publish: true
+type: Reminders
 ---
 
 # Tags Must Use Train-Case

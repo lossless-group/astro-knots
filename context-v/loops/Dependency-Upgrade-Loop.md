@@ -19,6 +19,7 @@ hex_code: wbxcc3
 date_authored_initial_draft: 2026-07-06
 date_authored_current_draft: 2026-07-06
 publish: true
+type: Loops
 ---
 
 # Dependency Upgrade Loop

@@ -15,6 +15,7 @@ hex_code: juiwwv
 date_authored_initial_draft: 2026-05-08
 date_authored_current_draft: 2026-05-08
 publish: true
+type: Reminders
 ---
 
 # Wrap Long String Values in Double Quotes

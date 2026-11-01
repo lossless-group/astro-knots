@@ -13,6 +13,7 @@ hex_code: til99g
 date_authored_initial_draft: 2026-04-20
 date_authored_current_draft: 2026-04-20
 publish: true
+type: Reminders
 ---
 
 ## What "Flare" Means

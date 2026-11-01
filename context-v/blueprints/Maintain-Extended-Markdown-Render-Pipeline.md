@@ -16,6 +16,7 @@ site_uuid: 58a9fc59-72a1-4030-8918-43f00c2454bd
 hex_code: 011fdo
 date_authored_initial_draft: 2025-12-15
 date_authored_current_draft: 2025-12-15
+type: Blueprints
 ---
 
 # Maintain an Extended Markdown Render Pipeline for Astro-Knots

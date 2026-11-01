@@ -21,6 +21,7 @@ date_modified: 2026-04-21
 site_uuid: edd8f440-3d99-400b-bf30-d2732bc1c4c9
 hex_code: blyj6i
 publish: true
+type: Specs
 ---
 
 # Create an Image-Heavy Portfolio Website for Boutique E-Commerce

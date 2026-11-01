@@ -22,6 +22,7 @@ tags:
   - Svelte
   - Information-Hierarchy
   - Astro-Knots
+type: Blueprints
 ---
 
 # Build an Upgrade Ladder Cart from Superset Tiers

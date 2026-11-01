@@ -25,6 +25,7 @@ tags:
   - Config
   - Import-Aliases
   - Developer-Experience
+type: Reminders
 ---
 
 # Preference for Shortcuts in Config to Absolute Paths

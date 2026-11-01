@@ -22,6 +22,7 @@ site_uuid: 95582160-c960-42db-a9de-baff6f90c42b
 hex_code: a5qllv
 date_authored_current_draft: 2026-05-18
 publish: true
+type: Specs
 ---
 
 # Image Catalog and ImageKit Hosting for Arthouse

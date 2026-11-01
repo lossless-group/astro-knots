@@ -21,6 +21,7 @@ square_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-E
 hex_code: kmj1qe
 lede: "Markdown slide decks already embed via a `:::slides` directive; Astro-component decks do not — the embed route only reads `.md` files."
 summary: "Blueprint for the Reveal.js slide-embedding pipeline shared across lossless.group, hypernova-site, and twf_site. Documents the whole chain — the `:::slides` remark directive, `SlidesEmbed.astro`, the `/slides/embed/[...slug]` route, and `OneSlideDeck.astro` — plus the configuration table and the path-sanitization constraints. Read it before adding slides to a new site (fullstack-vc was the trigger), and note the open question it flags: whether to stay on Reveal.js or move to Svelte + GSAP. The unfinished work is making Astro-component decks embeddable, not just markdown ones."
+type: Blueprints
 ---
 
 

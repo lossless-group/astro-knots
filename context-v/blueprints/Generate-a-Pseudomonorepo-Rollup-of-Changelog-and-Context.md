@@ -26,6 +26,7 @@ hex_code: 0tt8ut
 date_authored_initial_draft: 2026-05-04
 date_authored_current_draft: 2026-05-04
 publish: true
+type: Blueprints
 ---
 
 # Generate a Pseudomonorepo Rollup of Changelog and Context

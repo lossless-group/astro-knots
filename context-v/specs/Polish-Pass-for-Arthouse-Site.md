@@ -22,6 +22,7 @@ site_uuid: 7b623111-fb6b-4f70-aaaa-788c0e48b000
 hex_code: og64ho
 date_authored_current_draft: 2026-05-18
 publish: true
+type: Specs
 ---
 
 # Polish Pass for Arthouse Site

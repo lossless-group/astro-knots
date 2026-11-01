@@ -25,6 +25,7 @@ tags:
   - Astro
   - Astro-Knots
   - Site-Defaults
+type: Specs
 ---
 
 # Include Full Search as a Default

@@ -14,6 +14,7 @@ hex_code: tvqwxe
 date_authored_initial_draft: 2026-04-29
 date_authored_current_draft: 2026-04-29
 publish: true
+type: Explorations
 ---
 
 # Practices to Sense-Make Context Vigilance at Scale

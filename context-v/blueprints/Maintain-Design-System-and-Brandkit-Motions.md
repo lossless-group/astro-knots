@@ -17,6 +17,7 @@ hex_code: 6tj75h
 date_authored_initial_draft: 2026-04-25
 date_authored_current_draft: 2026-04-25
 publish: true
+type: Blueprints
 ---
 
 # Maintain Design System & Brand Kit Motions

@@ -16,6 +16,7 @@ hex_code: q0o25o
 date_authored_initial_draft: 2026-05-05
 date_authored_current_draft: 2026-05-05
 publish: true
+type: Prompts
 ---
 
 # Ideogram Style Prefix for Splash OG Images

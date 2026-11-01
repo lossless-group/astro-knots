@@ -21,6 +21,7 @@ parent_spec: "[[Codifying-a-Comprehensive-Extended-Markdown-Flavor-and-Shared-Pa
 site_uuid: e62a76a4-2ff3-4eb5-a142-f0d6fbeda339
 hex_code: nt3wvs
 publish: true
+type: Specs
 ---
 
 # Versatile Component Library for Video Players

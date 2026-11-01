@@ -21,6 +21,7 @@ slug: maintain-a-dynamic-multi-product-changelog
 tags: [State-Of-The-Art-Practices, CI-CD-Pipelines]
 site_uuid: cad8920a-222a-460b-9c39-4b5699c722fa
 hex_code: 71znuz
+type: Specs
 ---
 
 

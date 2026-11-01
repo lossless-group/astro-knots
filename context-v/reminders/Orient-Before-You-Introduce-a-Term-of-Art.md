@@ -20,6 +20,7 @@ tags:
   - Content-Modeling
   - Copywriting
   - Astro-Knots
+type: Reminders
 ---
 
 # Orient Before You Introduce a Term of Art

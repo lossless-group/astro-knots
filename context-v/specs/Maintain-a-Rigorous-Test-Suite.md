@@ -20,6 +20,7 @@ slug: maintain-a-rigorous-test-suite
 tags: [Acceptance-Testing, Test-Driven-Development]
 site_uuid: 3082223b-3908-4c3c-a7ca-5895341e1f44
 hex_code: flt6ot
+type: Specs
 ---
 Recommended Test Strategy
 

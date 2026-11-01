@@ -11,6 +11,7 @@ site_uuid: fc71171c-3603-4031-991f-bc948b7c8ea7
 hex_code: 7a3esr
 date_created: 2026-08-21
 publish: true
+type: Reminders
 ---
 
 ## The ruling

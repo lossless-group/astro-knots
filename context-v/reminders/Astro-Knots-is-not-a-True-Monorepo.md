@@ -13,6 +13,7 @@ hex_code: diby1f
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
 publish: true
+type: Reminders
 ---
 
 # Reducing Confusion

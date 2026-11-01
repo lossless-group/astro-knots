@@ -23,6 +23,7 @@ banner_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-E
 portrait_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_portrait_image_1755815520946_NlMeL6qdl.webp"
 square_image: "https://ik.imagekit.io/xvpgfijuw/uploads/lossless/july/Maintain-Embeddable-Slides_square_image_1755815527652_HEYKVBKOm.webp"
 hex_code: f47t66
+type: Blueprints
 ---
 
 # Blueprint for Developing and Maintaining Interactive Polling Systems

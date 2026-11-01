@@ -1,0 +1,17 @@
+# Reminders
+
+* [Astro Frontmatter: Avoid Inline Block Comments and Risky Regex Literals](Astro-Frontmatter-Avoid-Inline-Block-Comments-and-Risky-Regex.md) - In `.astro` frontmatter, a `/* */` comment after a statement lexes as a regex literal — the error reports a column past EOF. Use `//`.
+* [Astro Knots is not a True Monorepo](Astro-Knots-is-not-a-True-Monorepo.md) - A reminder that Astro-Knots is organized like a monorepo but functions as a collection of independent Astro projects for convenient pattern porting.
+* [Dates are UTC at rest, viewer-local at render](Dates-Are-UTC-At-Rest-Viewer-Local-At-Render.md)
+* [Design System Pages Per Site](Design-System-Pages-Per-Site.md) - Every site should have a design-system route with browsable pages for components, flare, and layouts — built with zero-friction by Code Assistants, not a third-party documentation tool.
+* [Flare Components — Creative Workflow](Flare-Components-Creative-Workflow.md) - Flare is our naming convention for design-oriented components — images, illustrations, and animations as code. This reminder covers naming, preferred tech, and the creative brief workflow.
+* [Improvising within Design System Color Palettes](Improvising-within-Design-System-Color-Palettes.md) - A reminder to AI code assistants and developers: use named colors and design tokens; when improvising raw hex or rgba values, reintegrate them into the system.
+* [Orient Before You Introduce a Term of Art](Orient-Before-You-Introduce-a-Term-of-Art.md) - A reader who does not yet know what the thing is cannot learn its name. Plain question first, clinical title second — enforce it in the schema.
+* [Preference for Shortcuts in Config to Absolute Paths](Preference-for-Shortcuts-in-Config-to-Absolute-Paths.md) - `../../../components/basics/DeckHeader.astro` breaks the moment you move the importer; `@components/…` reads the same from anywhere.
+* [Preferred Stack](Preferred-Stack.md) - A quick reference for the preferred technology stack: HTML/CSS first, Astro for SSG, Svelte for interactivity, Tailwind for styling, and no React.
+* [Quirks of Obsidian Flavored Markdown](Quirks-of-Obsidian-Flavored-Markdown.md) - A quick reference for the quirks of Obsidian Flavored Markdown.
+* [Rule to Assure Collection Schema is Flexible](Rule-to-Assure-Collection-Schema-is-Flexible.md) - A lenient Zod schema doesn't remove the failure, it moves it — the build goes green and the date renders blank instead.
+* [Tags Must Use Train-Case](Tags-Must-Use-Train-Case.md) - All tags in YAML frontmatter must use Train-Case — capitalize each word, hyphens between words, no spaces, no underscores, no all-lowercase.
+* [Wrap Long String Values in Double Quotes](Wrap-Long-String-Values-in-Double-Quotes.md) - Long YAML string values — descriptions, titles with punctuation, URLs with query strings, ledes — should always be wrapped in double quotes. Cheap insurance against the entire class of YAML-syntax-collision bugs.
+* [Write a Changelog Prior to Meaningful Commits](Write-a-Changelog-Prior-to-Meaningful-Commits.md) - A quick reference for writing a changelog prior to meaningful commits.
+* [YAML Frontmatter Parsing Must Be Lenient](YAML-Frontmatter-Parsing-Must-Be-Lenient.md) - Across every Astro Knots site, content frontmatter parsing must tolerate messy YAML — log a warning and skip the file, never fail the whole build. No strict YAML parsers, ever.

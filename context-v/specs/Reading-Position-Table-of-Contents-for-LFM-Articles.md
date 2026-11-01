@@ -25,6 +25,7 @@ tags:
   - Navigation
   - Responsive-Design
   - Accessibility
+type: Specs
 ---
 
 # A Reading-Position Table of Contents for LFM Articles

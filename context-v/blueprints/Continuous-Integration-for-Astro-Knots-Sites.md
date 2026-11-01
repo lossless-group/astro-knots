@@ -21,6 +21,7 @@ tags:
   - Astro-Knots
   - Testing
   - Deployment
+type: Blueprints
 ---
 
 # Continuous Integration for Astro Knots Sites

@@ -19,6 +19,7 @@ authors:
 image_prompt: "A modern web interface with a navigation bar at the top. As the user hovers over a navigation item, a large, elegant dropdown menu appears with a grid of content cards, each with an icon, title, and description. The dropdown has a subtle shadow and smooth animation."
 site_uuid: de610b9f-a8f2-4d71-be5c-f0b54f57ef91
 hex_code: zbfdvp
+type: Blueprints
 ---
 
 # Jumbotron Popdown Patterns

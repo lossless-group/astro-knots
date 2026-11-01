@@ -13,6 +13,7 @@ hex_code: cn14w0
 date_authored_initial_draft: 2026-04-26
 date_authored_current_draft: 2026-04-26
 publish: true
+type: Reminders
 ---
 
 ## Property Naming Convenetions

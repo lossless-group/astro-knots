@@ -13,6 +13,7 @@ hex_code: tto3n3
 date_authored_initial_draft: 2024-12-01
 date_authored_current_draft: 2024-12-01
 publish: true
+type: Blueprints
 ---
 
 # Slides System Living Specification

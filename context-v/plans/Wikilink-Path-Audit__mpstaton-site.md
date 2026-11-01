@@ -15,6 +15,7 @@ generated_by: scripts/audit-wikilinks.ts
 site_uuid: 53914074-4574-4b5c-9cb2-2b8af0f7899b
 hex_code: vzxyb1
 publish: false
+type: Plans
 ---
 
 # Wikilink Path Audit — mpstaton-site

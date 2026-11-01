@@ -17,6 +17,7 @@ authors:
 site_uuid: 2a0d83d4-dee5-451b-a41d-375821253f90
 hex_code: ijrohs
 publish: true
+type: Explorations
 ---
 
 # Web Research Agents for Content Augmentation

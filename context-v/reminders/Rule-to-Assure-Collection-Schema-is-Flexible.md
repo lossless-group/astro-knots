@@ -26,6 +26,7 @@ date_authored_final_draft:
 at_semantic_version: 0.0.1.0
 publish: true
 related_blueprint: "[[Managing-Complex-Markdown-Content-at-Build-Time]]"
+type: Reminders
 ---
 
 # Rule to Assure Collection Schema is Flexible

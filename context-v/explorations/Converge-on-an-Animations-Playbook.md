@@ -17,6 +17,7 @@ authors:
 site_uuid: 7107ab5e-ad9f-4914-a4ce-198c7438361d
 hex_code: 847gu6
 publish: true
+type: Explorations
 ---
 
 # Converge on an Animations Playbook

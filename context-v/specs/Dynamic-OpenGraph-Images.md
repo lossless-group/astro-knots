@@ -21,6 +21,7 @@ slug: dynamic-opengraph-images
 tags: [Marketing-Site, Digital-Marketing]
 site_uuid: 2d4d45af-8b5d-4a2e-9b8a-a7e70890b900
 hex_code: 0q6q2b
+type: Specs
 ---
 # A System for Generating Dynamic OpenGraph Images based on Content and Variables
 

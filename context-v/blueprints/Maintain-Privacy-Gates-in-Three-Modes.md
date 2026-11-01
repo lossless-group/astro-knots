@@ -37,6 +37,7 @@ tags:
   - SSR-Gating
   - Investment-Memos
   - Cross-Site-Pattern
+type: Blueprints
 ---
 
 # Maintain Privacy Gates in Three Modes

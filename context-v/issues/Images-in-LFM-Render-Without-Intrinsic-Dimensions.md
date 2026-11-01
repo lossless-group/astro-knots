@@ -21,6 +21,7 @@ hex_code: 8d8z49
 date_authored_initial_draft: 2026-08-15
 date_authored_current_draft: 2026-08-15
 publish: true
+type: Issues
 ---
 
 ## Why care?

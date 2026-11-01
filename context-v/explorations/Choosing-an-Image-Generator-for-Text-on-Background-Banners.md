@@ -17,6 +17,7 @@ authors:
 site_uuid: efc625b6-a4d2-4782-bbee-4657f463a5ae
 hex_code: s4v615
 publish: true
+type: Explorations
 ---
 
 # Choosing an Image Generator for Text-on-Background Banners

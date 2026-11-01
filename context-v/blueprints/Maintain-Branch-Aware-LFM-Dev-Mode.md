@@ -16,6 +16,7 @@ site_uuid: 6ee6602f-3454-41b9-9092-3ee94c20a03b
 hex_code: kysd25
 date_authored_initial_draft: 2026-05-03
 date_authored_current_draft: 2026-05-03
+type: Blueprints
 ---
 
 # Maintain a Branch-Aware LFM Dev Mode

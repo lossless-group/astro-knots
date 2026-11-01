@@ -151,6 +151,8 @@ function unionLoader(options: UnionLoaderOptions) {
       // 1. Local parent content (astro-knots' own).
       try {
         for await (const file of fsGlob('**/*.md', { cwd: options.localDir })) {
+          // OKF folder indexes are navigation for agents, not pages.
+          if (file.split('/').pop() === 'index.md') continue;
           const abs = resolve(options.localDir, file);
           const text = await readFile(abs, 'utf8');
           const { data, body } = parseFrontmatter(text);
@@ -177,6 +179,9 @@ function unionLoader(options: UnionLoaderOptions) {
       try {
         for await (const file of fsGlob('**/*.md', { cwd: options.rollupDir })) {
           if (file === 'README.md' || file.endsWith('/README.md')) continue;
+          // OKF folder indexes (ours and every rolled-up child's) are
+          // navigation for agents, not pages.
+          if (file.split('/').pop() === 'index.md') continue;
           const abs = resolve(options.rollupDir, file);
           const text = await readFile(abs, 'utf8');
           const { data, body } = parseFrontmatter(text);

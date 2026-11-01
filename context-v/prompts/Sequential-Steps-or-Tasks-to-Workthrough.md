@@ -19,6 +19,7 @@ image_prompt: "An airplane engineer at the airport walking up to a sophisticated
 site_uuid: 2bdb7585-8a75-4611-81aa-1e12439f8c9a
 hex_code: qijllf
 publish: false
+type: Prompts
 ---
 
 # Today's sequence:

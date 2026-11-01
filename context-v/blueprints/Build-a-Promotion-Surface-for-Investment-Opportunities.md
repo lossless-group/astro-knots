@@ -22,6 +22,7 @@ hex_code: 5oqwxl
 date_authored_initial_draft: 2026-05-03
 date_authored_current_draft: 2026-05-03
 publish: true
+type: Blueprints
 ---
 
 ## What This Blueprint Is

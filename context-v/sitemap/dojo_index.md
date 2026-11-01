@@ -13,6 +13,7 @@ tags:
 lede: "Prompt for the dojo landing page: a 2/3 hero core-message column beside a 1/3 read-our-content CTA, system tokens only, all three modes."
 summary: "Prompt capture for the fullstack-vc dojo landing page, including a rough Astro sketch of the layout and the four-slot message hierarchy (contextSetter, headerTxt, subheaderTxt, supportingTxt) with draft copy. The sketch is illustrative pseudo-code and does not compile. Use it for layout intent and copy; get the component contracts from the design system."
 publish: false
+type: Sitemap
 ---
 
 ❯ Let's make the dojo/index.astro page

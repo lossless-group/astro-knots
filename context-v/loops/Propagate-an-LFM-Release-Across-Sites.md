@@ -22,6 +22,7 @@ tags:
   - Dependency-Management
   - Browser-Drive
   - Site-Maintenance
+type: Loops
 ---
 
 # Propagate an LFM Release Across Sites

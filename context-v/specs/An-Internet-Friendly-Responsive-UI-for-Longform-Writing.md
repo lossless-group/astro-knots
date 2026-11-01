@@ -41,6 +41,7 @@ tags:
   - Agentic-VC-Dojo
 site_uuid: 6592ce87-071d-4def-a9ee-bc722a4f993a
 hex_code: ehql34
+type: Specs
 ---
 
 # Context

@@ -14,6 +14,7 @@ hex_code: 44exec
 date_authored_initial_draft: 2026-04-20
 date_authored_current_draft: 2026-04-20
 publish: true
+type: Reminders
 ---
 
 # Don't Improvise Colors — Use the Design System

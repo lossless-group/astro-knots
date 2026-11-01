@@ -23,6 +23,7 @@ hex_code: cb0wzx
 date_authored_initial_draft: 2026-05-17
 date_authored_current_draft: 2026-05-17
 publish: true
+type: Reminders
 ---
 
 # Astro Frontmatter: Avoid Inline Block Comments and Risky Regex Literals

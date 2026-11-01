@@ -15,6 +15,7 @@ hex_code: juf7h6
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
 publish: true
+type: Blueprints
 ---
 
 # Maintain Themes & Modes Across CSS and Tailwind (Hypernova Implementation Blueprint)

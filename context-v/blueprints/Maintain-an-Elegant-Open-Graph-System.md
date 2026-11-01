@@ -22,6 +22,7 @@ portrait_image: https://ik.imagekit.io/xvpgfijuw/uploads/lossless/2025-sept/Main
 square_image: https://ik.imagekit.io/xvpgfijuw/uploads/lossless/2025-sept/Maintain-an-Elegant-Open-Graph-System_square_image_1760114665324__jTn7ykb9.webp
 site_uuid: 7b4c5275-16a2-4b59-a2d6-71ecaf1f8538
 hex_code: 0x55oh
+type: Blueprints
 ---
 
 ## Why This Matters: The Messaging-First Share Economy

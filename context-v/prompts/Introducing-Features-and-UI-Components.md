@@ -20,6 +20,7 @@ image_prompt: A jenga tower with Hypernova branding, and a stack of code files w
 site_uuid: 4b42f460-3254-4b95-b732-b3180d80185b
 hex_code: 53o3d9
 publish: true
+type: Prompts
 ---
 
 # Context

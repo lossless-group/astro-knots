@@ -27,6 +27,7 @@ hex_code: m1gjtk
 date_authored_initial_draft: 2026-05-12
 date_authored_current_draft: 2026-05-12
 publish: true
+type: Blueprints
 ---
 
 # Maintain Confidential Access with Persistent Sessions and Auth Telemetry

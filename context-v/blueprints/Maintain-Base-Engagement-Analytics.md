@@ -36,6 +36,7 @@ tags:
   - Privacy-Gates
   - Reading-Telemetry
   - Cross-Site-Pattern
+type: Blueprints
 ---
 
 # Maintain Base Engagement Analytics

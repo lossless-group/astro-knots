@@ -20,6 +20,7 @@ hex_code: 0rta9t
 date_authored_initial_draft: 2026-05-08
 date_authored_current_draft: 2026-05-08
 publish: true
+type: Plans
 ---
 
 # Wikilink Resolution System for LFM

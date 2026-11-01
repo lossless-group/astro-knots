@@ -16,6 +16,7 @@ authors:
 site_uuid: 997c3e8e-a075-4317-bdf5-1f741d05024e
 hex_code: vfg91b
 publish: true
+type: Explorations
 ---
 
 # Exploring GitHub Actions for Package Publishing

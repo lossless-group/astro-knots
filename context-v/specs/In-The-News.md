@@ -13,6 +13,7 @@ hex_code: 9816tz
 date_authored_initial_draft: 2025-11-15
 date_authored_current_draft: 2025-11-15
 publish: false
+type: Specs
 ---
 
 Closable sidebar, expandable to full page.  

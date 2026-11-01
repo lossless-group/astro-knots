@@ -23,6 +23,7 @@ tags:
   - Astro-Knots
   - Code-Duplication
   - Content-Loaders
+type: Issues
 ---
 
 # Nine hand-rolled frontmatter parsers, all functionally identical

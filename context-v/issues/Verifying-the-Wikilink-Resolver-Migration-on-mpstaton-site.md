@@ -21,6 +21,7 @@ tags:
 lede: "The migration is written, pushed, and provably identical to the rules it replaces — but nobody has watched it resolve a single real link, because the content it needs is behind two API tokens that only exist on another machine."
 summary: "Pick-up doc for finishing the mpstaton-site wikilink migration on a machine that has GITHUB_PERSONAL_ACCESS_TOKEN and YOUTUBE_API_KEY. Records exactly what shipped, what was verified and how, the one unverified claim, the three environment blockers hit on NixOS and how each was cleared, and the specific check that remains. Read before touching remark-lossless-wikilinks-local.ts or src/config/wikilinks.ts."
 publish: true
+type: Issues
 ---
 
 # Verifying the Wikilink Resolver Migration on mpstaton-site
