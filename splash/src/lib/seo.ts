@@ -68,9 +68,14 @@ export interface SeoEntry {
 
 export const STATIC_SEO = {
   root: {
-    title: 'A small lattice of Astro sites',
+    title: 'Best-in-class websites, battle-tested patterns',
     description:
-      "A pseudomonorepo of Astro websites, tied together by a two-tier token system, a three-mode contract, and one real published package — Lossless Flavored Markdown.",
+      'Battle-tested patterns for best-in-class websites that any agent, developer, or n00b can follow. An alternative to Wix, Squarespace and Webflow.',
+  } satisfies SeoEntry,
+  sitesIndex: {
+    title: 'The sites',
+    description:
+      'The family of Astro sites built on Astro Knots patterns. Each is its own repo and deploys on its own.',
   } satisfies SeoEntry,
   changelogIndex: {
     title: 'Changelog',

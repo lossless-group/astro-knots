@@ -4,7 +4,6 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import KnotMark from '@components/KnotMark.astro';
 import KnotDivider from '@components/KnotDivider.astro';
 import ModeToggle from '@components/ModeToggle.astro';
-import SiteCard from '@components/SiteCard.astro';
 import TokenSwatchRow from '@components/TokenSwatchRow.astro';
 import BuildASite from '@components/BuildASite.astro';
 import { STATIC_SEO } from '@lib/seo';
@@ -34,6 +33,13 @@ try {
 } catch {
   latestChangelog = [];
 }
+
+const outOfTheBox = [
+  'Develops high-quality sites quickly, but refactors to manageable code.',
+  'Honors mode, theme, brand kit and design system.',
+  'Practices SEO and GEO, and is always aware of share optics. Includes dynamically generated share images if asked.',
+  'Includes the best way to manage content in Markdown imaginable. Plays nice with Obsidian.',
+];
 
 const stats = [
   { value: sites.length.toString(), label: 'Astro sites tied together' },
@@ -75,8 +81,8 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
         <span class="topbar__name mono">astro-knots</span>
       </a>
       <nav class="topbar__nav" aria-label="Primary">
-        <a href="#sites">Sites</a>
         <a href="#build-a-site">Build a site</a>
+        <a href={`${base}sites/`}>Sites</a>
         <a href={`${base}design-variants/`}>Design variants</a>
         <a href="#tokens">Tokens</a>
         <a href="#candor">Candor</a>
@@ -94,27 +100,48 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
     <!-- HERO -->
     <section class="hero">
       <div class="container">
-        <p class="eyebrow">A pseudomonorepo of Astro sites · The Lossless Group</p>
+        <p class="eyebrow">Astro Knots · The Lossless Group</p>
 
         <div class="hero__lockup">
           <div class="hero__mark"><KnotMark size={120} /></div>
           <h1 class="hero__title">
-            <span class="display">Loose threads,</span>
-            <span class="display gradient-text">tied with intent.</span>
+            <span class="display">Build an awesome</span>
+            <span class="display gradient-text">content-driven website!</span>
           </h1>
         </div>
 
         <p class="hero__lede">
-          {sites.length} Astro sites + four splash pages. One workspace. A shared context layer, a single published package, and
-          a strict three-mode color contract. Not a true monorepo — never tried to be — but tied
-          together by patterns the team actually uses.
+          A battle-tested set of patterns for best-in-class websites, any agent, developer, or n00b
+          can follow.
         </p>
 
         <div class="hero__actions">
-          <a href="#sites" class="btn btn--primary">See the lattice</a>
-          <a href="#build-a-site" class="btn btn--ghost">Build one with your agent</a>
+          <a href="#build-a-site" class="btn btn--primary">Build one with your agent</a>
+          <a href={`${base}sites/`} class="btn btn--ghost">See the sites</a>
           <a href={repoUrl} target="_blank" rel="noopener" class="btn btn--ghost">View on GitHub →</a>
           <p class="hero__hint mono">↑ try the mode toggle, watch everything pivot.</p>
+        </div>
+
+        <div class="pitch">
+          <div class="pitch__why">
+            <h2 class="display pitch__question">Why have your website stuck in a platform?</h2>
+            <p>
+              An alternative to Wix, Squarespace, Weebly and Webflow, for those unafraid or eager for
+              Generative AI cooperation.
+            </p>
+            <p>
+              No need to re-invent the wheel. <strong>Developers</strong>, all the true rigor is built in
+              from the start. <strong>Amateurs</strong>, get creative and get going knowing you are doing it
+              right.
+            </p>
+          </div>
+
+          <div class="pitch__box">
+            <p class="eyebrow">Out of the box</p>
+            <ul class="pitch__list">
+              {outOfTheBox.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
         </div>
 
         <ul class="hero__stats">
@@ -125,42 +152,6 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
             </li>
           ))}
         </ul>
-      </div>
-    </section>
-
-    <KnotDivider />
-
-    <!-- SITES -->
-    <section id="sites" class="section">
-      <div class="container">
-        <header class="section__head">
-          <p class="eyebrow">The lattice</p>
-          <h2 class="display">The sites</h2>
-          <p class="section__lede">
-            Each site is its own repo, included here as a git submodule. Each card carries a thread
-            in that site's brand color — a small reminder that nothing's actually merged.
-          </p>
-        </header>
-
-        <div class="sites-grid">
-          {sites.map((s) => (
-            <div class={s.data.featured ? 'sites-cell sites-cell--wide' : 'sites-cell'}>
-              <SiteCard
-                title={s.data.title ?? s.id}
-                slug={s.id}
-                lede={s.data.lede}
-                status={s.data.status}
-                repo={s.data.repo}
-                liveUrl={s.data.live_url}
-                icon={s.data.icon}
-                featured={s.data.featured}
-                tags={s.data.tags}
-                threadColor={s.data.thread_color}
-                maintainedBy={s.data.maintained_by}
-              />
-            </div>
-          ))}
-        </div>
       </div>
     </section>
 
@@ -519,29 +510,59 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
   }
   .section__footnote code { color: var(--color-accent); }
 
-  /* SITES GRID — featured spans wide on large screens */
+  /* VARIANTS */
   .variants__lede { max-width: 68ch; line-height: 1.65; opacity: .88; margin: .75rem 0 1.75rem; }
   .variants__row { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; }
   .variants__hint { font-size: .82rem; opacity: .6; }
 
-  .sites-grid {
+  /* PITCH — why, and what's in the box */
+  .pitch {
+    margin-top: var(--space-12);
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-4);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
   }
-  .sites-cell {
-    grid-column: span 3;
-    display: flex;
+  @media (max-width: 880px) {
+    .pitch { grid-template-columns: minmax(0, 1fr); }
   }
-  .sites-cell--wide { grid-column: span 6; }
-  .sites-cell > :global(.site-card) { width: 100%; }
-  @media (min-width: 900px) {
-    .sites-cell--wide { grid-column: span 3; }
-    .sites-cell { grid-column: span 2; }
+  .pitch__question {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    line-height: 1.15;
+    margin-bottom: var(--space-4);
   }
-  @media (max-width: 640px) {
-    .sites-grid { grid-template-columns: 1fr; }
-    .sites-cell, .sites-cell--wide { grid-column: span 1; }
+  .pitch__why p {
+    color: var(--color-text-soft);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 52ch;
+  }
+  .pitch__why p + p { margin-top: var(--space-4); }
+  .pitch__why strong { color: var(--color-text); }
+  .pitch__box {
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    position: relative;
+  }
+  .pitch__box::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--gradient-thread);
+  }
+  .pitch__list {
+    margin: var(--space-3) 0 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: var(--space-3);
+    color: var(--color-text);
+    line-height: 1.55;
   }
 
   /* CANDOR */
