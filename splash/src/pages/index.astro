@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
 import KnotDivider from '@components/KnotDivider.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import TokenSwatchRow from '@components/TokenSwatchRow.astro';
@@ -79,7 +80,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
   <header class="topbar">
     <div class="container topbar__inner">
       <a class="topbar__brand" href={base}>
-        <KnotMark size={32} />
+        <KnotMarkRing size={32} />
         <span class="topbar__name mono">astro-knots</span>
       </a>
       <nav class="topbar__nav" aria-label="Primary">
@@ -105,7 +106,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
         <p class="eyebrow">Astro Knots · The Lossless Group</p>
 
         <div class="hero__lockup">
-          <div class="hero__mark"><KnotMark size={120} /></div>
+          <div class="hero__mark"><KnotMarkRing size={120} /></div>
           <h1 class="hero__title">
             <span class="display">Build an awesome</span>
             <span class="display gradient-text">content-driven website.</span>
@@ -169,7 +170,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
 
     <!-- TOKEN DEMO -->
     <section id="variants" class="section">
-      <div class="wrap">
+      <div class="container">
         <div class="section__head">
           <h2 class="display">Redesign a site as <span class="gradient-text">three real directions.</span></h2>
         </div>

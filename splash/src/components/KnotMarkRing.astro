@@ -12,13 +12,15 @@ interface Props {
   size?: number;
   /** Draw the rounded-square tile behind it, like the app icon. */
   tile?: boolean;
+  /** Turn off the slow "pulling thread" motion (on by default, like KnotMark). */
+  static?: boolean;
 }
 
-const { size = 56, tile = false } = Astro.props;
+const { size = 56, tile = false, static: isStatic = false } = Astro.props;
 ---
 
 <svg
-  class:list={['knot-ring', { 'knot-ring--tile': tile }]}
+  class:list={['knot-ring', { 'knot-ring--tile': tile, 'knot-ring--static': isStatic }]}
   width={size}
   height={size}
   viewBox="0 0 64 64"
@@ -46,10 +48,10 @@ const { size = 56, tile = false } = Astro.props;
   {tile && <rect width="64" height="64" rx="14" class="knot-ring__tile" />}
   <circle cx="32" cy="32" r="26" stroke="url(#knot-ring-r)" stroke-width="4.4" />
   <g transform="translate(32 32) scale(0.86) translate(-32 -30)" stroke-width="5.8">
-    <path d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18" stroke="url(#knot-ring-a)" />
-    <path d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#knot-ring-a)" />
-    <path d="M 12 18 C 12 30 24 30 32 22" stroke="url(#knot-ring-b)" />
-    <path d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#knot-ring-b)" />
+    <path class="knot-ring__thread knot-ring__thread--a" d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18" stroke="url(#knot-ring-a)" />
+    <path class="knot-ring__thread knot-ring__thread--a" d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#knot-ring-a)" />
+    <path class="knot-ring__thread knot-ring__thread--b" d="M 12 18 C 12 30 24 30 32 22" stroke="url(#knot-ring-b)" />
+    <path class="knot-ring__thread knot-ring__thread--b" d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#knot-ring-b)" />
   </g>
 </svg>
 
@@ -57,4 +59,17 @@ const { size = 56, tile = false } = Astro.props;
   .knot-ring { display: block; }
   .knot-ring__tile { fill: var(--color-bg); }
   .knot-ring--tile { filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--color-accent) 22%, transparent)); }
+  .knot-ring:not(.knot-ring--tile) { overflow: visible; filter: drop-shadow(0 0 14px color-mix(in oklab, var(--color-accent) 28%, transparent)); }
+
+  /* The same slow "pulling thread" motion as KnotMark. */
+  .knot-ring__thread { stroke-dasharray: 220; stroke-dashoffset: 0; }
+  .knot-ring:not(.knot-ring--static) .knot-ring__thread--a { animation: knot-ring-flow 9s ease-in-out infinite; }
+  .knot-ring:not(.knot-ring--static) .knot-ring__thread--b { animation: knot-ring-flow 9s ease-in-out infinite; animation-delay: -4.5s; }
+  @keyframes knot-ring-flow {
+    0%, 100% { stroke-dashoffset: 0; }
+    50% { stroke-dashoffset: 60; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .knot-ring__thread { animation: none !important; }
+  }
 </style>

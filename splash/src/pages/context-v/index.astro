@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import { STATIC_SEO } from '@lib/seo';
 
@@ -50,7 +50,7 @@ const groups: Group[] = [...groupMap.entries()]
   <header class="archive-topbar">
     <div class="container archive-topbar__inner">
       <a class="archive-topbar__brand" href={base}>
-        <KnotMark size={28} static />
+        <KnotMarkRing size={28} static />
         <span class="mono">astro-knots</span>
       </a>
       <ModeToggle />

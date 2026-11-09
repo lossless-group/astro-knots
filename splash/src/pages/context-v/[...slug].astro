@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import { getSiteOgImage } from '@lib/seo';
 
@@ -47,7 +47,7 @@ const articleTags = entry.data.tags;
   <header class="reading-topbar">
     <div class="container reading-topbar__inner">
       <a class="reading-topbar__brand" href={base}>
-        <KnotMark size={28} static />
+        <KnotMarkRing size={28} static />
         <span class="mono">astro-knots</span>
       </a>
       <ModeToggle />
