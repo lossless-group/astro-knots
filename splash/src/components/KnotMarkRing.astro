@@ -1,0 +1,60 @@
+---
+/**
+ * KnotMarkRing — the knot held in a ring: the square mark used for the
+ * favicon and app icons (public/icons/knot-ring-*.svg). Like KnotMark, the
+ * strokes read live theme tokens, so it recolors with light, dark and vibrant.
+ *
+ * `tile` adds the rounded-square background, as the app icon has.
+ */
+
+interface Props {
+  /** Width/height in pixels. Default 56. */
+  size?: number;
+  /** Draw the rounded-square tile behind it, like the app icon. */
+  tile?: boolean;
+}
+
+const { size = 56, tile = false } = Astro.props;
+---
+
+<svg
+  class:list={['knot-ring', { 'knot-ring--tile': tile }]}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id="knot-ring-a" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-accent)" />
+      <stop offset="100%" stop-color="var(--color-thread)" />
+    </linearGradient>
+    <linearGradient id="knot-ring-b" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-thread)" />
+      <stop offset="100%" stop-color="var(--color-accent-warm)" />
+    </linearGradient>
+    <linearGradient id="knot-ring-r" x1="0" y1="64" x2="64" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-accent-warm)" />
+      <stop offset="50%" stop-color="var(--color-thread)" />
+      <stop offset="100%" stop-color="var(--color-accent)" />
+    </linearGradient>
+  </defs>
+
+  {tile && <rect width="64" height="64" rx="14" class="knot-ring__tile" />}
+  <circle cx="32" cy="32" r="26" stroke="url(#knot-ring-r)" stroke-width="4.4" />
+  <g transform="translate(32 32) scale(0.86) translate(-32 -30)" stroke-width="5.8">
+    <path d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18" stroke="url(#knot-ring-a)" />
+    <path d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#knot-ring-a)" />
+    <path d="M 12 18 C 12 30 24 30 32 22" stroke="url(#knot-ring-b)" />
+    <path d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#knot-ring-b)" />
+  </g>
+</svg>
+
+<style>
+  .knot-ring { display: block; }
+  .knot-ring__tile { fill: var(--color-bg); }
+  .knot-ring--tile { filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--color-accent) 22%, transparent)); }
+</style>

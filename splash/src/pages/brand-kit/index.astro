@@ -1,0 +1,225 @@
+---
+// Brand kit for the astro-knots splash. Internal reference: noindex, not in
+// the public nav. Starts with the marks; colors, type and layouts to follow.
+import BaseLayout from '@layouts/BaseLayout.astro';
+import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
+import ModeToggle from '@components/ModeToggle.astro';
+
+const base = import.meta.env.BASE_URL;
+
+// The square icon explorations live outside public/ (design/knot-mark-square/),
+// so they're read at build time and shown as data URIs. Each stays its own
+// image: inlined, they'd share gradient ids and borrow each other's colors.
+const raw = import.meta.glob('../../../design/knot-mark-square/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
+const NOTES: Record<string, string> = {
+  '04-in-a-ring': 'The knot held in a ring. The favorite so far.',
+  '07-in-a-ring-bold': '04 tuned for 16px: heavier ring and knot, more air between them.',
+  '08-in-a-ring-dark': '07 on a dark tile in dark-mode colors. App icon, dark tabs.',
+  '09-in-a-ring-no-tile': 'Transparent, for browser tabs. Recolors for dark tabs on its own.',
+  '01-centered-tile': "Today's knot, centered on a tile, larger and thicker.",
+  '02-square-knot': 'Two linked rounded squares. Clearest at 16px, but reads as a link icon.',
+  '03-four-lobes': 'The knot and a copy turned 90°. Rich large, muddy small.',
+  '05-flexed': 'The knot stretched taller to fill the square.',
+  '06-square-knot-dark': '02 on a dark tile in dark-mode colors.',
+};
+const ORDER = Object.keys(NOTES);
+
+const icons = Object.entries(raw)
+  .map(([path, svg]) => {
+    const name = path.split('/').pop()!.replace(/\.svg$/, '');
+    return { name, note: NOTES[name] ?? '', src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` };
+  })
+  .sort((a, b) => {
+    const ia = ORDER.indexOf(a.name);
+    const ib = ORDER.indexOf(b.name);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+---
+
+<BaseLayout title="Brand kit" description="The astro-knots marks, colors and type." noindex>
+  <header class="archive-topbar">
+    <div class="container archive-topbar__inner">
+      <a class="archive-topbar__brand" href={base}>
+        <KnotMark size={28} static />
+        <span class="mono">astro-knots</span>
+      </a>
+      <ModeToggle />
+    </div>
+  </header>
+
+  <main class="container kit">
+    <header class="kit__head">
+      <p class="eyebrow">Internal reference</p>
+      <h1 class="display">Brand kit</h1>
+      <p class="kit__lede">
+        The marks first. Toggle the mode in the header to see the live knot recolor; the icon
+        explorations below are fixed-color files, as a favicon or app icon would be.
+      </p>
+    </header>
+
+    <section class="kit__section" id="marks">
+      <h2 class="display">The knot</h2>
+      <p class="kit__note">The live mark (<code>KnotMark.astro</code>), reading the theme tokens.</p>
+      <div class="kit__live">
+        <KnotMark size={160} />
+        <KnotMark size={64} static />
+        <KnotMark size={32} static />
+      </div>
+    </section>
+
+    <section class="kit__section" id="ring">
+      <h2 class="display">The ring: favicon and app icon</h2>
+      <p class="kit__note">
+        The square mark. Live (<code>KnotMarkRing.astro</code>), it reads the theme tokens and follows
+        the mode toggle. As files (<code>public/icons/</code>, from
+        <code>scripts/build-knot-icons.mjs</code>), there's one per mode; the browser tab swaps to
+        match the mode you pick.
+      </p>
+      <div class="kit__live">
+        <KnotMarkRing size={160} tile />
+        <KnotMarkRing size={64} tile />
+        <KnotMarkRing size={32} tile />
+        <KnotMarkRing size={64} />
+      </div>
+      <div class="ring-files">
+        {['light', 'dark', 'vibrant'].map((mode) => (
+          <figure class="ring-file">
+            <div class="icon__sizes">
+              <img src={`${base}icons/knot-ring-${mode}.svg`} width="120" height="120" alt={`Ring icon, ${mode} mode`} />
+              <img src={`${base}icons/knot-ring-${mode}.svg`} width="32" height="32" alt="" />
+              <img src={`${base}icons/knot-ring-${mode}.svg`} width="16" height="16" alt="" />
+            </div>
+            <figcaption class="mono">knot-ring-{mode}.svg</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section class="kit__section" id="square-icons">
+      <h2 class="display">Square icon explorations</h2>
+      <p class="kit__note">
+        Candidates for a favicon and app icon, from <code>splash/design/knot-mark-square/</code>. Each
+        at app-icon (180), 64, 32 and favicon (16) size, then in a light and a dark browser tab.
+      </p>
+
+      <div class="icons">
+        {icons.map((icon) => (
+          <article class:list={['icon', { 'icon--favorite': icon.name === '04-in-a-ring' }]}>
+            <h3 class="mono">{icon.name}</h3>
+            <p class="icon__note">{icon.note}</p>
+            <div class="icon__sizes">
+              <img src={icon.src} width="180" height="180" alt={`${icon.name} at 180px`} />
+              <img src={icon.src} width="64" height="64" alt="" />
+              <img src={icon.src} width="32" height="32" alt="" />
+              <img src={icon.src} width="16" height="16" alt="" />
+            </div>
+            <div class="icon__tabs">
+              <span class="tab tab--light"><img src={icon.src} width="16" height="16" alt="" />astro-knots</span>
+              <span class="tab tab--dark"><img src={icon.src} width="16" height="16" alt="" />astro-knots</span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .archive-topbar {
+    border-bottom: 1px solid var(--color-border);
+    padding: 14px 0;
+    background: color-mix(in oklab, var(--color-bg) 80%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .archive-topbar__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .archive-topbar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text);
+  }
+
+  .kit { padding: clamp(3rem, 8vh, 6rem) 0 var(--space-16); }
+  .kit__head { max-width: 720px; margin-bottom: var(--space-12); }
+  .kit__head h1 { margin-top: var(--space-3); font-size: clamp(2.25rem, 5vw, 3.5rem); }
+  .kit__lede { margin-top: var(--space-4); color: var(--color-text-soft); font-size: 1.05rem; }
+  .kit__section { margin-bottom: var(--space-16); }
+  .kit__section h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+  .kit__note { margin: var(--space-2) 0 var(--space-6); color: var(--color-text-soft); max-width: 70ch; }
+  .kit__note code, .kit__lede code { font-family: var(--font__mono); color: var(--color-accent); }
+  .kit__live {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+  }
+
+  .ring-files {
+    margin-top: var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--space-4);
+  }
+  .ring-file {
+    margin: 0;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+  }
+  .ring-file figcaption { margin-top: var(--space-3); font-size: 0.8rem; color: var(--color-text-dim); }
+
+  .icons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--space-4);
+  }
+  .icon {
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+  }
+  .icon--favorite { border-color: var(--color-border-accent); box-shadow: var(--shadow-glow); }
+  .icon h3 { font-size: 0.85rem; color: var(--color-text); }
+  .icon__note { margin: var(--space-2) 0 var(--space-4); color: var(--color-text-soft); font-size: 0.9rem; }
+  .icon__sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .icon__sizes img:first-child { max-width: 100%; height: auto; }
+  .icon__tabs { margin-top: var(--space-4); display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px 8px 0 0;
+    font-family: var(--font__sans);
+    font-size: 0.75rem;
+  }
+  /* Fixed browser-chrome colors: these mock real tabs, not the site's theme. */
+  .tab--light { background: #dedad2; color: #1f1f1f; }
+  .tab--dark { background: #2b2b30; color: #e8e8ea; }
+</style>
