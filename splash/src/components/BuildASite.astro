@@ -15,6 +15,7 @@ const guardrails = [
   'Rapid creativity, followed up by strong refactors',
   'Design system and component library, maintained',
 ];
+const contextV = { before: 'Pairs with ', link: 'context-v.dev', href: 'https://context-v.dev/', after: ' for memory and context layers' };
 ---
 
 <section id="build-a-site" class="section build">
@@ -96,6 +97,10 @@ const guardrails = [
             <span>{g}</span>
           </li>
         ))}
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+          <span>{contextV.before}<a href={contextV.href} target="_blank" rel="noopener" class="build__inline-link">{contextV.link}</a>{contextV.after}</span>
+        </li>
       </ul>
       <a href={MCP_REPO_URL} target="_blank" rel="noopener" class="build__repo mono">astro-knots-mcp on GitHub →</a>
     </div>
@@ -284,6 +289,13 @@ const guardrails = [
     stroke-linecap: round;
     stroke-linejoin: round;
   }
+  .build__inline-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+    text-underline-offset: 3px;
+  }
+  .build__inline-link:hover { text-decoration-color: var(--color-accent); }
   .build__repo { font-size: 0.85rem; color: var(--color-thread); }
 
   @media (prefers-reduced-motion: reduce) {
