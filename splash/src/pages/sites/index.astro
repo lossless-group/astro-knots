@@ -3,20 +3,13 @@
 // so the homepage can lead with what Astro Knots is for.
 import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
+import HighlightGrid from '@components/HighlightGrid.astro';
 import KnotMarkRing from '@components/KnotMarkRing.astro';
 import ModeToggle from '@components/ModeToggle.astro';
-import SiteCard from '@components/SiteCard.astro';
 import { STATIC_SEO } from '@lib/seo';
 
 const base = import.meta.env.BASE_URL;
-
-// Sorted by `order`, alphabetical fallback. Featured first via order.
-const sites = (await getCollection('site-highlights')).sort((a, b) => {
-  const oa = a.data.order ?? 999;
-  const ob = b.data.order ?? 999;
-  if (oa !== ob) return oa - ob;
-  return a.id.localeCompare(b.id);
-});
+const sites = await getCollection('site-highlights');
 ---
 
 <BaseLayout title={STATIC_SEO.sitesIndex.title} description={STATIC_SEO.sitesIndex.description}>
@@ -40,28 +33,12 @@ const sites = (await getCollection('site-highlights')).sort((a, b) => {
       </p>
       <p class="archive__back mono">
         <a href={base}>← Back to splash</a>
+        <span class="dim"> · </span>
+        <a href={`${base}splashes/`}>See the splash pages →</a>
       </p>
     </header>
 
-    <div class="sites-grid">
-      {sites.map((s) => (
-        <div class={s.data.featured ? 'sites-cell sites-cell--wide' : 'sites-cell'}>
-          <SiteCard
-            title={s.data.title ?? s.id}
-            slug={s.id}
-            lede={s.data.lede}
-            status={s.data.status}
-            repo={s.data.repo}
-            liveUrl={s.data.live_url ?? (s.data as { production_url?: string }).production_url}
-            icon={s.data.icon}
-            featured={s.data.featured}
-            tags={s.data.tags}
-            threadColor={s.data.thread_color}
-            maintainedBy={s.data.maintained_by}
-          />
-        </div>
-      ))}
-    </div>
+    <HighlightGrid items={sites} />
   </main>
 </BaseLayout>
 
@@ -93,25 +70,5 @@ const sites = (await getCollection('site-highlights')).sort((a, b) => {
   .archive__head h1 { margin-top: var(--space-3); font-size: clamp(2.25rem, 5vw, 3.5rem); }
   .archive__lede { margin-top: var(--space-4); color: var(--color-text-soft); font-size: 1.05rem; }
   .archive__back { margin-top: var(--space-6); font-size: 0.875rem; }
-
-  /* Featured sites span wide on large screens. */
-  .sites-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-4);
-  }
-  .sites-cell {
-    grid-column: span 3;
-    display: flex;
-  }
-  .sites-cell--wide { grid-column: span 6; }
-  .sites-cell > :global(.site-card) { width: 100%; }
-  @media (min-width: 900px) {
-    .sites-cell--wide { grid-column: span 3; }
-    .sites-cell { grid-column: span 2; }
-  }
-  @media (max-width: 640px) {
-    .sites-grid { grid-template-columns: 1fr; }
-    .sites-cell, .sites-cell--wide { grid-column: span 1; }
-  }
+  .archive__back .dim { color: var(--color-text-dim); }
 </style>

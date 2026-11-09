@@ -77,6 +77,11 @@ export const STATIC_SEO = {
     description:
       'The family of Astro sites built on Astro Knots patterns. Each is its own repo and deploys on its own.',
   } satisfies SeoEntry,
+  splashesIndex: {
+    title: 'The splash pages',
+    description:
+      'Every repo in the Lossless tree with a front page of its own: what it is, its changelog and notes, built from Astro Knots patterns.',
+  } satisfies SeoEntry,
   changelogIndex: {
     title: 'Changelog',
     description:
