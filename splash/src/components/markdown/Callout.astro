@@ -1,0 +1,50 @@
+---
+// Callout — structural component for LFM/remark-callouts directives.
+//
+// Receives a `containerDirective` MDAST node where `node.name === "callout"`.
+// All variant data (label, icon, accent color) lives in `callout-types.ts` and
+// `callout.css`. This file only handles structure: header row + body slot.
+//
+// Two attribute shapes from the upstream remark-callouts plugin:
+//   - `node.attributes.type` — the bracketed type, e.g. "warning" from `[!warning]`
+//   - `node.attributes.title` — author-supplied title (line 1 of the callout)
+//
+// If `title` is absent, we fall back to the type's default label. To suppress
+// the header row entirely, the author can write `[!warning]-` (Obsidian's
+// foldable/empty-title syntax) which arrives here as title=`""`.
+import AstroMarkdown from "./AstroMarkdown.astro";
+import { resolveCalloutType, getCalloutMeta } from "./callout-types";
+
+export interface Props {
+  node: any;
+  data?: any;
+}
+
+const { node, data } = Astro.props as Props;
+const attrs = node.attributes ?? {};
+const type = resolveCalloutType(attrs.type);
+const meta = getCalloutMeta(type);
+
+// Empty string ("") = author explicitly asked for no header.
+// Undefined / missing = use the default label.
+const headerText: string | null =
+  attrs.title === ""        ? null
+  : attrs.title             ? attrs.title
+  : meta.label;
+
+const children = Array.isArray(node?.children) ? node.children : [];
+---
+
+<style is:global>@import "./callout.css";</style>
+
+<aside class={`ak-callout ak-callout--${type}${headerText === null ? " ak-callout--no-header" : ""}`} role="note">
+  <span class="ak-callout-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" set:html={meta.iconPaths} />
+  </span>
+
+  {headerText && <div class="ak-callout-header">{headerText}</div>}
+
+  <div class="ak-callout-body">
+    {children.map((child: any) => <AstroMarkdown node={child} data={data} />)}
+  </div>
+</aside>
