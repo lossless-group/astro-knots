@@ -70,7 +70,7 @@ export const STATIC_SEO = {
   root: {
     title: 'Best-in-class websites, battle-tested patterns',
     description:
-      'Battle-tested patterns for best-in-class websites that any agent, developer, or n00b can follow. An alternative to Wix, Squarespace and Webflow.',
+      'Battle-tested patterns for best-in-class websites that you, or your agent, can follow. Own your site instead of renting it from Wix or Squarespace.',
   } satisfies SeoEntry,
   sitesIndex: {
     title: 'The sites',

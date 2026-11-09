@@ -35,16 +35,18 @@ try {
 }
 
 const outOfTheBox = [
-  'Develops high-quality sites quickly, but refactors to manageable code.',
-  'Honors mode, theme, brand kit and design system.',
-  'Practices SEO and GEO, and is always aware of share optics. Includes dynamically generated share images if asked.',
-  'Includes the best way to manage content in Markdown imaginable. Plays nice with Obsidian.',
+  'Builds fast, then cleans up after itself: quick drafts become tidy, reusable code.',
+  'Respects your modes, theme, brand kit and design system.',
+  'Ready for search engines, AI answers and good-looking link previews, with share images made to order.',
+  'The best way to keep content in Markdown, and it plays nicely with Obsidian.',
 ];
 
 const stats = [
-  { value: sites.length.toString(), label: 'Astro sites tied together' },
-  { value: '3', label: 'Modes (light · dark · vibrant)' },
-  { value: '1', label: 'Real published package (LFM)' },
+  { value: sites.length.toString(), label: 'Astro sites built this way' },
+  { value: '3', label: 'Modes: light, dark, vibrant' },
+  { value: '1', label: 'Published package: LFM →', href: 'https://lossless-group.github.io/lossless-flavored-markdown-package/' },
+  { value: '1', label: 'MCP server for any agent →', href: '#build-a-site' },
+  { value: '1', label: 'Plugin for Claude Code & Codex →', href: '#build-a-site' },
 ];
 
 const candor = [
@@ -106,13 +108,13 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
           <div class="hero__mark"><KnotMark size={120} /></div>
           <h1 class="hero__title">
             <span class="display">Build an awesome</span>
-            <span class="display gradient-text">content-driven website!</span>
+            <span class="display gradient-text">content-driven website.</span>
           </h1>
         </div>
 
         <p class="hero__lede">
-          A battle-tested set of patterns for best-in-class websites, any agent, developer, or n00b
-          can follow.
+          Battle-tested patterns for best-in-class websites. Your agent can follow them, and so can
+          you, whether you've shipped a hundred sites or this is your first.
         </p>
 
         <div class="hero__actions">
@@ -124,15 +126,14 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
 
         <div class="pitch">
           <div class="pitch__why">
-            <h2 class="display pitch__question">Why have your website stuck in a platform?</h2>
+            <h2 class="display pitch__question">Why rent your website from a platform?</h2>
             <p>
-              An alternative to Wix, Squarespace, Weebly and Webflow, for those unafraid or eager for
-              Generative AI cooperation.
+              Wix, Squarespace, Weebly and Webflow keep your site on their terms. If you're happy to build
+              with AI, you can own the whole thing instead.
             </p>
             <p>
-              No need to re-invent the wheel. <strong>Developers</strong>, all the true rigor is built in
-              from the start. <strong>Amateurs</strong>, get creative and get going knowing you are doing it
-              right.
+              No need to reinvent the wheel. <strong>Developers:</strong> the rigor is built in from day
+              one. <strong>Beginners:</strong> get creative and get going, knowing you're doing it right.
             </p>
           </div>
 
@@ -145,12 +146,18 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
         </div>
 
         <ul class="hero__stats">
-          {stats.map((s) => (
-            <li>
-              <span class="hero__stat-value display">{s.value}</span>
-              <span class="hero__stat-label">{s.label}</span>
-            </li>
-          ))}
+          {stats.map((s) => {
+            const Tag = s.href ? 'a' : 'div';
+            const external = s.href?.startsWith('http');
+            return (
+              <li>
+                <Tag class="hero__stat-link" href={s.href} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>
+                  <span class="hero__stat-value display">{s.value}</span>
+                  <span class="hero__stat-label">{s.label}</span>
+                </Tag>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
@@ -408,7 +415,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
   .hero__stats {
     margin-top: var(--space-16);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: var(--space-6);
     list-style: none;
     padding: var(--space-6) 0 0;
@@ -434,6 +441,12 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
     font-size: 0.85rem;
     letter-spacing: 0.04em;
   }
+  .hero__stat-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .hero__stat-link:hover .hero__stat-label { color: var(--color-accent); }
 
   /* BUTTONS */
   .btn {

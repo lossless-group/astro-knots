@@ -28,11 +28,20 @@ const guardrails = [
 
     <div class="build__grid">
       <div class="build__prompt">
-        <label class="build__label mono" for="setup-prompt">1 · Copy this prompt into your agent</label>
+        <div class="build__prompt-head">
+          <label class="build__label mono" for="setup-prompt">1 · Copy this prompt into your agent</label>
+          <button type="button" class="build__copy mono" data-copy-target="setup-prompt" aria-live="polite">
+            <svg class="build__copy-icon build__copy-icon--copy" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" rx="2.5"></rect>
+              <path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"></path>
+            </svg>
+            <svg class="build__copy-icon build__copy-icon--done" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5"></path>
+            </svg>
+            <span class="build__copy-text">Copy prompt</span>
+          </button>
+        </div>
         <textarea id="setup-prompt" class="build__textarea mono" readonly rows="14">{prompt}</textarea>
-        <button type="button" class="btn btn--primary build__copy" data-copy-target="setup-prompt">
-          Copy the prompt
-        </button>
         <p class="build__fine">
           Works in the Claude Code CLI, the Codex CLI and the ChatGPT desktop app (not Codex's IDE
           extension). Recommended along the way: an Ideogram key, so your agent can keep making images
@@ -82,9 +91,13 @@ const guardrails = [
         target.select();
         document.execCommand('copy');
       }
-      const was = button.textContent;
-      button.textContent = 'Copied. Paste it into your agent.';
-      setTimeout(() => (button.textContent = was), 2500);
+      const label = button.querySelector('.build__copy-text');
+      button.classList.add('is-copied');
+      if (label) label.textContent = 'Copied. Now paste it';
+      setTimeout(() => {
+        button.classList.remove('is-copied');
+        if (label) label.textContent = 'Copy prompt';
+      }, 2500);
     });
   }
 </script>
@@ -120,7 +133,53 @@ const guardrails = [
     border-radius: var(--radius-md);
   }
   .build__textarea:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .build__copy { margin-top: var(--space-4); }
+
+  .build__prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
+  .build__prompt-head .build__label { margin-bottom: 0; }
+  .build__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 9px 18px 9px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--gradient-thread);
+    color: var(--color-bg);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+  .build__copy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 32px color-mix(in oklab, var(--color-accent) 35%, transparent);
+  }
+  .build__copy:active { transform: translateY(0); }
+  .build__copy:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  .build__copy-icon {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .build__copy-icon--done { display: none; }
+  .build__copy.is-copied .build__copy-icon--copy { display: none; }
+  .build__copy.is-copied .build__copy-icon--done { display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .build__copy, .build__copy:hover { transition: none; transform: none; }
+  }
   .build__fine {
     margin-top: var(--space-4);
     color: var(--color-text-dim);
