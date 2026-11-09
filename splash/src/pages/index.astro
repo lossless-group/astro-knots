@@ -6,6 +6,7 @@ import KnotDivider from '@components/KnotDivider.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import SiteCard from '@components/SiteCard.astro';
 import TokenSwatchRow from '@components/TokenSwatchRow.astro';
+import BuildASite from '@components/BuildASite.astro';
 import { STATIC_SEO } from '@lib/seo';
 
 const base = import.meta.env.BASE_URL;
@@ -75,6 +76,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
       </a>
       <nav class="topbar__nav" aria-label="Primary">
         <a href="#sites">Sites</a>
+        <a href="#build-a-site">Build a site</a>
         <a href={`${base}design-variants/`}>Design variants</a>
         <a href="#tokens">Tokens</a>
         <a href="#candor">Candor</a>
@@ -110,6 +112,7 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
 
         <div class="hero__actions">
           <a href="#sites" class="btn btn--primary">See the lattice</a>
+          <a href="#build-a-site" class="btn btn--ghost">Build one with your agent</a>
           <a href={repoUrl} target="_blank" rel="noopener" class="btn btn--ghost">View on GitHub →</a>
           <p class="hero__hint mono">↑ try the mode toggle, watch everything pivot.</p>
         </div>
@@ -160,6 +163,11 @@ const repoUrl = 'https://github.com/lossless-group/astro-knots';
         </div>
       </div>
     </section>
+
+    <KnotDivider />
+
+    <!-- BUILD A SITE -->
+    <BuildASite />
 
     <!-- TOKEN DEMO -->
     <section id="variants" class="section">

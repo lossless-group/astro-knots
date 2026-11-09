@@ -3,8 +3,8 @@ title: "Maintain Design System and Brand Kit Motions"
 lede: >-
   Every Astro-Knots site ships `/brand-kit` for stakeholders and `/design-system` for developers — this is the scope split and the upkeep.
 date_created: 2026-04-25
-date_modified: 2026-04-25
-date_last_updated: 2026-04-25
+date_modified: 2026-11-09
+date_last_updated: 2026-11-09
 use_index: 3
 status: Draft
 category: Blueprints
@@ -16,7 +16,7 @@ augmented_with:
 site_uuid: 456c5528-3bbd-4abe-89c6-42f5a68e0505
 hex_code: 6tj75h
 date_authored_initial_draft: 2026-04-25
-date_authored_current_draft: 2026-04-25
+date_authored_current_draft: 2026-11-09
 publish: true
 type: Blueprints
 ---
@@ -150,7 +150,20 @@ The pages decay if no one tends to them. The motions that keep them alive:
 1. **New component → Design System update in the same PR.** Don't merge a component without adding it to `/design-system` (even if just a stub linking to the source file).
 2. **Brand evolution → Brand Kit update first.** New token, new font, new mark — Brand Kit is updated before the change ships to other pages, so there's a single page proving the new brand reads correctly across modes.
 3. **Theme/mode bug surfaced → reproduce in Brand Kit or Design System first.** If a component breaks in vibrant mode, the catalog is where the regression lives until fixed.
-4. **AI assistant creating components.** The assistant should be instructed (via `CLAUDE.md` or prompt) to update the relevant catalog entry whenever it introduces a new component or variant. This is the motion that replaces Storybook discipline.
+4. **AI assistant creating components.** The assistant should be instructed (via `CLAUDE.md` or prompt) to update the relevant catalog entry whenever it introduces a new component or variant. This is the motion that replaces Storybook discipline. The procedure is now a skill: `maintain-design-system-page`.
+5. **Spike, then refactor into components** (added 2026-11-09). See §7.1.
+
+### 7.1 Where catalog entries come from: spike, then refactor
+
+Coding agents are "faster" and "better" when building new features, pages and UI without thinking about the existing component library. So the agent makes a **gametime decision** to use the library or not. When the emphasis is to be creative, we usually break free of it, then **refactor back into it** once the work is approved. The design system has two halves, and the refactor covers both: **back into the component library** (extract components, reusing or extending existing ones before creating new ones, and catalog each here in the same change) and **back onto the theme** (every hard-coded color, font and effect becomes a named token in `theme.css` read through a semantic token, defined for all three modes, and shown on `/brand-kit`).
+
+The refactor is the discipline most developers forget, and it slows the team down later: one-off markup, the same card built four ways, a catalog that no longer describes the site. Three things keep it from being forgotten:
+
+- **Spikes are marked** with an `@spike <name>` comment in each file they create, so the debt is visible.
+- **`knot-check components`** (astro-knots-mcp) lists open spikes, every component no `/design-system` page mentions, and every raw color or font left outside the theme files.
+- **The refactor is its own task**, often handed to a separate agent (the Astro Knots plugin's `component-refactorer` in Claude Code), with behavior locked by a snapshot test before anything moves.
+
+Full procedure: the `spike-then-refactor-into-components` skill.
 
 ---
 
@@ -188,3 +201,4 @@ When adding these pages to a new site:
 - **Brand Kit reference implementations:** `sites/hypernova-site/src/pages/brand-kit/`, `sites/twf_site/src/pages/brand-kit/`.
 - **Design System reference implementation:** `sites/dark-matter/src/pages/design-system/` (most expansive sub-page structure).
 - [New Site Quickstart Guide](../prompts/New-Site-Quickstart-Guide.md) — barebones onboarding instructions for both pages.
+- Skills (in lossless-agent-skills): `maintain-design-system-page` (the procedure for these pages) and `spike-then-refactor-into-components` (§7.1).

@@ -1,0 +1,164 @@
+---
+// "Build a site": the copy-a-prompt setup for astro-knots-mcp, plus the
+// install commands for people who'd rather run them by hand.
+import { INSTALL, MCP_REPO_URL, MCP_URL, setupPrompt } from '@lib/astro-knots-mcp';
+
+const prompt = setupPrompt();
+const guardrails = [
+  'Astro, with Svelte only where it needs to be interactive',
+  'No React, no JSX habits: checked on every edit',
+  'Markdown through Lossless Flavored Markdown',
+  'Tests first, with Vitest',
+  'Light, dark and vibrant modes from two-tier tokens',
+  'Share images that fit iMessage, WhatsApp and the feeds',
+];
+---
+
+<section id="build-a-site" class="section build">
+  <div class="container">
+    <header class="section__head">
+      <p class="eyebrow">Build one yourself</p>
+      <h2 class="display">Tie your own knot, <span class="gradient-text">with your agent.</span></h2>
+      <p class="section__lede">
+        The patterns behind these sites, packaged for Claude Code and Codex: skills your agent
+        loads when it needs them, and a check that catches React habits the moment they're
+        written. Paste one prompt and your agent sets itself up, then asks what you're building.
+      </p>
+    </header>
+
+    <div class="build__grid">
+      <div class="build__prompt">
+        <label class="build__label mono" for="setup-prompt">1 · Copy this prompt into your agent</label>
+        <textarea id="setup-prompt" class="build__textarea mono" readonly rows="14">{prompt}</textarea>
+        <button type="button" class="btn btn--primary build__copy" data-copy-target="setup-prompt">
+          Copy the prompt
+        </button>
+        <p class="build__fine">
+          Works in the Claude Code CLI, the Codex CLI and the ChatGPT desktop app (not Codex's IDE
+          extension). Recommended along the way: an Ideogram key, so your agent can keep making images
+          that match your site.
+        </p>
+      </div>
+
+      <div class="build__manual">
+        <p class="build__label mono">2 · Or install it yourself</p>
+
+        <article class="build__card">
+          <h3 class="display">Claude Code</h3>
+          <pre class="build__code mono"><code>{INSTALL.claudeCode.join('\n')}</code></pre>
+        </article>
+
+        <article class="build__card">
+          <h3 class="display">Codex</h3>
+          <pre class="build__code mono"><code>{INSTALL.codex.join('\n')}</code></pre>
+          <p class="build__note">Codex runs a plugin's hooks only once you've trusted them in <code>/hooks</code>.</p>
+        </article>
+
+        {MCP_URL && (
+          <article class="build__card">
+            <h3 class="display">Any MCP client</h3>
+            <pre class="build__code mono"><code>{MCP_URL}</code></pre>
+            <p class="build__note">A remote server with no sign-in. It stores nothing about you.</p>
+          </article>
+        )}
+
+        <ul class="build__list">
+          {guardrails.map((g) => <li>{g}</li>)}
+        </ul>
+        <a href={MCP_REPO_URL} target="_blank" rel="noopener" class="build__repo mono">astro-knots-mcp on GitHub →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy-target]')) {
+    button.addEventListener('click', async () => {
+      const target = document.getElementById(button.dataset.copyTarget ?? '') as HTMLTextAreaElement | null;
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.value);
+      } catch {
+        target.select();
+        document.execCommand('copy');
+      }
+      const was = button.textContent;
+      button.textContent = 'Copied. Paste it into your agent.';
+      setTimeout(() => (button.textContent = was), 2500);
+    });
+  }
+</script>
+
+<style>
+  .build__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .build__grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  .build__label {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-dim);
+    margin-bottom: var(--space-3);
+  }
+  .build__textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 18rem;
+    resize: vertical;
+    padding: var(--space-4);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--color-text);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+  }
+  .build__textarea:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .build__copy { margin-top: var(--space-4); }
+  .build__fine {
+    margin-top: var(--space-4);
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    max-width: 60ch;
+  }
+  .build__manual {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .build__card {
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+  }
+  .build__card h3 { font-size: 1rem; margin-bottom: var(--space-2); }
+  .build__code {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--color-accent);
+  }
+  .build__note {
+    margin-top: var(--space-2);
+    font-size: 0.82rem;
+    color: var(--color-text-soft);
+  }
+  .build__note code { font-family: var(--font__mono); color: var(--color-accent); }
+  .build__list {
+    margin: var(--space-2) 0 0;
+    padding-left: 1.1rem;
+    color: var(--color-text-soft);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .build__repo { font-size: 0.85rem; color: var(--color-thread); }
+</style>
