@@ -79,3 +79,7 @@
 [submodule "mcps/astro-knots-mcp"]
 	path = mcps/astro-knots-mcp
 	url = https://github.com/lossless-group/astro-knots-mcp.git
+[submodule "sites/thrifty-energy"]
+	path = sites/thrifty-energy
+	url = https://github.com/lossless-group/thrifty-energy.git
+	branch = main

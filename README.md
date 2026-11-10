@@ -42,6 +42,7 @@ _Listted in the order of their recency and likely relevance to future projects_
 | hypernova-site | [hypernova-labs/hypernova-site](https://github.com/hypernova-labs/hypernova-site) | Active | Client site |
 | dark-matter | [lossless-group/matter-site](https://github.com/lossless-group/matter-site) | Active | Client site |
 | twf_site | [lossless-group/the-water-foundation-site](https://github.com/lossless-group/the-water-foundation-site) | Active | The Water Foundation |
+| thrifty-energy | [lossless-group/thrifty-energy](https://github.com/lossless-group/thrifty-energy) | Active | Client site, [thrifty.energy](https://thrifty.energy/) |
 | cilantro-site | [lossless-group/cilantro-site](https://github.com/lossless-group/cilantro-site) | Active | Client site, strong reference implementation |
 | cogs-site | | In progress | |
 | coglet-shuffle | | In progress | Nested astro-site |
