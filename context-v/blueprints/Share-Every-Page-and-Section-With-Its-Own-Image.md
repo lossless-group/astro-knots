@@ -11,7 +11,7 @@ authors:
   - Michael Staton
 augmented_with:
   - Claude Code on Claude Opus 5.5
-at_semantic_version: 0.0.1.0
+at_semantic_version: 0.0.2.0
 category: Blueprints
 type: Blueprints
 tags:
@@ -81,6 +81,46 @@ src/utils/share.ts                       shareOrCopy(): one helper for both butt
    so a static build writes every card to `dist/og/`. No runtime, no cold starts,
    no Vercel-only APIs.
 
+## Designing the cards
+
+The cards are seen small: in a chat thread, beside other cards, and on
+WhatsApp as a square cropped from the middle of the tall card. Design for that,
+not for the JPEG on your laptop. These rules came from Cathode's first cards in
+a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
+
+- **Keep the card tall (3:4) and balance the space.** Mark at the top, footer
+  at the bottom. With a photo, the photo is a band across the top 56% and the
+  text sits just under it. Without one, the text is centered. A card that
+  leaves room for a photo it doesn't have looks empty.
+- **Anchor a photo where its subject is.** Event banners are wide and usually
+  composed with the subject on one side. Use `objectPosition: 'left center'`
+  (or the side that fits), never the default center crop, which can leave
+  nothing but background.
+- **Size type for a phone.** On a 1080px tall card, titles run about 132px
+  (short) down to 68px (long), subtitles 42px, kicker and footer 30px or more.
+  Step long titles down early so they fit under the photo band.
+- **Keep wide-card text off the photo.** Photo on the right 58%, text capped at
+  about half the width.
+- **One universal card for the site.** The home page, and any page without its
+  own card, gets a big-type card after lfg-hub's default
+  (`ai-labs/dididecks-ai/client-sites/lfg-hub/public/ogimage__LFG-Hub--Default.jpg`):
+  mark top left, a bracketed kicker, the headline as large as the frame allows
+  with its last word in the accent color, one line under it, and a ruled footer
+  (site name left, tagline and domain right). Put its content in the middle
+  third, so WhatsApp's square crop still shows the headline. In Cathode it's
+  `layout: 'universal'` on the card, with `accent` naming the highlighted words.
+- **Check at preview size before shipping.** Resize the tall card to 480px high
+  and crop its center square to 200px; if the headline doesn't read in both,
+  it isn't done. Then send yourself the link.
+
+## Share buttons people find
+
+- **A share icon beside the page title.** It's the most-used share on the page,
+  so it sits inline in the h1, sized from the title, in the accent color.
+- **Section share buttons are always visible.** A button that only appears on
+  hover is one nobody finds, and phones don't hover. Use a share icon (arrow
+  out of a tray), not a link icon, when the button shares rather than copies.
+
 ## Rules that bit us
 
 - **Satori reads TTF, OTF and WOFF. Not WOFF2, not EOT.** Google Fonts serves EOT
@@ -113,10 +153,13 @@ cards without photos, or only for h2.
 ## Reference implementation
 
 `astro-knots/sites/cathode-site` (repo `lossless-group/cathode-site`), shipped
-2026-11-17. Start there; copy and adapt the files listed above.
+2026-11-17. Start there; copy and adapt the files listed above. The universal
+card is `universal()` in `src/lib/og-render.ts`; the title share icon is
+`<ShareButton icon />` in `src/components/ui/ShareButton.astro`.
 
 ## See also
 
 - [[Maintain-an-Elegant-Open-Graph-System]]: the page-level metadata architecture this extends
+- [[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]: what the first cards got wrong in iMessage
 - `lfm/context-v/specs/Maintain-Heading-Anchors-and-Share-Links.md`: heading ids as data
 - The `open-graph-share-seo-geo` skill: unfurl rules, JPEG over WebP, tall-first
