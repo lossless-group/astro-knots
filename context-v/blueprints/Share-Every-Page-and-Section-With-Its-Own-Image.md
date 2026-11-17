@@ -120,6 +120,11 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
 - **Section share buttons are always visible.** A button that only appears on
   hover is one nobody finds, and phones don't hover. Use a share icon (arrow
   out of a tray), not a link icon, when the button shares rather than copies.
+- **Confirm every copy with a toast.** On desktop a copy is silent, so it
+  looks like nothing happened. Show "Link copied", the heading (for a section)
+  or page title, and the copied link, for about three seconds, as
+  `role="status"`. Skip it when the native share sheet opened. Cathode:
+  `showShareToast()` in `src/utils/share.ts`.
 
 ## Rules that bit us
 
