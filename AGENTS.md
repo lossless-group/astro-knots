@@ -109,6 +109,10 @@ Each site in `sites/*`:
   `@astrojs/netlify` once an endpoint needs an adapter), never `vercel.json`.
   The host is the only difference: Cathode and Thrifty still render markdown
   with `@lossless-group/lfm`; edviro-blog keeps Edviro's MDX.
+- **`cathode-site` deploys from Edviro's fork, `Edviro-YC/cathode-site`,** not
+  from `lossless-group/cathode-site`. Work lands in ours on `development`, then
+  goes across as a PR into Edviro's fork (merge commit), and all three branches
+  are synced in both repos. See `sites/cathode-site/AGENTS.md`.
 
 **What the workspace provides:**
 - See all sites together for pattern comparison
