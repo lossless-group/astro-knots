@@ -149,6 +149,19 @@ Both pages use the standard `BaseThemeLayout` and surface the theme + mode toggl
 
 `design-system-viewer/` — An older internal tool (not deployed) for visualizing tokens, icons, and components across the workspace. Currently minimal scaffolding on Astro 6 + Tailwind 4. The aspiration was a shared micro-frontend that each site could embed, but the in-site `/design-system` pattern (above) has largely superseded it. Kept around as a sandbox.
 
+## Standard Equipment: Every Site Ships These
+
+Any site that renders long-form markdown ships all of these from day one. They are
+not per-site features to be asked for; an agent scaffolding or touching a site adds
+whichever are missing, and puts each in `/design-system` in the same change.
+
+| Equipment | What it is | Blueprint | Copy from |
+|---|---|---|---|
+| **Table of contents** | Left rail on wide screens, burger on laptops, a top bar naming the current section on phones; built from LFM's `tree.data.headings`, never the DOM | [Standard ToC](context-v/blueprints/Standard-Table-of-Contents-for-Every-Markdown-Collection.md) | `sites/cathode-site` (`TableOfContents*.astro`, `table-of-contents.*`), `sites/fullstack-vc` |
+| **Share images** | A tall og:image and a wide twitter:image for every page, plus a universal big-type site card | [Share Every Page and Section](context-v/blueprints/Share-Every-Page-and-Section-With-Its-Own-Image.md) | `sites/cathode-site` (`lib/share-cards.ts`, `lib/og-render.ts`) |
+| **Share buttons** | An icon beside the page title, an always-visible share icon on each h2/h3 that shares the section's own card, and a "Link copied" toast | same | `sites/cathode-site` (`ShareButton.astro`, `HeadingAnchor.astro`, `utils/share.ts`) |
+| **Search** | Pagefind, built at build time | `maintain-splash-pages` skill | `sites/cathode-site` |
+
 ## Starting a New Site
 
 See the full guide: **`context-v/prompts/New-Site-Quickstart-Guide.md`**
