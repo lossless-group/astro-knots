@@ -15,7 +15,7 @@ summary: >-
 type: Issues
 publish: true
 date_created: 2026-11-09
-date_modified: 2026-11-09
+date_modified: 2026-11-17
 date_authored_initial_draft: 2026-11-09
 date_authored_current_draft: 2026-11-09
 date_authored_final_draft:
@@ -180,12 +180,29 @@ immediate fix works on Pages: remove the wide `og:image` block, keep the tall
 one and `twitter:image`, then re-share with `?v=2` (iMessage caches per URL
 for days). It goes upstream, since the live site is the parent repo's.
 
+## Update, 2026-11-17: the static default works in iMessage
+
+cathode-site shipped with exactly the static default above: one tall
+1080×1440 `og:image` per page and the wide card in `twitter:image` only.
+Shared in iMessage, a write-up showed as a clean tall card with its own photo
+and title, no mixing
+([the card](https://cathode.co/og/tall/log/energy-management-is-a-data-discipline-7x24-fall-2026.jpg)).
+So iMessage reads the single `og:image` and ignores `twitter:image`, which can
+stay. edviro-blog shipped the same head the same day, and its
+`scripts/check-seo.mjs` now fails any page that breaks it. How those cards are
+made: [[Share-Every-Page-and-Section-With-Its-Own-Image]].
+
+Still open: the edge layer for LinkedIn and other wide-first crawlers, the
+FantasyGM fix upstream, and the `knot-check` rule.
+
 ## Done when
 
-- [ ] Reproduced on an iPhone, and the cause confirmed: a single tall
+- [x] Reproduced on an iPhone, and the cause confirmed: a single tall
       `og:image` (with the wide `twitter:image`) gives a clean tall card, two
       `og:image` tags give the mixed one. Also confirm iMessage ignores
       `twitter:image`; if it doesn't, the static default drops it.
+      (Single-tall half confirmed on cathode-site, 2026-11-17; iMessage ignores
+      `twitter:image`.)
 - [ ] FantasyGM's head fixed upstream, and a fresh share looks right.
 - [ ] The edge layer built and running on one Cloudflare-hosted site, with
       a test that requests the page as each crawler in the table and checks

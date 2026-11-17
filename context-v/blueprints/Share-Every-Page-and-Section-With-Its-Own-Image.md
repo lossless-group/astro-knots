@@ -11,7 +11,7 @@ authors:
   - Michael Staton
 augmented_with:
   - Claude Code on Claude Opus 5.5
-at_semantic_version: 0.0.2.0
+at_semantic_version: 0.0.3.0
 category: Blueprints
 type: Blueprints
 tags:
@@ -22,7 +22,7 @@ tags:
   - Astro-Knots
 site_uuid: b5382bd4-e3a8-4737-9639-ed0c48a6a215
 hex_code: h0y0h2
-summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementation: sites/cathode-site (2026-11-17). Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
+summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementations: sites/cathode-site (dark brand, LFM) and sites/edviro-blog (light brand, Astro MDX), both 2026-11-17. Build-time cards rendered in the site itself are the default for any site with more than a handful of pages; Ideogram art and hero screenshots are for the one-off site card only. Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
 ---
 
 # Share Every Page and Every Section With Its Own Image
@@ -52,6 +52,43 @@ on a static site, with no server.
   h2/h3 shares the section's page. On a phone they open the native share sheet; on
   desktop they copy the link.
 
+## Proven in a real thread
+
+This is the tall card for one Cathode write-up, as iMessage showed it on
+2026-11-17: the event's photo anchored on its subject, the type readable at
+thumbnail size, and the page's own title instead of a generic site card.
+
+![Cathode's tall share card for "Energy management is a data discipline, says Uptime": a globe photo across the top, a green kicker naming the 7x24 Exchange Fall 2026 Conference, the title in large white type, and a one-line summary](https://cathode.co/og/tall/log/energy-management-is-a-data-discipline-7x24-fall-2026.jpg)
+
+## Build the cards in the site, at build time
+
+This is the default way to make share images on an Astro Knots site. Generate
+every card from the site's own content, in the site's own repo, during
+`astro build`:
+
+- **One card per page costs nothing extra.** An illustrated or screenshotted
+  card has to be made by hand for each page, so in practice every page shares the
+  same one. A card built from content exists for every page, event and section
+  the moment the content does.
+- **No runtime.** The endpoint is static (`getStaticPaths`), so the JPEGs are
+  plain files in `dist/`. There is no server to keep warm and no host-specific
+  API. The same code deployed on Netlify (cathode-site, edviro-blog) and would
+  on Vercel. This replaces the request-time Playwright screenshots in
+  `specs/Dynamic-OpenGraph-Images.md`.
+- **Tall by default.** Each page gets one `og:image`, the tall 1080×1440 card,
+  and the wide card goes in `twitter:image` only. iMessage and WhatsApp show the
+  tall card large; X uses the wide one. See
+  [[iPhone-Share-Previews-Conflate-the-Tall-and-Wide-Banners]] for why there is
+  never a second `og:image`.
+- **The brand comes along.** The renderer restates the site's Tier 1 color
+  values and uses its fonts and logo, so the cards match the site. On a site
+  with a hand-made brand card, keep it as the site card's wide image and
+  generate the tall one to match (edviro-blog does this).
+
+Use Ideogram (the `generate-consistent-og-images` skill) for artwork a page
+deserves on its own, such as a splash page or a deck. Even then, emit it as the
+page's tall `og:image` and the wide variant as `twitter:image`.
+
 ## How it works
 
 ```text
@@ -77,7 +114,13 @@ src/utils/share.ts                       shareOrCopy(): one helper for both butt
    `<AstroMarkdown node={tree} data={{ shareBase, shareDepths: [2, 3], shareTitle }} />`.
    `AstroMarkdown` already threads `data` through every recursive render; the
    heading branch hands `shareUrl={shareBase + id + '/'}` to `HeadingAnchor`.
-4. **Images are built, not served.** The `.jpg.ts` endpoint uses `getStaticPaths`,
+4. **Sites without LFM read Astro's headings instead.** edviro-blog renders
+   Edviro's own MDX, so its registry takes `headings` from Astro's
+   `render(entry)` (the same slugs as the DOM ids), and a small component places
+   a button after each matching heading inside the article. One approach then
+   covers `.md` write-ups and `.mdx` articles, which can't share a component
+   override. Which headings get a button is still decided at build time.
+5. **Images are built, not served.** The `.jpg.ts` endpoint uses `getStaticPaths`,
    so a static build writes every card to `dist/og/`. No runtime, no cold starts,
    no Vercel-only APIs.
 
@@ -109,6 +152,10 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
   (site name left, tagline and domain right). Put its content in the middle
   third, so WhatsApp's square crop still shows the headline. In Cathode it's
   `layout: 'universal'` on the card, with `accent` naming the highlighted words.
+- **On a light brand, keep the photo off the logo.** A dark logo over a photo
+  disappears. edviro-blog puts the logo on white at the top, the photo as a
+  rounded inset under it, and the text below; the footer is the grey band from
+  Edviro's brand card. Dark brands (Cathode) can run the photo behind the mark.
 - **Check at preview size before shipping.** Resize the tall card to 480px high
   and crop its center square to 200px; if the headline doesn't read in both,
   it isn't done. Then send yourself the link.
@@ -136,6 +183,17 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
   sized container; without one, long titles run off the edge.
 - **Position with top/left and an explicit inner size, not padding.** Padding on
   an absolutely positioned full-size box pushed the footer off the bottom.
+- **Clamp by lines, not characters.** Cutting a subtitle at N characters
+  stops mid-word ("A school b…") and still overflows when the words are long.
+  Give the text block `display: 'block'` and `lineClamp: 2` (titles 3 to 4);
+  satori ends the last line with an ellipsis.
+- **A full-width box with padding is wider than the card.** A footer of
+  `width: cardWidth` plus horizontal padding ran its right-hand text off the
+  edge ("Backed by Y Comb"). Put an inner box at `left: pad`,
+  `width: cardWidth - 2 * pad` instead.
+- **Size inline share icons from the heading.** A `<button>` doesn't inherit the
+  heading's font size, so an icon sized in `em` comes out tiny. Set
+  `font-size: inherit` on the button.
 - **Ship JPEG.** resvg writes PNG; convert with sharp. JPEG is what every unfurler
   handles and the smallest for photo-backed cards (see the JPEG-over-WebP rule in
   the `open-graph-share-seo-geo` skill).
@@ -155,12 +213,21 @@ added about 45 seconds, mostly fetching and resizing background photos. Images
 are cached per build. If a site grows to thousands of sections, render section
 cards without photos, or only for h2.
 
-## Reference implementation
+## Reference implementations
 
-`astro-knots/sites/cathode-site` (repo `lossless-group/cathode-site`), shipped
-2026-11-17. Start there; copy and adapt the files listed above. The universal
-card is `universal()` in `src/lib/og-render.ts`; the title share icon is
-`<ShareButton icon />` in `src/components/ui/ShareButton.astro`.
+- **`astro-knots/sites/cathode-site`** (repo `lossless-group/cathode-site`),
+  shipped 2026-11-17. Dark brand, LFM-rendered write-ups, photo behind the mark.
+  The universal card is `universal()` in `src/lib/og-render.ts`; the title share
+  icon is `<ShareButton icon />` in `src/components/ui/ShareButton.astro`.
+- **`astro-knots/sites/edviro-blog`** (repo `lossless-group/edviro-blog`, merged
+  into `Edviro-YC/edviro-blog` as PR #4), shipped the same day. Light brand,
+  Astro MDX articles and `.md` write-ups, sections from `render().headings` via
+  `src/components/share/SectionShareButtons.astro`. Satori plus sharp only, no
+  resvg. Its `scripts/check-seo.mjs` asserts the tall `og:image`, a matching
+  `og:image:type` and the wide `twitter:image` on every page; copy that check.
+
+Start from whichever matches your site's renderer and brand, and copy and adapt
+the files listed above.
 
 ## See also
 
