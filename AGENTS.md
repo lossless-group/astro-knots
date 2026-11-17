@@ -105,7 +105,7 @@ Each site in `sites/*`:
 - Must have all necessary code in its own repo to deploy independently
 - Deploys via Vercel (or similar) by watching its own repo
 - **Exception: Edviro-family sites deploy on Netlify, not Vercel.** `thrifty-energy`,
-  `cathode` and `edviro-blog` follow the client's host: use `netlify.toml` (and
+  `cathode-site` and `edviro-blog` follow the client's host: use `netlify.toml` (and
   `@astrojs/netlify` once an endpoint needs an adapter), never `vercel.json`.
   The host is the only difference: Cathode and Thrifty still render markdown
   with `@lossless-group/lfm`; edviro-blog keeps Edviro's MDX.

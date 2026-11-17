@@ -43,14 +43,14 @@ _Listted in the order of their recency and likely relevance to future projects_
 | dark-matter | [lossless-group/matter-site](https://github.com/lossless-group/matter-site) | Active | Client site |
 | twf_site | [lossless-group/the-water-foundation-site](https://github.com/lossless-group/the-water-foundation-site) | Active | The Water Foundation |
 | thrifty-energy | [lossless-group/thrifty-energy](https://github.com/lossless-group/thrifty-energy) | Active | Client site, [thrifty.energy](https://thrifty.energy/) |
-| cathode | [lossless-group/cathode](https://github.com/lossless-group/cathode) | In progress | Client site, cathode.co. Data center sub-brand on the Edviro platform |
+| cathode-site | [lossless-group/cathode-site](https://github.com/lossless-group/cathode-site) | In progress | Client site, cathode.co. Data center sub-brand on the Edviro platform |
 | edviro-blog | [lossless-group/edviro-blog](https://github.com/lossless-group/edviro-blog) | Active | Private fork of Edviro's blog, served at edviro.com/blog/ |
 | mandatory-ventures | [lossless-group/mandatory-ventures-site](https://github.com/lossless-group/mandatory-ventures-site) | In progress | Client site |
 | cilantro-site | [lossless-group/cilantro-site](https://github.com/lossless-group/cilantro-site) | Active | Client site, strong reference implementation |
 | cogs-site | | In progress | |
 | coglet-shuffle | | In progress | Nested astro-site |
 
-All sites deploy independently from their own repos, via Vercel by default. **Edviro-family sites deploy on Netlify instead:** `thrifty-energy`, `cathode` and `edviro-blog` use `netlify.toml`, never `vercel.json`. Only the host changes: Cathode and Thrifty still render markdown with `@lossless-group/lfm` (edviro-blog keeps Edviro's MDX).
+All sites deploy independently from their own repos, via Vercel by default. **Edviro-family sites deploy on Netlify instead:** `thrifty-energy`, `cathode-site` and `edviro-blog` use `netlify.toml`, never `vercel.json`. Only the host changes: Cathode and Thrifty still render markdown with `@lossless-group/lfm` (edviro-blog keeps Edviro's MDX).
 
 ## Published Packages
 
