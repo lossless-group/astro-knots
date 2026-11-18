@@ -1,0 +1,109 @@
+---
+// CrossReferenceContentEmbed — a section of another document, shown in this one.
+//
+// Renders LFM's `cross-reference-embed` node (`![[Note#Heading]]`, see
+// @lossless-group/lfm's docs-v/cross-reference-embeds.md). Named for what it
+// is, so it doesn't collide with other embeds (link previews, media). The content reads as part of the page: same type, same
+// spacing, no box. A thin rule down the left side and a small source line say
+// it comes from somewhere else, and "Open original" links to that document.
+//
+// When the document or section couldn't be found, LFM still sends the node,
+// empty, with `status` saying why; this shows one quiet line and the link.
+import AstroMarkdown from "./AstroMarkdown.astro";
+
+interface Props {
+  node: any;
+  data?: any;
+}
+
+const { node, data } = Astro.props;
+const embed = node.data?.crossReferenceEmbed ?? {};
+const children: any[] = Array.isArray(node.children) ? node.children : [];
+const found = embed.status === "ok" && children.length > 0;
+const missing =
+  embed.status === "missing-section"
+    ? `The section “${embed.section}” isn’t in ${embed.title}.`
+    : embed.status === "too-deep"
+      ? `${embed.title} is embedded too many levels deep to show here.`
+      : `${embed.title} couldn’t be found.`;
+---
+
+<aside class="lfm-xref-embed" data-embed-status={embed.status} aria-label={`From ${embed.title}`}>
+  <p class="lfm-xref-embed__source">
+    <span class="lfm-xref-embed__from">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />
+        <path d="M14 4h6v6" />
+        <path d="M20 4 11 13" />
+      </svg>
+      From <cite>{embed.title}</cite>{/* The section's own heading follows, so it's named here only when it's missing. */}{!found && embed.section && <span class="lfm-xref-embed__section"> · {embed.section}</span>}
+    </span>
+    {embed.url && (
+      <a class="lfm-xref-embed__open" href={embed.url}>Open original</a>
+    )}
+  </p>
+
+  {found ? (
+    <div class="lfm-xref-embed__body">
+      {children.map((child) => <AstroMarkdown node={child} data={data} />)}
+    </div>
+  ) : (
+    <p class="lfm-xref-embed__missing">{missing}</p>
+  )}
+</aside>
+
+<style>
+  .lfm-xref-embed {
+    margin: 1.75rem 0;
+    padding: 0.1rem 0 0.1rem 1.1rem;
+    border-left: 2px solid color-mix(in srgb, var(--color-primary, currentColor) 45%, transparent);
+  }
+
+  .lfm-xref-embed__source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin: 0 0 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .lfm-xref-embed__from svg {
+    width: 0.9em;
+    height: 0.9em;
+    margin-right: 0.3em;
+    vertical-align: -0.1em;
+  }
+
+  .lfm-xref-embed__from cite {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--color-text, inherit);
+  }
+
+  .lfm-xref-embed__open {
+    color: var(--color-primary, currentColor);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .lfm-xref-embed__open::after {
+    content: " ↗";
+  }
+  .lfm-xref-embed__open:hover {
+    text-decoration: underline;
+  }
+
+  /* The embedded section's own heading sits a touch closer to the source line. */
+  .lfm-xref-embed__body > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  .lfm-xref-embed__missing {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+</style>
