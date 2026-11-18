@@ -1,0 +1,95 @@
+/*
+ * reader.css — type for reading content: what AstroMarkdown renders for an
+ * article, write-up or doc. Wrap that output in `<div class="reader">`.
+ *
+ * One body size and one ratio decide every size. Each heading level up is the
+ * level below times the ratio:
+ *
+ *   h5 = body   h4 = body × r   h3 = body × r²   h2 = body × r³
+ *   page title = body × r⁴ … r⁵, growing with the viewport
+ *
+ * So changing `--reader-size` or `--reader-ratio` (here, or in a site's theme)
+ * resizes every heading, margin and title with it. Phones get a gentler ratio
+ * so headings don't wrap into towers.
+ *
+ * Headings use the display face; reading copy uses the reader face. A site
+ * sets both in its theme (Tier 2 tokens):
+ *   --font-display   headings, e.g. Geist
+ *   --font-reader    body copy, e.g. a serif
+ *
+ * Copied from astro-knots/packages/lfm-astro/components/reader.css. Sites keep
+ * the algorithm and change only the tokens.
+ */
+
+:root {
+  --reader-size: 1.125rem; /* body copy; everything else scales from it */
+  --reader-ratio: 1.25; /* major third: each heading level ×1.25 */
+  --reader-leading: 1.7;
+
+  --reader-r1: var(--reader-ratio);
+  --reader-r2: calc(var(--reader-r1) * var(--reader-ratio));
+  --reader-r3: calc(var(--reader-r2) * var(--reader-ratio));
+  --reader-r4: calc(var(--reader-r3) * var(--reader-ratio));
+  --reader-r5: calc(var(--reader-r4) * var(--reader-ratio));
+}
+
+@media (max-width: 640px) {
+  :root {
+    --reader-size: 1.0625rem;
+    --reader-ratio: 1.2;
+  }
+}
+
+.reader {
+  font-family: var(--font-reader, var(--font-body, serif));
+  font-size: var(--reader-size);
+  line-height: var(--reader-leading);
+}
+
+/* Sizes in em of the reader's body size; margins in em of each heading's own
+   size, so a bigger heading gets proportionally more room above it. */
+.reader :where(h2, h3, h4, h5, h6) {
+  font-family: var(--font-display, inherit);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--color-text, inherit);
+  margin: 1.6em 0 0.45em;
+  text-wrap: balance;
+}
+.reader h2 {
+  font-size: calc(var(--reader-r3) * 1em);
+  letter-spacing: -0.025em;
+  margin-top: 1.5em;
+}
+.reader h3 {
+  font-size: calc(var(--reader-r2) * 1em);
+  letter-spacing: -0.02em;
+}
+.reader h4 {
+  font-size: calc(var(--reader-r1) * 1em);
+}
+.reader h5 {
+  font-size: 1em;
+}
+.reader h6 {
+  font-size: 0.875em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, inherit);
+}
+.reader > :where(h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+
+/* The page title, outside .reader: one step above h2 on phones, two on wide screens. */
+.reader-title {
+  font-family: var(--font-display, inherit);
+  font-size: clamp(
+    calc(var(--reader-size) * var(--reader-r4)),
+    1rem + 3.6vw,
+    calc(var(--reader-size) * var(--reader-r5))
+  );
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
