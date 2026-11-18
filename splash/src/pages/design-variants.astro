@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import SiteCard from '@components/SiteCard.astro';
 import { STATIC_SEO } from '@lib/seo';
@@ -85,7 +85,7 @@ const constraints = [
 <BaseLayout title={STATIC_SEO.designVariants.title} description={STATIC_SEO.designVariants.description}>
   <header class="topbar">
     <a href={base} class="topbar__brand">
-      <KnotMark size={28} />
+      <KnotMarkRing size={28} />
       <span class="mono">astro-knots</span>
     </a>
     <nav class="topbar__nav">

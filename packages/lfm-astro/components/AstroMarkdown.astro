@@ -5,6 +5,7 @@ import CodeBlock from "./CodeBlock.astro";
 import Callout from "./Callout.astro";
 import MarkdownImage from "./MarkdownImage.astro";
 import HeadingAnchor from "./HeadingAnchor.astro";
+import CrossReferenceContentEmbed from "./CrossReferenceContentEmbed.astro";
 
 export interface Props {
   node: Root | Content;
@@ -90,9 +91,13 @@ function childrenOf(n: any): any[] {
 
 {type === "listItem" && (
   <li>
-    {childrenOf(node).map((child) => (
-      <Astro.self node={child} data={data} />
-    ))}
+    {/* A tight list (no blank lines between items) keeps its text bare, as
+        CommonMark renders it; only loose items get <p>. */}
+    {childrenOf(node).map((child) =>
+      child.type === "paragraph" && !(node as any).spread
+        ? childrenOf(child).map((inline) => <Astro.self node={inline} data={data} />)
+        : <Astro.self node={child} data={data} />
+    )}
   </li>
 )}
 
@@ -143,19 +148,16 @@ function childrenOf(n: any): any[] {
 {type === "table" && (
   <div class="ak-table-wrap">
     <table>
-      {childrenOf(node).map((child, idx) => {
-        if (idx === 0) {
-          return (
-            <thead>
-              <Astro.self node={child} data={data} />
-            </thead>
-          );
-        }
-        return null;
-      })}
+      {/* The first row is the header: its cells are <th>. Column alignment
+          from the |:--:| row travels down to every cell. */}
+      {childrenOf(node).slice(0, 1).map((child) => (
+        <thead>
+          <Astro.self node={child} data={{ ...data, tableHeader: true, tableAlign: (node as any).align }} />
+        </thead>
+      ))}
       <tbody>
         {childrenOf(node).slice(1).map((child) => (
-          <Astro.self node={child} data={data} />
+          <Astro.self node={child} data={{ ...data, tableHeader: false, tableAlign: (node as any).align }} />
         ))}
       </tbody>
     </table>
@@ -164,19 +166,24 @@ function childrenOf(n: any): any[] {
 
 {type === "tableRow" && (
   <tr>
-    {childrenOf(node).map((child) => (
-      <Astro.self node={child} data={data} />
+    {childrenOf(node).map((child, col) => (
+      <Astro.self node={child} data={{ ...data, tableCol: col }} />
     ))}
   </tr>
 )}
 
-{type === "tableCell" && (
-  <td>
-    {childrenOf(node).map((child) => (
-      <Astro.self node={child} data={data} />
-    ))}
-  </td>
-)}
+{type === "tableCell" && (() => {
+  const Tag = data?.tableHeader ? "th" : "td";
+  const align = data?.tableAlign?.[data?.tableCol];
+  const inner = { ...data, tableHeader: undefined, tableAlign: undefined, tableCol: undefined };
+  return (
+    <Tag style={align ? `text-align: ${align}` : undefined}>
+      {childrenOf(node).map((child) => (
+        <Astro.self node={child} data={inner} />
+      ))}
+    </Tag>
+  );
+})()}
 
 {type === "delete" && (
   <del>
@@ -212,6 +219,10 @@ function childrenOf(n: any): any[] {
   if (directive.name === "image") {
     return <MarkdownImage node={directive} data={data} />;
   }
+  // ![[Note#Heading]]: a section of another document (LFM `crossReferenceEmbeds`).
+  if (directive.name === "cross-reference-embed") {
+    return <CrossReferenceContentEmbed node={directive} data={data} />;
+  }
   // Fallback: render children as-is
   return (
     <div>
@@ -227,8 +238,11 @@ function childrenOf(n: any): any[] {
   if (directive.name === "badge") {
     return <span class="ak-badge">{childrenOf(directive).map((child) => toString(child))}</span>;
   }
-  // Fallback: just render inner text
-  return <>{childrenOf(directive).map((child) => toString(child))}</>;
+  // Unknown inline directive: print it as written rather than dropping it,
+  // so text that only looked like a directive still reads.
+  const label = childrenOf(directive).length ? `[${childrenOf(directive).map((child) => toString(child)).join("")}]` : "";
+  const attrs = Object.entries(directive.attributes ?? {}).map(([k, v]) => `${k}="${v}"`).join(" ");
+  return <>{`:${directive.name}${label}${attrs ? `{${attrs}}` : ""}`}</>;
 })()}
 
 {/* Fallback for unhandled node types: render children only */}

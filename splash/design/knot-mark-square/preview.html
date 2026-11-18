@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knot mark: square explorations</title>
+<style>
+  :root { --bg: #f6f1e6; --ink: #0c0c14; --muted: #6b665c; }
+  body { margin: 0; padding: 32px 16px; font: 15px/1.5 ui-sans-serif, system-ui, sans-serif; background: #e9e4d9; color: var(--ink); }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  p { margin: 0 0 24px; color: var(--muted); max-width: 70ch; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: #fff; border-radius: 14px; padding: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 14px; font-family: ui-monospace, monospace; }
+  .sizes { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+  .sizes img { display: block; }
+  .dark { background: #0c0c14; border-radius: 8px; padding: 6px; display: flex; gap: 8px; align-items: flex-end; }
+  .tab { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px 8px 0 0; background: #dedad2; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Knot mark: square explorations</h1>
+<p>New files only; KnotMark.astro and public/favicon.svg are untouched. Each variant at app-icon (180), 64, 32 and favicon (16) sizes, plus how it sits in a browser tab.</p>
+<div class="grid" id="grid"></div>
+<script>
+  const files = ["04-in-a-ring", "07-in-a-ring-bold", "08-in-a-ring-dark", "09-in-a-ring-no-tile", "01-centered-tile", "02-square-knot", "03-four-lobes", "05-flexed", "06-square-knot-dark"];
+  const grid = document.getElementById("grid");
+  for (const f of files) {
+    const src = `${f}.svg`;
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h2>${f}</h2>
+      <div class="sizes">
+        <img src="${src}" width="180" height="180" alt="">
+        <img src="${src}" width="64" height="64" alt="">
+        <img src="${src}" width="32" height="32" alt="">
+        <img src="${src}" width="16" height="16" alt="">
+      </div>
+      <p style="margin:12px 0 0"><span class="tab"><img src="${src}" width="16" height="16" alt="">astro-knots</span></p>`;
+    grid.appendChild(card);
+  }
+</script>
+</body>
+</html>

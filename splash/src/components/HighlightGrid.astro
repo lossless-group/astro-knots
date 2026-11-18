@@ -1,0 +1,63 @@
+---
+// HighlightGrid — the card grid for /sites/ and /splashes/. Takes entries from
+// either highlights collection (same card shape) and lays them out, featured
+// cards wider on large screens.
+import type { CollectionEntry } from 'astro:content';
+import SiteCard from '@components/SiteCard.astro';
+
+interface Props {
+  items: CollectionEntry<'site-highlights'>[] | CollectionEntry<'splash-highlights'>[];
+}
+
+const { items } = Astro.props;
+
+// Sorted by `order`, alphabetical fallback. Featured first via order.
+const sorted = [...items].sort((a, b) => {
+  const oa = a.data.order ?? 999;
+  const ob = b.data.order ?? 999;
+  if (oa !== ob) return oa - ob;
+  return a.id.localeCompare(b.id);
+});
+---
+
+<div class="sites-grid">
+  {sorted.map((s) => (
+    <div class={s.data.featured ? 'sites-cell sites-cell--wide' : 'sites-cell'}>
+      <SiteCard
+        title={s.data.title ?? s.id}
+        slug={s.id}
+        lede={s.data.lede}
+        status={s.data.status}
+        repo={s.data.repo}
+        liveUrl={s.data.live_url ?? (s.data as { production_url?: string }).production_url}
+        icon={s.data.icon}
+        featured={s.data.featured}
+        tags={s.data.tags}
+        threadColor={s.data.thread_color}
+        maintainedBy={s.data.maintained_by}
+      />
+    </div>
+  ))}
+</div>
+
+<style>
+  .sites-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-4);
+  }
+  .sites-cell {
+    grid-column: span 3;
+    display: flex;
+  }
+  .sites-cell--wide { grid-column: span 6; }
+  .sites-cell > :global(.site-card) { width: 100%; }
+  @media (min-width: 900px) {
+    .sites-cell--wide { grid-column: span 3; }
+    .sites-cell { grid-column: span 2; }
+  }
+  @media (max-width: 640px) {
+    .sites-grid { grid-template-columns: 1fr; }
+    .sites-cell, .sites-cell--wide { grid-column: span 1; }
+  }
+</style>

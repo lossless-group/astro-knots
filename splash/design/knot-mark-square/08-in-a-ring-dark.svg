@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 08 · 07 on a dark tile, in dark-mode colors: app icon and dark browser tabs. -->
+  <defs>
+    <linearGradient id="ka" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5b6fff"/><stop offset="100%" stop-color="#c8ff2e"/>
+    </linearGradient>
+    <linearGradient id="kb" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c8ff2e"/><stop offset="100%" stop-color="#ffb84d"/>
+    </linearGradient>
+    <linearGradient id="kr" x1="0" y1="64" x2="64" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffb84d"/><stop offset="50%" stop-color="#c8ff2e"/><stop offset="100%" stop-color="#5b6fff"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0c0c14"/>
+  <circle cx="32" cy="32" r="26" stroke="url(#kr)" stroke-width="4.4"/>
+  <g transform="translate(32 32) scale(0.86) translate(-32 -30)" stroke-width="5.8">
+    <path d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18" stroke="url(#ka)"/>
+    <path d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#ka)"/>
+    <path d="M 12 18 C 12 30 24 30 32 22" stroke="url(#kb)"/>
+    <path d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#kb)"/>
+  </g>
+</svg>

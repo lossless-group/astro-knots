@@ -9,13 +9,14 @@ date_first_published: null
 date_last_updated: 2025-10-13
 at_semantic_version: 0.0.1.1
 publish: false
-status: Deferred
+status: Superseded
+superseded_by: "[[Share-Every-Page-and-Section-With-Its-Own-Image]]"
 deferral_note: "From the doc's own status line: core functionality implemented, Vercel deployment pending resolution."
 augmented_with:
   - "Claude Sonnet 4 on Claude Code"
 category: Marketing-Site
 date_created: 2025-10-13
-date_modified: 2025-10-13
+date_modified: 2026-11-17
 authors:
   - Michael Staton
 image_prompt: "A view of inside a bus, where riders are looking down at their phones. Each rider is sharing websites and content on social media, and OpenGraph images are popping up above their head as if they are thought bubbles"
@@ -26,6 +27,13 @@ hex_code: 0q6q2b
 type: Specs
 ---
 # A System for Generating Dynamic OpenGraph Images based on Content and Variables
+
+> [!note] Superseded (2026-11-17)
+> The goal here, an image per page from its content, shipped another way:
+> satori renders every card at build time, so there is no request-time
+> Playwright screenshot, no SSR route and no Vercel adapter. See
+> [[Share-Every-Page-and-Section-With-Its-Own-Image]], live on cathode-site and
+> edviro-blog. Kept for the record of what the Playwright approach ran into.
 
 **Status:** Work in Progress - Core functionality implemented, Vercel deployment pending resolution
 

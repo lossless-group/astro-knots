@@ -104,6 +104,15 @@ Each site in `sites/*`:
 - Added to `pnpm-workspace.yaml` for development convenience only
 - Must have all necessary code in its own repo to deploy independently
 - Deploys via Vercel (or similar) by watching its own repo
+- **Exception: Edviro-family sites deploy on Netlify, not Vercel.** `thrifty-energy`,
+  `cathode-site` and `edviro-blog` follow the client's host: use `netlify.toml` (and
+  `@astrojs/netlify` once an endpoint needs an adapter), never `vercel.json`.
+  The host is the only difference: Cathode and Thrifty still render markdown
+  with `@lossless-group/lfm`; edviro-blog keeps Edviro's MDX.
+- **`cathode-site` deploys from Edviro's fork, `Edviro-YC/cathode-site`,** not
+  from `lossless-group/cathode-site`. Work lands in ours on `development`, then
+  goes across as a PR into Edviro's fork (merge commit), and all three branches
+  are synced in both repos. See `sites/cathode-site/AGENTS.md`.
 
 **What the workspace provides:**
 - See all sites together for pattern comparison
@@ -475,6 +484,20 @@ When a site needs a pattern from packages:
 2. **Copy file:** `cp packages/astro/src/components/Button.astro sites/twf_site/src/components/`
 3. **Adapt to site:** Adjust colors, sizes, styles for the site's brand
 4. **Site owns the code:** The copied file belongs to the site now
+
+### Standard Equipment: Every Site Ships These
+
+Any site that renders long-form markdown ships all of these from day one. They are
+not per-site features to be asked for; an agent scaffolding or touching a site adds
+whichever are missing, and puts each in `/design-system` in the same change.
+
+| Equipment | What it is | Blueprint | Copy from |
+|---|---|---|---|
+| **Table of contents** | Left rail on wide screens, burger on laptops, a top bar naming the current section on phones; built from LFM's `tree.data.headings`, never the DOM | [Standard ToC](context-v/blueprints/Standard-Table-of-Contents-for-Every-Markdown-Collection.md) | `sites/cathode-site` (`TableOfContents*.astro`, `table-of-contents.*`), `sites/fullstack-vc` |
+| **Reading type scale** | One body size and one ratio size every heading (h4 = size × r … h2 = × r³, title up to × r⁵); headings in the display face, copy in a reader face; LFM output wrapped in `.reader` | [Relative Type Scale](context-v/blueprints/Relative-Type-Scale-for-LFM-Reading-Content.md) | `packages/lfm-astro/components/reader.css`; `sites/cathode-site`, `sites/edviro-blog` |
+| **Share images** | A tall og:image and a wide twitter:image for every page, plus a universal big-type site card | [Share Every Page and Section](context-v/blueprints/Share-Every-Page-and-Section-With-Its-Own-Image.md) | `sites/cathode-site` (`lib/share-cards.ts`, `lib/og-render.ts`) |
+| **Share buttons** | An icon beside the page title, an always-visible share icon on each h2/h3 that shares the section's own card, and a "Link copied" toast | same | `sites/cathode-site` (`ShareButton.astro`, `HeadingAnchor.astro`, `utils/share.ts`) |
+| **Search** | Pagefind, as a spill-out palette: results under the bar, kind and tag chips, accent-colored matches (never browser yellow), section jumps, a sheet on phones. Use the Pagefind JS API, not the stock Pagefind UI | `maintain-splash-pages` skill | `sites/cathode-site` (`SearchBox.astro`, plain JS), `sites/lossless-toolkit-site` (`PagefindSearch.svelte`) |
 
 ### Adding a New Client Site
 

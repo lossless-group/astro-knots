@@ -1,0 +1,9 @@
+# ISOLATION: pnpm stops at the nearest workspace root, so this file keeps the
+# splash separate from any workspace above it. BUILD SCRIPTS: the approvals below
+# live here, and --ignore-workspace skips this file, so don't pass that flag.
+packages:
+  - '.'
+
+allowBuilds:
+  esbuild: true
+  sharp: true

@@ -79,3 +79,19 @@
 [submodule "mcps/astro-knots-mcp"]
 	path = mcps/astro-knots-mcp
 	url = https://github.com/lossless-group/astro-knots-mcp.git
+[submodule "sites/thrifty-energy"]
+	path = sites/thrifty-energy
+	url = https://github.com/lossless-group/thrifty-energy.git
+	branch = main
+[submodule "sites/edviro-blog"]
+	path = sites/edviro-blog
+	url = https://github.com/lossless-group/edviro-blog.git
+	branch = development
+[submodule "sites/cathode-site"]
+	path = sites/cathode-site
+	url = https://github.com/lossless-group/cathode-site.git
+	branch = development
+[submodule "sites/mandatory-ventures"]
+	path = sites/mandatory-ventures
+	url = https://github.com/lossless-group/mandatory-ventures-site.git
+	branch = development

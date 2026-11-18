@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 01 · Today's knot, recentred on a square tile, scaled up and thickened for 16px. -->
+  <defs>
+    <linearGradient id="ka" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#b3196a"/>
+    </linearGradient>
+    <linearGradient id="kb" x1="64" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#b3196a"/><stop offset="100%" stop-color="#d4900a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#f6f1e6"/>
+  <g transform="translate(32 32) scale(1.22) translate(-32 -30)" stroke-width="4.6">
+    <path d="M 12 32 C 12 18 24 14 32 22 C 40 30 52 30 52 18" stroke="url(#ka)"/>
+    <path d="M 52 18 C 52 30 40 30 32 38 C 24 46 12 46 12 32" stroke="url(#ka)"/>
+    <path d="M 12 18 C 12 30 24 30 32 22" stroke="url(#kb)"/>
+    <path d="M 32 38 C 40 46 52 46 52 32 C 52 18 40 14 32 22" stroke="url(#kb)"/>
+  </g>
+</svg>

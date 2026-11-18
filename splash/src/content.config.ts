@@ -36,11 +36,11 @@ const lenientBoolean = z.preprocess(
   z.boolean().optional(),
 );
 
-// ─── Site highlights (local, curated) ───────────────────────────────────────
+// ─── Site and splash highlights (local, curated) ────────────────────────────
+// Both use the same card shape: sites are the client and team websites,
+// splashes are each repo's own GitHub Pages (or Vercel) front page.
 
-const siteHighlights = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/site-highlights' }),
-  schema: z
+const highlightSchema = z
     .object({
       title: lenientString,
       lede: lenientString,
@@ -55,7 +55,16 @@ const siteHighlights = defineCollection({
       tags: lenientStringArray,
       maintained_by: lenientString,
     })
-    .passthrough(),
+    .passthrough();
+
+const siteHighlights = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/site-highlights' }),
+  schema: highlightSchema,
+});
+
+const splashHighlights = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/splash-highlights' }),
+  schema: highlightSchema,
 });
 
 // ─── Roll-up paths ──────────────────────────────────────────────────────────
@@ -238,6 +247,7 @@ const contextV = defineCollection({
 
 export const collections = {
   'site-highlights': siteHighlights,
+  'splash-highlights': splashHighlights,
   changelog,
   'context-v': contextV,
 };

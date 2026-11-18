@@ -1,7 +1,10 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
+import AstroMarkdown from '@components/markdown/AstroMarkdown.astro';
+import Sources from '@components/markdown/Sources.astro';
+import { renderable } from '@lib/markdown';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import KnotMark from '@components/KnotMark.astro';
+import KnotMarkRing from '@components/KnotMarkRing.astro';
 import ModeToggle from '@components/ModeToggle.astro';
 import { getSiteOgImage } from '@lib/seo';
 
@@ -15,7 +18,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { tree, citations } = await renderable(entry.body);
 const date = entry.data.date_modified ?? entry.data.date_created ?? entry.data.date;
 const base = import.meta.env.BASE_URL;
 
@@ -47,7 +50,7 @@ const articleTags = entry.data.tags;
   <header class="reading-topbar">
     <div class="container reading-topbar__inner">
       <a class="reading-topbar__brand" href={base}>
-        <KnotMark size={28} static />
+        <KnotMarkRing size={28} static />
         <span class="mono">astro-knots</span>
       </a>
       <ModeToggle />
@@ -83,7 +86,8 @@ const articleTags = entry.data.tags;
       </header>
 
       <div class="prose">
-        <Content />
+        <AstroMarkdown node={tree} />
+        {citations.length > 0 && <Sources citations={citations} />}
       </div>
     </article>
   </main>

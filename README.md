@@ -42,11 +42,15 @@ _Listted in the order of their recency and likely relevance to future projects_
 | hypernova-site | [hypernova-labs/hypernova-site](https://github.com/hypernova-labs/hypernova-site) | Active | Client site |
 | dark-matter | [lossless-group/matter-site](https://github.com/lossless-group/matter-site) | Active | Client site |
 | twf_site | [lossless-group/the-water-foundation-site](https://github.com/lossless-group/the-water-foundation-site) | Active | The Water Foundation |
+| thrifty-energy | [lossless-group/thrifty-energy](https://github.com/lossless-group/thrifty-energy) | Active | Client site, [thrifty.energy](https://thrifty.energy/) |
+| cathode-site | [lossless-group/cathode-site](https://github.com/lossless-group/cathode-site) | Active | Client site, cathode.co. Data center sub-brand on the Edviro platform. **Deploys on Netlify from [Edviro-YC/cathode-site](https://github.com/Edviro-YC/cathode-site)** (changes reach it by PR) |
+| edviro-blog | [lossless-group/edviro-blog](https://github.com/lossless-group/edviro-blog) | Active | Private fork of Edviro's blog, served at edviro.com/blog/ |
+| mandatory-ventures | [lossless-group/mandatory-ventures-site](https://github.com/lossless-group/mandatory-ventures-site) | In progress | Client site |
 | cilantro-site | [lossless-group/cilantro-site](https://github.com/lossless-group/cilantro-site) | Active | Client site, strong reference implementation |
 | cogs-site | | In progress | |
 | coglet-shuffle | | In progress | Nested astro-site |
 
-All sites deploy independently via Vercel from their own repos.
+All sites deploy independently from their own repos, via Vercel by default. **Edviro-family sites deploy on Netlify instead:** `thrifty-energy`, `cathode-site` and `edviro-blog` use `netlify.toml`, never `vercel.json`. Only the host changes: Cathode and Thrifty still render markdown with `@lossless-group/lfm` (edviro-blog keeps Edviro's MDX).
 
 ## Published Packages
 
@@ -144,6 +148,20 @@ Both pages use the standard `BaseThemeLayout` and surface the theme + mode toggl
 ## Design System Viewer
 
 `design-system-viewer/` — An older internal tool (not deployed) for visualizing tokens, icons, and components across the workspace. Currently minimal scaffolding on Astro 6 + Tailwind 4. The aspiration was a shared micro-frontend that each site could embed, but the in-site `/design-system` pattern (above) has largely superseded it. Kept around as a sandbox.
+
+## Standard Equipment: Every Site Ships These
+
+Any site that renders long-form markdown ships all of these from day one. They are
+not per-site features to be asked for; an agent scaffolding or touching a site adds
+whichever are missing, and puts each in `/design-system` in the same change.
+
+| Equipment | What it is | Blueprint | Copy from |
+|---|---|---|---|
+| **Table of contents** | Left rail on wide screens, burger on laptops, a top bar naming the current section on phones; built from LFM's `tree.data.headings`, never the DOM | [Standard ToC](context-v/blueprints/Standard-Table-of-Contents-for-Every-Markdown-Collection.md) | `sites/cathode-site` (`TableOfContents*.astro`, `table-of-contents.*`), `sites/fullstack-vc` |
+| **Reading type scale** | One body size and one ratio size every heading (h4 = size × r … h2 = × r³, title up to × r⁵); headings in the display face, copy in a reader face; LFM output wrapped in `.reader` | [Relative Type Scale](context-v/blueprints/Relative-Type-Scale-for-LFM-Reading-Content.md) | `packages/lfm-astro/components/reader.css`; `sites/cathode-site`, `sites/edviro-blog` |
+| **Share images** | A tall og:image and a wide twitter:image for every page, plus a universal big-type site card | [Share Every Page and Section](context-v/blueprints/Share-Every-Page-and-Section-With-Its-Own-Image.md) | `sites/cathode-site` (`lib/share-cards.ts`, `lib/og-render.ts`) |
+| **Share buttons** | An icon beside the page title, an always-visible share icon on each h2/h3 that shares the section's own card, and a "Link copied" toast | same | `sites/cathode-site` (`ShareButton.astro`, `HeadingAnchor.astro`, `utils/share.ts`) |
+| **Search** | Pagefind, as a spill-out palette: results under the bar, kind and tag chips, accent-colored matches (never browser yellow), section jumps, a sheet on phones. Use the Pagefind JS API, not the stock Pagefind UI | `maintain-splash-pages` skill | `sites/cathode-site` (`SearchBox.astro`, plain JS), `sites/lossless-toolkit-site` (`PagefindSearch.svelte`) |
 
 ## Starting a New Site
 

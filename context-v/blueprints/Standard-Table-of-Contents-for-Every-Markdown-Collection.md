@@ -5,7 +5,7 @@ lede: >-
 site_uuid: b64ab0c4-53c7-4e8f-ab59-f2fd55cd03fb
 hex_code: dt9uc8
 date_created: 2026-08-17
-date_modified: 2026-08-17
+date_modified: 2026-11-17
 status: Active
 category: Blueprints
 tags:
@@ -158,6 +158,22 @@ table-of-contents.client.ts    scrollspy, collapse, header measurement
 ```
 
 **Not split into `--` modifier siblings**, deliberately: the three states are viewport-driven, not author-chosen. All three render simultaneously and CSS decides. `--` is for variants an author picks (`ImageCarousel--Peek`).
+
+**Second implementation: `cathode-site`**, 2026-11-17, on its event-log
+write-ups. Copied from `fullstack-vc` with three changes worth keeping
+everywhere:
+
+- **Scrollspy scroll fallback.** The IntersectionObserver only fires when a
+  heading crosses the band, so a fast scroll or a reload part-way down that
+  jumps clean over one left the highlight stale or blank. A rAF-throttled
+  `scroll` listener now falls back to the last heading scrolled past whenever
+  no heading is in the band. `fullstack-vc` and `mpstaton-site` still lack it.
+- **The rail lines up with the site header.** The layout takes the site's full
+  container width (`.page-gutter`, 76rem) at ≥1280px, so the rail's left edge
+  sits under the logo; the prose column keeps its 48rem measure. Centering a
+  narrower box leaves the rail floating in from the edge on laptops.
+- **The site header carries `data-site-header`,** so the client script measures
+  the right element for its offset rather than the first `<header>` it finds.
 
 Two implementation notes that cost real time:
 
