@@ -1,6 +1,6 @@
 ---
 name: generate-site-design-variants
-description: Redesign a site as N complete, genuinely different design directions built in parallel against one shared content layer — working code, two-tier theming, three-mode contract, themed image assets, consistent stack — so a stakeholder can compare them like-for-like and retiring the losers is a delete rather than a refactor. Use whenever a prospective or existing client needs a redesign pitch, whenever the user says "three directions", "design variants", "show them some options", "redesign this site", "build a spike", "competing designs", or asks to generate multiple looks for one site; also when scaffolding the chooser/brand-kit/design-system surfaces those variants need. Encodes the spine-before-pixels ordering, the one-content-layer rule, per-direction Tier 2 theme files, the single-family themed-imagery pattern, constraint-in-code, and the no-cross-imports isolation that makes variants disposable.
+description: Redesign a site as N complete, genuinely different design directions built in parallel against one shared content layer — working code, two-tier theming, three-mode contract, themed image assets, consistent stack — so a stakeholder can compare them like-for-like and retiring the losers is a delete rather than a refactor. Use whenever a prospective or existing client needs a redesign pitch, whenever the user says "three directions", "design variants", "show them some options", "redesign this site", "build a spike", "competing designs", or asks to generate multiple looks for one site; also when scaffolding the chooser/brand-kit/design-system surfaces those variants need. Encodes the spine-before-pixels ordering, the live-client variant (status quo replicated at `/`, options under `/directions`, each a full design system kept clear of the system styles by a bare shell layout and a build-time isolation check), the one-content-layer rule, per-direction Tier 2 theme files, the single-family themed-imagery pattern, constraint-in-code, and the no-cross-imports isolation that makes variants disposable.
 ---
 
 # Generate Site Design Variants
@@ -65,7 +65,52 @@ src/pages/<direction-c>.astro
 `/` is an internal chooser. When a direction is picked it is promoted to `/` and
 the others are retired.
 
+#### Variant: a live client whose current site must hold steady
+
+When the site is live and the client wants to **chew on options before
+deciding**, the routing flips. Replicate the current site first and keep it at
+`/` until the group gives feedback; the options go under `/directions`.
+
+```
+src/pages/index.astro                       ← status quo: the live site, replicated. Holds `/`.
+src/pages/directions/index.astro            ← the chooser (internal, noindex)
+src/pages/directions/<slug>/index.astro     ← each option's homepage
+src/pages/directions/<slug>/design-system.astro
+src/directions/<slug>/                      ← each option's whole design: Layout, styles, components
+src/directions/registry.ts                  ← what the chooser lists
+```
+
+1. **Replicate before you redesign.** Scrape the live page (copy, image URLs,
+   a full-page screenshot) into the shared content layer and rebuild it as the
+   baseline. It is the yardstick every option is judged against, and the
+   chooser lists it first.
+2. **The status quo owns the system styles** (`src/styles/`). Leave it alone
+   while options are under review.
+3. **Each option is a full design system, not a Tier 2 theme.** An option may
+   change type, spacing, components and resets, not just colour, so it can't
+   inherit the system's global element styles. Suppress them structurally:
+   - Options render through a **bare shell layout** (`DirectionShell.astro`)
+     that imports no CSS. Astro ships only the CSS in a page's import graph, so
+     nothing from `src/styles/` reaches an option page unless something imports
+     it.
+   - Each option's `Layout.astro` imports its own `styles/index.css` and wraps
+     the shell. Every rule is scoped to `[data-direction="<slug>"]`.
+   - **Make the boundary executable.** Put a sentinel custom property in the
+     system theme (`--system-theme: …`) and a `--direction: <slug>` marker in
+     each option's stylesheet. A post-build script fails the build if an option
+     page contains the sentinel or another option's marker, or lacks its own.
+4. **Promotion is the same delete-and-move**, just later: the chosen option
+   replaces `/`, the status quo and the losing options are deleted.
+
+Reference: `astro-knots/sites/ai-camp-site/ai-camp-site-sidecar`
+(`src/layouts/DirectionShell.astro`, `src/directions/README.md`,
+`scripts/check-direction-isolation.mjs`).
+
 ### Phase 2 — Variants are themes, not forks
+
+> Under the live-client variant above, each option is a self-contained design
+> system instead. The theme pattern below still applies *inside* an option:
+> Tier 1 and Tier 2 tokens, scoped to that option.
 
 This is the load-bearing decision. A direction costs **one Tier 2 theme file**,
 not a copy of the component tree.
@@ -146,12 +191,16 @@ from one island.
 
 | Route | Audience | Contents |
 |---|---|---|
-| `/` | Internal / stakeholder | The chooser. Every direction, one click away. |
+| `/` | Internal / stakeholder | The chooser. Every direction, one click away. (Live-client variant: the status quo holds `/` and the chooser moves to `/directions`.) |
 | `/brand-kit` | Stakeholders, client marketing | Palette, type, mark, imagery, and where they came from. |
 | `/design-system` | Developers, agents | Component catalogue. **Direction *and* mode switchable at runtime.** |
 
 These replace Storybook. They ship inside the site, in the site's own theme and
 runtime, so they cannot drift from it.
+
+Under the live-client variant, each option carries its own catalogue at
+`/directions/<slug>/design-system`, rendered through that option's layout, since
+the options don't share a design system.
 
 ## Constraint-in-code — what makes agent output trustworthy
 
@@ -218,6 +267,9 @@ converging on the same safe layout.
 - [ ] Site-local lockfile + `vercel.json`; no `packageManager` pin
 - [ ] `robots noindex, nofollow` while the work is speculative
 - [ ] Confidential source material in `context-v/extra/` (gitignored)
+- [ ] Live-client variant: status quo at `/` matches the live site; the
+      isolation check runs in `pnpm build` and fails on a deliberately leaky
+      test option (prove it once, then delete the test option)
 
 ## Anti-patterns
 
@@ -232,6 +284,16 @@ family plus blend-mode dissolve, or draw it in code.
 
 **Reading `--color__*` from a component.** Breaks the one-line re-brand, which is
 the main thing the two-tier system buys.
+
+**Replacing a live client's homepage with the chooser.** When the client wants
+time with the options, the current site holds `/` and the options wait at
+`/directions`. Swapping `/` before they decide takes away the thing they're
+comparing against.
+
+**Letting the system theme leak into an option.** A shared global stylesheet
+(element resets, `body`, `h1`) silently restyles every option, and the
+comparison stops being fair. Bare shell layout, scoped styles, and a build-time
+check.
 
 **Building variants in separate repos or branches.** They must be reachable
 side-by-side at sibling routes or the comparison never actually happens.

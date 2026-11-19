@@ -95,3 +95,10 @@
 	path = sites/mandatory-ventures
 	url = https://github.com/lossless-group/mandatory-ventures-site.git
 	branch = development
+[submodule "sites/ai-camp-site"]
+	path = sites/ai-camp-site
+	url = https://github.com/ai-camp-org/ai-camp-site.git
+	branch = development
+[submodule "context-v/skill-packs/seo-skills"]
+	path = context-v/skill-packs/seo-skills
+	url = https://github.com/lossless-group/seo-skills

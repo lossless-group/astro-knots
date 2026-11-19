@@ -2,7 +2,7 @@
 title: "Context-V — Context Vigilance for AI-Native Software Teams"
 lede: "A working library of the documents we feed to Claude Code so we can build sites, apps, and design systems at remarkable speed — and a directory schema that keeps that library legible as it grows."
 date_created: 2026-04-29
-date_modified: 2026-04-29
+date_modified: 2026-11-19
 status: Published
 category: Index
 tags: [Context-Vigilance, Documentation, AI-Collaboration, Claude-Code, Knowledge-Management, Index]
@@ -70,6 +70,7 @@ context-v/
 ├── issue-resolution/  — incidents, root causes, fixes worth remembering
 ├── explorations/      — open questions, landscape scans, decisions in progress
 ├── loops/             — recurring Claude Code /loop agents with full upgrade/maintenance prompts
+├── skill-packs/       — (experimental) third-party repos, usually forks, that bundle many skills
 ├── strategy/          — business and product strategy notes (private context)
 ├── sitemap/           — page/section/component breakdowns for sites in flight
 └── extra/             — long-form source material we draw on but don't render
@@ -160,6 +161,18 @@ Current contents:
 ```
 /loop context-v/loops/<Loop-Name>.md
 ```
+
+---
+
+## `skill-packs/` — third-party skill repositories (experimental)
+
+`skill-packs/` is an **experimental** new folder within Context Vigilance (`context-v/`). It accommodates **third-party repositories that contain multiple skills**, most likely ones we have forked into the `lossless-group` org so we can adapt them. Each pack keeps its own repo, its own git history, and its own layout; we do not flatten its skills into `agent-skills/`.
+
+How it differs from `agent-skills/`: `agent-skills/` holds skills we author. `skill-packs/` holds whole repos someone else authored, which we pull from upstream and may patch.
+
+- `skill-packs/seo-skills/` — 30 SEO skills (technical SEO audits, Ahrefs and DataForSEO SERP workflows, backlinks, GEO). Our fork [lossless-group/seo-skills](https://github.com/lossless-group/seo-skills) of [Illyism/seo-skills](https://github.com/Illyism/seo-skills).
+
+To add a pack, add it as a submodule: `git submodule add https://github.com/lossless-group/<pack> context-v/skill-packs/<pack>`. Edit a pack only in its own repo, and pull upstream changes into the fork rather than editing copies elsewhere.
 
 ---
 
