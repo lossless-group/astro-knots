@@ -11,7 +11,7 @@ summary: >-
   the photo, and give the site one big-type universal card (after lfg-hub's).
   Resolved 2026-11-17. Read before building or restyling share cards on any
   site; the rules are folded into
-  Share-Every-Page-and-Section-With-Its-Own-Image.md.
+  Share-Every-Page-and-Section-With-Its-Own-OG-Image.md.
 type: Issues
 publish: true
 date_created: 2026-11-17
@@ -37,7 +37,7 @@ tags:
 ## What we saw
 
 cathode-site shipped a generated card for every page (see
-[[Share-Every-Page-and-Section-With-Its-Own-Image]]). Every check passed: the
+[[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]). Every check passed: the
 tags were right, the images returned `200 image/jpeg`, and the cards looked
 fine as full-size JPEGs on a laptop. Then the links went into an iMessage
 thread, and three cards in a row looked broken:

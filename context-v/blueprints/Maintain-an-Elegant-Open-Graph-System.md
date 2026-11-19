@@ -28,7 +28,7 @@ type: Blueprints
 
 > [!note] Share images: tall, per page, built in the site (2026-11-17)
 > This blueprint covers the metadata system. For the images themselves, the
-> default is now [[Share-Every-Page-and-Section-With-Its-Own-Image]]: every page
+> default is now [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]: every page
 > gets its own card, rendered at build time from its content, with one tall
 > 1080×1440 `og:image` and the wide 1200×630 card in `twitter:image` only. A
 > single site-wide 1200×630 `defaultImage`, as in the examples below, is now
@@ -235,7 +235,7 @@ export const SITE_SEO: SiteSEO = {
   siteUrl: 'https://example.com', // Set from env in production
   defaultTitle: 'Your Site Name',
   defaultDescription: 'Your compelling site description under 155 characters.',
-  defaultImage: '/og-default.jpg', // fallback only; prefer per-page tall cards (Share-Every-Page-and-Section-With-Its-Own-Image)
+  defaultImage: '/og-default.jpg', // fallback only; prefer per-page tall cards (Share-Every-Page-and-Section-With-Its-Own-OG-Image)
   defaultImageAlt: 'Your Site Name logo and tagline',
   twitterHandle: '@yourhandle',
   themeColor: '#1a1a2e',

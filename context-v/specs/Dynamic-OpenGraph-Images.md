@@ -10,7 +10,7 @@ date_last_updated: 2025-10-13
 at_semantic_version: 0.0.1.1
 publish: false
 status: Superseded
-superseded_by: "[[Share-Every-Page-and-Section-With-Its-Own-Image]]"
+superseded_by: "[[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]"
 deferral_note: "From the doc's own status line: core functionality implemented, Vercel deployment pending resolution."
 augmented_with:
   - "Claude Sonnet 4 on Claude Code"
@@ -32,7 +32,7 @@ type: Specs
 > The goal here, an image per page from its content, shipped another way:
 > satori renders every card at build time, so there is no request-time
 > Playwright screenshot, no SSR route and no Vercel adapter. See
-> [[Share-Every-Page-and-Section-With-Its-Own-Image]], live on cathode-site and
+> [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]], live on cathode-site and
 > edviro-blog. Kept for the record of what the Playwright approach ran into.
 
 **Status:** Work in Progress - Core functionality implemented, Vercel deployment pending resolution

@@ -1,17 +1,17 @@
 ---
-title: "Share Every Page and Every Section With Its Own Image"
+title: "Share Every Page and Every Section With Its Own OG Image"
 lede: "Every page unfurls as its own card, and every heading in a write-up shares as its own card too. Built at build time, no server needed."
 publish: true
 status: Reference
 date_created: 2026-11-17
-date_modified: 2026-11-17
+date_modified: 2026-11-18
 date_authored_initial_draft: 2026-11-17
-date_authored_current_draft: 2026-11-17
+date_authored_current_draft: 2026-11-18
 authors:
   - Michael Staton
 augmented_with:
   - Claude Code on Claude Opus 5.5
-at_semantic_version: 0.0.3.0
+at_semantic_version: 0.0.4.0
 category: Blueprints
 type: Blueprints
 tags:
@@ -22,10 +22,10 @@ tags:
   - Astro-Knots
 site_uuid: b5382bd4-e3a8-4737-9639-ed0c48a6a215
 hex_code: h0y0h2
-summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementations: sites/cathode-site (dark brand, LFM) and sites/edviro-blog (light brand, Astro MDX), both 2026-11-17. Build-time cards rendered in the site itself are the default for any site with more than a handful of pages; Ideogram art and hero screenshots are for the one-off site card only. Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
+summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementations: sites/cathode-site (dark brand, LFM) and sites/edviro-blog (light brand, Astro MDX), both 2026-11-17; sites/fullstack-vc (2026-11-18) adds the content-hashed render cache, so a build only renders cards whose inputs changed. Build-time cards rendered in the site itself are the default for any site with more than a handful of pages; Ideogram art and hero screenshots are for the one-off site card only. Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
 ---
 
-# Share Every Page and Every Section With Its Own Image
+# Share Every Page and Every Section With Its Own OG Image
 
 ## Why care?
 
@@ -123,6 +123,45 @@ src/utils/share.ts                       shareOrCopy(): one helper for both butt
 5. **Images are built, not served.** The `.jpg.ts` endpoint uses `getStaticPaths`,
    so a static build writes every card to `dist/og/`. No runtime, no cold starts,
    no Vercel-only APIs.
+6. **A card renders once, not once per build.** The endpoint still runs for every
+   card on every build, but `renderCard()` checks a cache first and only renders
+   cards whose inputs changed. See [Cache renders between builds](#cache-renders-between-builds).
+
+## Cache renders between builds
+
+There is no reason to regenerate share images for pages that haven't changed. A
+card's JPEG is a pure function of its inputs, so hash the inputs and keep the
+JPEG:
+
+```ts
+// og-render.ts: renderCard() wraps the real renderer
+const key = sha256(rendererAssetsHash(), variant, JSON.stringify(card), photoInput(card.image));
+const file = join(process.cwd(), 'node_modules/.astro/og-cache', `${key}.jpg`);
+if (existsSync(file)) return readFileSync(file);   // hit: no satori, resvg, sharp or download
+const jpg = await renderCardUncached(card, variant);
+writeFileSync(file, jpg);                            // miss: render once, keep it
+```
+
+- **What goes in the key:** the whole `ShareCard` (title, kicker, subtitle, image
+  source, layout), the variant, and a `RENDER_VERSION` constant. Edit a title and
+  that card's two images re-render; nothing else does.
+- **The renderer's own assets are inputs.** Hash the font files and the mark
+  once per build and fold that into every key, so swapping a font re-renders
+  everything without anyone remembering to.
+- **Bump `RENDER_VERSION` when the design changes** (layout, colors, type sizes).
+  Code changes aren't detected automatically; the constant is the switch.
+- **Hash by content, never by mtime.** CI clones fresh, so every file has a new
+  mtime on every deploy. A local photo is hashed by its bytes (replacing a banner
+  at the same path re-renders its card). A remote photo is hashed by its URL
+  alone: downloading it to see whether it changed is the cost the cache avoids.
+  If a remote image changes behind the same URL, bump the version.
+- **Keep the cache in Astro's cache dir, `node_modules/.astro/`.** Vercel and
+  Netlify carry `node_modules` between builds, so deploys reuse it. A cleared
+  build cache only costs one slow build.
+- **A failed cache write is not an error.** Catch it and return the rendered
+  JPEG; a read-only disk costs speed, never correctness.
+- **Stale entries are harmless.** Old keys are never read again. Delete
+  `node_modules/.astro/og-cache` whenever you like.
 
 ## Designing the cards
 
@@ -208,9 +247,13 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
 
 ## Cost
 
-Rendering is the slow part of the build: on cathode-site, 65 cards (130 images)
-added about 45 seconds, mostly fetching and resizing background photos. Images
-are cached per build. If a site grows to thousands of sections, render section
+Rendering is the slow part of a cold build: on cathode-site, 65 cards (130 images)
+added about 45 seconds, mostly fetching and resizing background photos; on
+fullstack-vc, 371 cards (742 images) took the build from about 45 seconds to
+about 217. With the render cache, the next build took 10 seconds, every image a
+cache hit, and a normal deploy only renders the handful of cards that changed.
+Within one build, photos are also cached in memory, so a photo shared by many
+cards is fetched once. If a site grows to thousands of sections, render section
 cards without photos, or only for h2.
 
 ## Reference implementations
@@ -225,6 +268,13 @@ cards without photos, or only for h2.
   `src/components/share/SectionShareButtons.astro`. Satori plus sharp only, no
   resvg. Its `scripts/check-seo.mjs` asserts the tall `og:image`, a matching
   `og:image:type` and the wide `twitter:image` on every page; copy that check.
+- **`astro-knots/sites/fullstack-vc`** (repo `lossless-group/fullstack-vc`),
+  2026-11-18. Dark brand, LFM, Vercel. The reference for the **render cache**
+  (`renderCard()` in `src/lib/og-render.ts`), and for keying cards by URL path
+  (`shareKeyForPath()` in `src/lib/share-cards.ts`), so the layout finds every
+  page's card without the page passing a key. Tool cards show their banner as a
+  rounded inset (`imageFit: 'inset'`), because banners carry their own text and a
+  full-bleed crop cuts it.
 
 Start from whichever matches your site's renderer and brand, and copy and adapt
 the files listed above.

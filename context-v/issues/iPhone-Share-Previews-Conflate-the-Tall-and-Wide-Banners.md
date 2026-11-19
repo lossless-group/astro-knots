@@ -190,7 +190,7 @@ and title, no mixing
 So iMessage reads the single `og:image` and ignores `twitter:image`, which can
 stay. edviro-blog shipped the same head the same day, and its
 `scripts/check-seo.mjs` now fails any page that breaks it. How those cards are
-made: [[Share-Every-Page-and-Section-With-Its-Own-Image]].
+made: [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]].
 
 Still open: the edge layer for LinkedIn and other wide-first crawlers, the
 FantasyGM fix upstream, and the `knot-check` rule.
