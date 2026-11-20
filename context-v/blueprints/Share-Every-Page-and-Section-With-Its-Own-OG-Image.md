@@ -4,14 +4,14 @@ lede: "Every page unfurls as its own card, and every heading in a write-up share
 publish: true
 status: Reference
 date_created: 2026-11-17
-date_modified: 2026-11-18
+date_modified: 2026-11-19
 date_authored_initial_draft: 2026-11-17
-date_authored_current_draft: 2026-11-18
+date_authored_current_draft: 2026-11-19
 authors:
   - Michael Staton
 augmented_with:
   - Claude Code on Claude Opus 5.5
-at_semantic_version: 0.0.4.0
+at_semantic_version: 0.0.5.0
 category: Blueprints
 type: Blueprints
 tags:
@@ -22,7 +22,7 @@ tags:
   - Astro-Knots
 site_uuid: b5382bd4-e3a8-4737-9639-ed0c48a6a215
 hex_code: h0y0h2
-summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementations: sites/cathode-site (dark brand, LFM) and sites/edviro-blog (light brand, Astro MDX), both 2026-11-17; sites/fullstack-vc (2026-11-18) adds the content-hashed render cache, so a build only renders cards whose inputs changed. Build-time cards rendered in the site itself are the default for any site with more than a handful of pages; Ideogram art and hero screenshots are for the one-off site card only. Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
+summary: "Implementation blueprint for share images on every Astro Knots site: a tall 3:4 og:image and a wide twitter:image for every page, generated at build time with satori, resvg and sharp, plus a share button on every h2/h3 of long-form content that shares a /s/ page carrying that section's own card. Reference implementations: sites/cathode-site (dark brand, LFM) and sites/edviro-blog (light brand, Astro MDX), both 2026-11-17; sites/fullstack-vc (2026-11-18) adds the content-hashed render cache, so a build only renders cards whose inputs changed. Build-time cards rendered in the site itself are the default for any site with more than a handful of pages; Ideogram illustrations go inside the cards as the art layer, stored per page as share_art, with all words rendered from metadata; privacy-gated pages get the same full card plus a Private pill. Extends Maintain-an-Elegant-Open-Graph-System.md (page-level metadata) and lfm's Maintain-Heading-Anchors-and-Share-Links.md (heading ids). Load when scaffolding any site, or when a site has pages or sections that unfurl as a generic card."
 ---
 
 # Share Every Page and Every Section With Its Own OG Image
@@ -85,9 +85,9 @@ every card from the site's own content, in the site's own repo, during
   with a hand-made brand card, keep it as the site card's wide image and
   generate the tall one to match (edviro-blog does this).
 
-Use Ideogram (the `generate-consistent-og-images` skill) for artwork a page
-deserves on its own, such as a splash page or a deck. Even then, emit it as the
-page's tall `og:image` and the wide variant as `twitter:image`.
+Ideogram illustrations (the `generate-consistent-og-images` skill) go **inside**
+these cards as the art layer, not instead of them. See *Illustrations as the
+art layer* below.
 
 ## How it works
 
@@ -198,6 +198,53 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
 - **Check at preview size before shipping.** Resize the tall card to 480px high
   and crop its center square to 200px; if the headline doesn't read in both,
   it isn't done. Then send yourself the link.
+
+### Illustrations as the art layer
+
+A card has two layers: **art** (the photo band) and **text** (kicker, title,
+summary, footer, rendered from the page's metadata). An Ideogram illustration
+is just another kind of art. It goes where an event photo goes, and the text
+stays live metadata. A page gets an eye-catching image *and* a card that says
+what the page is.
+
+- **No words in the illustration.** Every word on the card comes from
+  metadata, so it's spelled right, readable at chat size, and changes when the
+  title does. Image models misspell, and baked-in text can't be edited.
+- **Prompt for the band.** Generate one wide illustration with the subject on
+  one side and calm space on the other ("subject left, quiet right"). The tall
+  card shows it as the top band; the wide card shows it on the right 58%. Set
+  `objectPosition` to the subject's side, as with photos.
+- **One illustration per page, not per heading.** Section cards reuse their
+  page's art with the heading as the title. That bounds the cost, and a page's
+  section cards read as a set.
+- **Store the art, not the card.** Generate once, upload to ImageKit, and put
+  the URL in the page's frontmatter as `share_art`, with the prompt in
+  `image_prompt`. The build composes the cards from it, so a new title never
+  means new art. Remote art goes through the render cache like any other input.
+- **Follow the site's DESIGN.md `imagery:` recipe,** so the illustrations look
+  like one series and match the brand.
+- **No art, no problem.** A page without `share_art` gets the text-centered
+  card, and the home page gets the universal card. Art is an upgrade, never a
+  requirement.
+
+### Private pages get a "Private" pill
+
+Gated content (LP updates, memos, decks, data rooms) is exactly what gets sent
+one-to-one over iMessage and WhatsApp, so it gets the same full card as a
+public page: art, title, summary, and section cards for its headings. The card
+adds one thing, a **"Private" pill**.
+
+- **One flag drives it.** Whatever the site already uses to gate a route
+  (`gated: true`, a collection under the access gate) also sets
+  `private: true` on the card. Never decide it in two places.
+- **Put it near the kicker,** high enough that it survives WhatsApp's centered
+  square crop and reads at preview size. Use the brand's accent, with a lock
+  glyph if the brand has one.
+- **On the wide card too,** so X and LinkedIn show it.
+- **The pill is a label, not protection.** The card JPEG is public, and so is
+  the unfurl to anyone the link is forwarded to. Title and summary are shared
+  on purpose. Don't put anything on a private card you wouldn't put in the
+  message itself.
 
 ## Share buttons people find
 
