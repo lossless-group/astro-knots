@@ -2,12 +2,12 @@
 title: "Live Content on Cloudflare Artifacts, Wrapped in an MCP"
 lede: "Published memos, decks and other site content live in Cloudflare Artifacts repos, one per deal. An MCP lets people and agents read, iterate on and publish that content, and the site renders whatever is on main."
 date_created: 2026-11-17
-date_modified: 2026-11-17
+date_modified: 2026-11-19
 authors:
   - Michael Staton
 augmented_with:
   - "Claude Code on Opus 5.5"
-semantic_version: 0.0.1.0
+semantic_version: 0.0.2.0
 publish: false
 tags:
   - Spec
@@ -19,6 +19,20 @@ status: Draft
 ---
 
 # Live Content on Cloudflare Artifacts, Wrapped in an MCP
+
+> [!important] Revised 2026-11-19: memo editing goes through memopop's connector
+> This spec proposed its own editing MCP and kept memopop's research and
+> section files out of the repo. Both were wrong for the real use case:
+> partners chatting with Claude to tweak **research, sections and the final
+> draft**. That connector already exists and is live: memopop's
+> (`https://memopop.didi.sh/mcp`, sign-in through id.didi.sh, spec
+> `memopop-orchestrator/context-v/specs/MemoPop-Connector-API.md`, which now
+> holds the editing rules under "Where an edit goes (Plan 9)"). So:
+>
+> - **No second editing MCP for memos.** The tools table below is superseded for memos.
+> - **Research and section files are the content partners edit**, not intermediates. A whole memo version is about 4 MB, mostly deck screenshots.
+> - **Datarooms are analysed locally only** and don't go to any repo. Slim them with the `slim-file-sizes` skill.
+> - What remains of this spec: how humain-web reads published memos, and whether Artifacts is where the connector keeps files. Storage is an implementation detail; the connector's own store works.
 
 ## Why Care?
 
@@ -70,7 +84,7 @@ Published content fits in a repo with room to spare. The inputs don't, and don't
 
 - Datarooms, source PDFs, PPTX, ZIP and video. They stay in `io/<firm>` for now and move to R2 later if they need a home off GitHub.
 - Self-contained HTML exports with images embedded in base64. The CogSciAI one is 5.1 MB and the site renders from markdown anyway. The PDF export may go in only if it's under 5 MB.
-- Pipeline intermediates (research files, section drafts, validation JSON).
+- ~~Pipeline intermediates (research files, section drafts, validation JSON).~~ Wrong, see the note at the top: research and section files are what partners edit and belong with the memo.
 
 **Enforced in code, not left to instructions.** The MCP's write tools and memopop's publish step both reject a file that breaks these rules. A JPEG wider than the cap, any WebP or PNG over 500 KB, any file over 5 MB, and any extension outside the allowed list are refused with a message that names the skill to run. An agent can't talk its way past a check in the Worker.
 
