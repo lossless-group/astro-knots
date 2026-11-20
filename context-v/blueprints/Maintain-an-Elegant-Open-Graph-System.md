@@ -1,14 +1,14 @@
 ---
 date_created: 2025-10-10
-date_modified: 2026-11-17
+date_modified: 2026-11-19
 title: Maintain an Elegant Open Graph System
 lede: A scalable, consistent architecture for Open Graph metadata optimized for the messaging-first share economy.
 date_authored_initial_draft: 2025-10-10
 date_authored_current_draft: 2026-10-14
 date_authored_final_draft: null
 date_first_published: 2025-10-10
-date_last_updated: 2026-11-17
-at_semantic_version: 0.3.0
+date_last_updated: 2026-11-19
+at_semantic_version: 0.4.0
 status: Implementing
 publish: true
 authors:
@@ -26,14 +26,15 @@ hex_code: 0x55oh
 type: Blueprints
 ---
 
-> [!note] Share images: tall, per page, built in the site (2026-11-17)
-> This blueprint covers the metadata system. For the images themselves, the
-> default is now [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]: every page
-> gets its own card, rendered at build time from its content, with one tall
-> 1080×1440 `og:image` and the wide 1200×630 card in `twitter:image` only. A
-> single site-wide 1200×630 `defaultImage`, as in the examples below, is now
-> only the fallback for a page with no card, and even then it should be tall.
-> Live on cathode-site and edviro-blog.
+> [!note] Share images: tall first, per page, built in the site (updated 2026-11-19)
+> We assume a link is shared through **iMessage or WhatsApp**, so the tall
+> 1080×1440 card is the default `og:image` on every site. The wide 1200×630
+> card goes in `twitter:image` for X, and can be routed to LinkedIn, Bluesky
+> and Discord at the edge (see *Which Image Each Platform Gets*). Never two
+> `og:image` tags. For building the cards themselves, see
+> [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]: every page gets its own
+> card, rendered at build time from its content. Live on cathode-site,
+> edviro-blog and fullstack-vc.
 
 ## Why This Matters: The Messaging-First Share Economy
 
@@ -79,7 +80,7 @@ The system should be approachable at every level of the organization:
 | **Site defaults** | Developer (once) | Set `SITE_SEO` config and forget — 80% of pages are covered automatically |
 | **Collection defaults** | Developer | Define defaults per content type (blog posts get `article` type, team pages get `profile` type) |
 | **Page overrides** | Developer or Marketer | High-value landing pages get custom titles, descriptions, images via props or frontmatter |
-| **Frontmatter fields** | Marketer or Content Author | Specify `shareImage`, `description` directly in markdown — no code changes needed |
+| **Frontmatter fields** | Marketer or Content Author | Specify `banner_tall_image`, `banner_image`, `description` directly in markdown — no code changes needed |
 
 **The goal:** A marketer should be able to control share previews by editing frontmatter. A developer should be able to set sensible defaults and walk away. Neither should need to understand the other's domain.
 
@@ -91,7 +92,7 @@ Different platforms render previews differently. Design for the lowest common de
 
 ### WhatsApp
 - **Primary concern:** Aggressive caching. WhatsApp caches previews for extended periods.
-- **Image:** Uses `og:image`. Displays at roughly 300x157 (crops to ~1.91:1 ratio)
+- **Image:** Uses `og:image`. Gets the tall card. Small previews crop a square from its middle (see below).
 - **Title:** Uses `og:title`. Truncates around 65 characters
 - **Description:** Uses `og:description`. Truncates around 100 characters
 - **Cache busting:** Nearly impossible. Change the URL or wait. Adding query params like `?v=2` can help force re-fetch.
@@ -141,6 +142,85 @@ Different platforms render previews differently. Design for the lowest common de
 - **Title:** Uses `og:title`
 - **Description:** Uses `og:description`
 - **Special:** Full OG protocol support including arrays and structured properties
+
+---
+
+## Which Image Each Platform Gets
+
+Every site keeps four share images. The frontmatter keys match the ones this
+blueprint's own frontmatter uses:
+
+| Variant | Key | Size | Where it goes |
+|---|---|---|---|
+| **Tall banner** | `banner_tall_image` | 1080×1440 (3:4) | `og:image`. The default for every page. |
+| **Banner** | `banner_image` | 1200×630 (1.91:1) | `twitter:image`. Also the image routed to LinkedIn, Bluesky and Discord (below). |
+| **Square** | `square_image` | 1200×1200 | No tag by default. Use it as `twitter:image` only on a page that sets `twitter:card` to `summary`. |
+| **Portrait** | `portrait_image` | 1200×1500 (4:5) | No tag. It's the image people post *as an image* (WhatsApp status, Instagram, a chat), so offer it as a download or on `/brand-kit`. |
+
+### What plain HTML can and can't do
+
+A static page has **two image slots**, not four:
+
+- **`og:image`** is read by iMessage, WhatsApp, LinkedIn, Bluesky, Discord,
+  Slack and Facebook.
+- **`twitter:image`** is read by X, which falls back to `og:image` without it.
+
+So with static HTML alone, X gets the banner and **everyone else gets the tall
+banner**. That's right for iMessage and WhatsApp, which we design for. It's a
+compromise on LinkedIn, which crops `og:image` to 1.91:1. A tall card loses its
+top and bottom there, so the middle band of the tall card has to carry the
+title (the design rules in
+[[Share-Every-Page-and-Section-With-Its-Own-OG-Image]] already put it there).
+
+Don't fix this with a second `og:image`. Clients pick an image and the size
+tags inconsistently, and iMessage has been seen mixing the two into one broken
+card ([[iPhone-Share-Previews-Conflate-the-Tall-and-Wide-Banners]]).
+
+### Routing the banner to LinkedIn, Bluesky and Discord (edge)
+
+To give each platform its own image, decide at request time: look at the
+crawler's `User-Agent` and rewrite the `og:image` tags before the HTML goes
+out. This needs an edge layer, either Vercel Routing Middleware or a Netlify
+Edge Function. A GitHub Pages splash can't do it and stays on the two static
+slots.
+
+| Crawler | Matches on | Gets |
+|---|---|---|
+| iMessage | `facebookexternalhit` **and** `Twitterbot` in the same string | Tall banner (leave the HTML alone) |
+| WhatsApp | `WhatsApp/` | Tall banner (leave the HTML alone) |
+| X | `Twitterbot` (without `facebookexternalhit`) | Banner, via `twitter:image` (no rewrite needed) |
+| LinkedIn | `LinkedInBot` | Banner |
+| Bluesky | `Cardyb` | Banner |
+| Discord | `Discordbot` | Banner |
+| Anything else | | Tall banner |
+
+Rules:
+
+1. **Test for iMessage first.** Apple's preview fetcher has sent a user agent
+   that contains both `facebookexternalhit` and `Twitterbot`. A rule that
+   checks `Twitterbot` first treats iMessage as X.
+2. **Rewrite the whole image block.** Swap `og:image`, `og:image:width`,
+   `og:image:height`, `og:image:type` and `og:image:alt` together. A wide image
+   declared as 1080×1440 is the same mismatch the second-`og:image` rule
+   avoids.
+3. **Keep the default HTML tall.** Middleware touches only the crawlers in the
+   table. Anything it doesn't recognise, including people, gets the static
+   page.
+4. **Don't cache the rewritten page for everyone.** Send `Vary: User-Agent`, or
+   skip the CDN cache for bot requests, so a LinkedIn-shaped page never reaches
+   iMessage.
+5. **Prove it before you trust it.** Fetch the page with each user agent and
+   check the tags: `curl -sA 'LinkedInBot/1.0' https://site/page | grep og:image`.
+   Then post a real link in each app. LinkedIn's Post Inspector shows its
+   result directly.
+
+> [!warning] Not built yet (2026-11-19)
+> No Astro Knots site runs this routing yet. The user-agent strings above come
+> from public reports and need checking against our own access logs, and
+> Bluesky's and Discord's use of a wide versus tall image needs a real post to
+> confirm. The bot-detection list in
+> [[Maintain-Confidential-Access-with-Persistent-Sessions-and-Auth-Telemetry]]
+> is a starting point for the matcher.
 
 ---
 
@@ -202,7 +282,8 @@ export interface SiteSEO {
   linkedInCompany?: string; // Company page URL for attribution
   defaultTitle: string;
   defaultDescription: string;
-  defaultImage: string; // MUST be absolute URL or path under /public
+  defaultImageTall: string; // og:image, 1080×1440. Absolute URL or path under /public
+  defaultImageWide: string; // twitter:image, 1200×630
   defaultImageAlt: string;
   themeColor?: string; // For Discord embeds, PWA, etc.
   locale?: string; // e.g., 'en_US'
@@ -211,7 +292,8 @@ export interface SiteSEO {
 export interface ShareMetaInput {
   title?: string;
   description?: string;
-  image?: string;
+  imageTall?: string; // og:image (banner_tall_image)
+  imageWide?: string; // twitter:image (banner_image)
   imageAlt?: string;
   url?: string;
   type?: 'website' | 'article' | 'profile' | 'product' | string;
@@ -235,7 +317,9 @@ export const SITE_SEO: SiteSEO = {
   siteUrl: 'https://example.com', // Set from env in production
   defaultTitle: 'Your Site Name',
   defaultDescription: 'Your compelling site description under 155 characters.',
-  defaultImage: '/og-default.jpg', // fallback only; prefer per-page tall cards (Share-Every-Page-and-Section-With-Its-Own-OG-Image)
+  // Fallbacks only; prefer per-page cards (Share-Every-Page-and-Section-With-Its-Own-OG-Image)
+  defaultImageTall: '/og-default-tall.jpg',
+  defaultImageWide: '/og-default.jpg',
   defaultImageAlt: 'Your Site Name logo and tagline',
   twitterHandle: '@yourhandle',
   themeColor: '#1a1a2e',
@@ -289,7 +373,8 @@ export function buildOgMeta(input: ShareMetaInput = {}): MetaTag[] {
 
   const title = truncate(input.title ?? SITE_SEO.defaultTitle, CHAR_LIMITS.title);
   const description = truncate(input.description ?? SITE_SEO.defaultDescription, CHAR_LIMITS.description);
-  const image = ensureAbsoluteUrl(input.image ?? SITE_SEO.defaultImage, siteUrl);
+  const imageTall = ensureAbsoluteUrl(input.imageTall ?? SITE_SEO.defaultImageTall, siteUrl);
+  const imageWide = ensureAbsoluteUrl(input.imageWide ?? SITE_SEO.defaultImageWide, siteUrl);
   const imageAlt = input.imageAlt ?? SITE_SEO.defaultImageAlt;
   const url = input.url ? ensureAbsoluteUrl(input.url, siteUrl) : undefined;
   const type = input.type ?? 'website';
@@ -303,9 +388,12 @@ export function buildOgMeta(input: ShareMetaInput = {}): MetaTag[] {
     { property: 'og:site_name', content: SITE_SEO.siteName },
     { property: 'og:title', content: title },
     { property: 'og:description', content: description },
-    { property: 'og:image', content: image },
-    { property: 'og:image:width', content: '1200' },
-    { property: 'og:image:height', content: '630' },
+    // One og:image only: the tall card, for iMessage and WhatsApp.
+    // Never add a second og:image; see "Which Image Each Platform Gets".
+    { property: 'og:image', content: imageTall },
+    { property: 'og:image:type', content: 'image/jpeg' },
+    { property: 'og:image:width', content: '1080' },
+    { property: 'og:image:height', content: '1440' },
     { property: 'og:image:alt', content: imageAlt },
   ];
 
@@ -340,14 +428,14 @@ export function buildOgMeta(input: ShareMetaInput = {}): MetaTag[] {
     }
   }
 
-  // Twitter Card (fallback to OG, but explicit is better)
+  // Twitter Card: X reads twitter:image, so it gets the wide banner
   meta.push({ name: 'twitter:card', content: 'summary_large_image' });
   if (SITE_SEO.twitterHandle) {
     meta.push({ name: 'twitter:site', content: SITE_SEO.twitterHandle });
   }
   meta.push({ name: 'twitter:title', content: title });
   meta.push({ name: 'twitter:description', content: description });
-  meta.push({ name: 'twitter:image', content: image });
+  meta.push({ name: 'twitter:image', content: imageWide });
   meta.push({ name: 'twitter:image:alt', content: imageAlt });
 
   // Theme color (for Discord embeds, PWA, browser chrome)
@@ -602,20 +690,28 @@ const schemas = jsonLd
 
 ## Image Fallback Chain
 
-When determining which image to use for OG tags, follow this cascade:
+Resolve the tall and the wide image separately, each with the same cascade:
 
-1. **Page-specific `shareImage`** — Explicitly set in frontmatter or page props
-2. **Content hero/banner image** — The main visual of the content
-3. **Collection default** — A default image for all posts in a collection (e.g., blog default)
-4. **Site default** — `SITE_SEO.defaultImage`
+1. **Page frontmatter** — `banner_tall_image` (tall) or `banner_image` (wide)
+2. **The page's generated card** — `/og/tall/{key}.jpg` or `/og/wide/{key}.jpg`, from [[Share-Every-Page-and-Section-With-Its-Own-OG-Image]]
+3. **Collection default** — e.g. a blog-wide tall and wide pair
+4. **Site default** — `SITE_SEO.defaultImageTall` / `SITE_SEO.defaultImageWide`
+
+Never fall back to a hero photo: it's rarely the right shape, size or format
+for a share card.
 
 ```ts
-// Example: resolving image in a content page
-const shareImage =
-  post.data.shareImage ??      // Explicit share image
-  post.data.heroImage ??       // Hero image as fallback
-  collectionDefaults.image ??  // Collection default
-  SITE_SEO.defaultImage;       // Site default
+// Example: resolving images in a content page
+const imageTall =
+  post.data.banner_tall_image ??   // Explicit override
+  cardUrl('tall', key) ??          // Generated per-page card
+  COLLECTION_DEFAULTS.blog.imageTall ??
+  SITE_SEO.defaultImageTall;
+const imageWide =
+  post.data.banner_image ??
+  cardUrl('wide', key) ??
+  COLLECTION_DEFAULTS.blog.imageWide ??
+  SITE_SEO.defaultImageWide;
 ```
 
 **Tip:** Create collection-specific defaults in your config:
@@ -624,11 +720,13 @@ const shareImage =
 // src/config/seo.ts
 export const COLLECTION_DEFAULTS = {
   blog: {
-    image: '/og-blog-default.jpg',
+    imageTall: '/og-blog-default-tall.jpg',
+    imageWide: '/og-blog-default.jpg',
     type: 'article' as const,
   },
   team: {
-    image: '/og-team-default.jpg',
+    imageTall: '/og-team-default-tall.jpg',
+    imageWide: '/og-team-default.jpg',
     type: 'profile' as const,
   },
   // ...
@@ -640,15 +738,18 @@ export const COLLECTION_DEFAULTS = {
 ## Asset Guidance
 
 ### Dimensions
-- **Primary:** 1200x630 (1.91:1 ratio) — Works everywhere
-- **Minimum:** 600x315 — Below this, some platforms won't show image
-- **Square fallback:** 1200x1200 for platforms that crop to square (rare)
-- **Portrait companion:** 1200x1500 (4:5). Not an `og:image`: it's the version people post *as an image* in a chat, a WhatsApp status, or Instagram, where a tall image takes more of the screen than a 1.91:1 card. Render it from the same template as the banner (see *Hero-Derived Share Images* below).
+The four variants and where each goes are in *Which Image Each Platform Gets*.
+In short:
+- **Tall banner (`og:image`, the default):** 1080×1440 (3:4). Keep the title in the middle band, because WhatsApp's small preview and LinkedIn both crop from the middle.
+- **Banner (`twitter:image`):** 1200×630 (1.91:1).
+- **Square:** 1200×1200. Only for a page using `twitter:card` `summary`.
+- **Portrait:** 1200×1500 (4:5). Never a meta tag: it's the version people post *as an image*. Render it from the same template as the others.
+- **Minimum:** 600×315. Below that, some platforms show no image.
 
 ### Format
-- **Preferred:** JPEG or WebP
-- **Avoid:** PNG with transparency (some platforms render black background)
-- **File size:** Under 300 KB for WhatsApp (see above), so in practice JPEG. Platforms accept up to 5 MB, but the messaging apps are the binding constraint.
+- **JPEG, always.** Not WebP: some unfurlers don't read it, and an image CDN that negotiates formats can serve a PNG several times larger (see the `open-graph-share-seo-geo` skill). Not PNG: transparency renders as black on some platforms, and photo PNGs blow the size limit.
+- **`og:image:type`** must say `image/jpeg` and match the bytes actually served.
+- **File size:** under 300 KB for WhatsApp (see above). Platforms accept up to 5 MB, but the messaging apps are the binding constraint.
 
 ### Location
 - Store in `public/` for stable, predictable URLs
@@ -657,13 +758,15 @@ export const COLLECTION_DEFAULTS = {
 ### Naming Convention
 ```
 public/
-├── og-default.jpg           # Site-wide fallback
-├── og-blog-default.jpg      # Blog collection default
-├── og-[page-name].jpg       # Page-specific
-└── og/
-    └── posts/
-        └── [slug].jpg       # Per-post images (if generated)
+├── og-default-tall.jpg      # Site-wide fallback, og:image
+├── og-default.jpg           # Site-wide fallback, twitter:image
+├── og-blog-default-tall.jpg # Blog collection default (tall)
+├── og-blog-default.jpg      # Blog collection default (wide)
+└── og-[page-name]-tall.jpg  # Hand-made page override, with its -wide pair
 ```
+
+Generated per-page cards are served from build-time endpoints, not
+`public/`: `/og/tall/{key}.jpg` and `/og/wide/{key}.jpg`.
 
 ---
 
@@ -686,7 +789,8 @@ const description = 'Learn about our mission, team, and values.';
   meta={{
     title,
     description,
-    image: '/og-about.jpg',
+    imageTall: '/og-about-tall.jpg',
+    imageWide: '/og-about.jpg',
   }}
   jsonLd={buildWebSiteSchema()}
 >
@@ -708,14 +812,16 @@ const post = await getEntry('blog', slug);
 
 const title = post.data.title;
 const description = post.data.description ?? post.data.excerpt;
-const image = post.data.shareImage ?? post.data.heroImage ?? COLLECTION_DEFAULTS.blog.image;
+// Resolved as in "Image Fallback Chain"
+const imageTall = post.data.banner_tall_image ?? cardUrl('tall', `blog/${slug}`);
+const imageWide = post.data.banner_image ?? cardUrl('wide', `blog/${slug}`);
 const url = new URL(`/blog/${slug}`, SITE_SEO.siteUrl).toString();
 
 const articleSchema = buildArticleSchema({
   type: 'BlogPosting',
   headline: title,
   description,
-  image,
+  image: imageWide,
   datePublished: post.data.publishedDate?.toISOString(),
   dateModified: post.data.updatedDate?.toISOString(),
   authorName: post.data.author,
@@ -728,7 +834,8 @@ const articleSchema = buildArticleSchema({
   meta={{
     title,
     description,
-    image,
+    imageTall,
+    imageWide,
     url,
     type: 'article',
     publishedTime: post.data.publishedDate?.toISOString(),
@@ -753,8 +860,12 @@ description: "A compelling description under 155 characters."
 publishedDate: 2025-01-15
 updatedDate: 2025-01-20
 author: "Author Name"
-heroImage: "/images/posts/my-post-hero.jpg"
-shareImage: "/og/posts/my-post.jpg"  # Optional: explicit OG image
+heroImage: "/images/posts/my-post-hero.jpg"   # On-page art, not a share image
+# Optional overrides; without them the page uses its generated cards
+banner_tall_image: "https://ik.imagekit.io/.../my-post_banner_tall.jpg"  # og:image
+banner_image: "https://ik.imagekit.io/.../my-post_banner.jpg"            # twitter:image
+square_image: "https://ik.imagekit.io/.../my-post_square.jpg"
+portrait_image: "https://ik.imagekit.io/.../my-post_portrait.jpg"
 tags:
   - technology
   - web development
@@ -802,7 +913,7 @@ const ogImage = new URL('/og-image.jpg', Astro.site).toString();
 
 ### The Problem with Custom Images
 
-**Custom image overrides exist** — marketers can always specify a `shareImage` in frontmatter to use a bespoke graphic. But this approach doesn't scale:
+**Custom image overrides exist** — marketers can always specify `banner_tall_image` and `banner_image` in frontmatter to use a bespoke graphic. But this approach doesn't scale:
 
 - Creating custom OG images for every blog post, team member, or product page is time-consuming
 - Designers become bottlenecks
@@ -838,12 +949,17 @@ Reference: `sites/humain-web/scripts/share-image/`.
 
 ```
 scripts/share-image/
-├── template.html   # the hero, restated at fixed pixel sizes; #banner / #tall pick the layout
+├── template.html   # the hero, restated at fixed pixel sizes; #banner / #tall / #portrait pick the layout
 └── render.sh       # headless Chrome → PNG → ImageMagick → JPEG in public/og/
 public/og/
-├── share-banner.jpg   # 1200x630 — the og:image on every page
-└── share-tall.jpg     # 1200x1500 — for posting as an image
+├── share-tall.jpg      # 1080x1440 — the og:image on every page
+├── share-banner.jpg    # 1200x630  — twitter:image
+└── share-portrait.jpg  # 1200x1500 — for posting as an image, never a meta tag
 ```
+
+> humain-web was built before tall-first: it ships the banner as `og:image`
+> and its 1200×1500 "tall" is the portrait. Follow the layout above, not its
+> current tags.
 
 ```bash
 render() { # name width height
@@ -852,8 +968,9 @@ render() { # name width height
     --window-size="$2,$3" --screenshot="$TMP/$1.png" "$TEMPLATE#$1"
   magick "$TMP/$1.png" -strip -quality 86 -sampling-factor 4:2:0 -interlace JPEG "public/og/share-$1.jpg"
 }
+render tall 1080 1440
 render banner 1200 630
-render tall 1200 1500
+render portrait 1200 1500
 ```
 
 **Why Chrome rather than Satori here.** Satori supports a subset of CSS: no `mask`, no `color-mix()`, limited `background-size: cover`, no layered absolutely-positioned art. A hero is usually exactly those things. Chrome renders the real CSS, so the template can reuse the hero's own rules almost verbatim and the card can't drift from the page. Satori stays the right tool for **per-page** cards generated at build or request time (below).
@@ -865,20 +982,20 @@ render tall 1200 1500
 - **Reference the site's assets by relative path** (`../../public/images/hero-bg.png`) and pass `--allow-file-access-from-files`, so the card always uses the current art.
 - **Fonts:** load the brand faces from Google Fonts with `display=block`, and give Chrome `--virtual-time-budget` so they arrive before the screenshot. A fallback face in a share card is the most common silent failure.
 - **JPEG out,** for the 300 KB WhatsApp limit. humain-web's are 44 KB and 93 KB.
-- **Centre everything.** WhatsApp's small preview is a centred square crop of the banner.
-- **Show both in `/brand-kit`** with the regenerate command, so the next person changing the tagline knows the cards exist.
+- **Centre everything.** WhatsApp's small preview is a centred square crop of the tall card.
+- **Show all three in `/brand-kit`** with the regenerate command, so the next person changing the tagline knows the cards exist.
 
-Wire the banner into the layout with absolute URLs and the size hints, which let platforms lay out the card before downloading the image:
+Wire the tall card in as `og:image` and the banner as `twitter:image`, with absolute URLs and the size hints, which let platforms lay out the card before downloading the image:
 
 ```astro
-<meta property="og:image" content={shareImage} />
-<meta property="og:image:secure_url" content={shareImage} />
+<meta property="og:image" content={shareTall} />
+<meta property="og:image:secure_url" content={shareTall} />
 <meta property="og:image:type" content="image/jpeg" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
+<meta property="og:image:width" content="1080" />
+<meta property="og:image:height" content="1440" />
 <meta property="og:image:alt" content="Brand: headline." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content={shareImage} />
+<meta name="twitter:image" content={shareBanner} />
 ```
 
 ### Template Philosophy
@@ -1087,6 +1204,8 @@ export const GET: APIRoute = async ({ request }) => {
       </div>
     ),
     {
+      // The wide variant. Render the tall one (1080×1440) from a tall layout,
+      // not by stretching this one.
       width: 1200,
       height: 630,
       fonts: [
@@ -1196,11 +1315,12 @@ The dynamic system handles 95% of cases, but sometimes you need bespoke:
 ---
 title: "Product Launch Announcement"
 description: "Introducing our revolutionary new feature"
-shareImage: "/og/campaigns/product-launch-2025.jpg"  # Custom override
+banner_tall_image: "/og/campaigns/product-launch-2025-tall.jpg"  # Custom og:image
+banner_image: "/og/campaigns/product-launch-2025.jpg"            # Custom twitter:image
 ---
 ```
 
-When `shareImage` is present in frontmatter, use it directly instead of the dynamic endpoint. This gives marketers the escape hatch they need for hero campaigns without requiring it for every page.
+When `banner_tall_image` or `banner_image` is present in frontmatter, use it directly instead of the generated card. Supply both, or the page shows a custom card on one platform and the generated one on the rest. This gives marketers the escape hatch they need for hero campaigns without requiring it for every page.
 
 ---
 
@@ -1301,13 +1421,15 @@ test('homepage has required OG tags', async ({ page }) => {
 ### Per-Page
 - [ ] Title under 60 characters
 - [ ] Description under 155 characters
-- [ ] OG image exists and is 1200x630
-- [ ] OG image URL is absolute HTTPS
+- [ ] Exactly one `og:image`: the tall 1080×1440 JPEG, with matching `og:image:type`, width and height
+- [ ] `twitter:image` is the wide 1200×630 JPEG
+- [ ] Both images under 300 KB
+- [ ] Image URLs are absolute HTTPS
 - [ ] `og:url` set to canonical URL
 - [ ] JSON-LD schema appropriate for content type
 
 ### Content Collections
-- [ ] Frontmatter schema includes `title`, `description`, `shareImage`
+- [ ] Frontmatter schema includes `title`, `description`, and optional `banner_tall_image`, `banner_image`, `square_image`, `portrait_image`
 - [ ] Collection defaults defined for fallback images
 - [ ] Article metadata (dates, author) mapped to OG and JSON-LD
 
