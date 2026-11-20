@@ -210,10 +210,13 @@ what the page is.
 - **No words in the illustration.** Every word on the card comes from
   metadata, so it's spelled right, readable at chat size, and changes when the
   title does. Image models misspell, and baked-in text can't be edited.
-- **Prompt for the band.** Generate one wide illustration with the subject on
-  one side and calm space on the other ("subject left, quiet right"). The tall
-  card shows it as the top band; the wide card shows it on the right 58%. Set
-  `objectPosition` to the subject's side, as with photos.
+- **Generate the art at 4:3, not at the card's size.** Ideogram never makes
+  the tall or wide card; satori does. One 4:3 illustration fills both slots:
+  the tall card's top band (1080×806, about 4:3, so it fits almost uncropped)
+  and the wide card's right 58% (696×630, nearly square, so `cover` trims
+  about a fifth off one side). Put the subject left of center and keep the
+  right fifth expendable, then anchor `objectPosition: 'left center'`, as with
+  photos.
 - **One illustration per page, not per heading.** Section cards reuse their
   page's art with the heading as the title. That bounds the cost, and a page's
   section cards read as a set.
