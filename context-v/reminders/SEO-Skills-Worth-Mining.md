@@ -37,7 +37,7 @@ It is not linked into any harness. We read these skills to write our own, not to
 | `customer-journey` | `marketing/` | Maps how customers find and compare a product across Google, AI chatbots, and social. |
 | `parasite-and-pr` | `marketing/` | Press release, Dev.to/Hashnode repost, and LinkedIn version, bundled for publishing elsewhere. |
 
-## Relevant, but need a paid service
+## Specific tool use (paid service cloud)
 
 | Skill | Folder | Service |
 |---|---|---|
