@@ -46,7 +46,7 @@ It is not linked into any harness. We read these skills to write our own, not to
 | `reddit-serp` | `seo/` | Finds Reddit threads ranking on page 1 for buying-intent keywords. |
 | `honest-link-outreach` | `seo/` | Vetted backlink prospects with plain-text email drafts. |
 
-## Also
+## Cool, but not often useful for me
 
 | Skill | Folder | What it does |
 |---|---|---|
