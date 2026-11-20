@@ -11,6 +11,7 @@
 * [Preferred Stack](Preferred-Stack.md) - A quick reference for the preferred technology stack: HTML/CSS first, Astro for SSG, Svelte for interactivity, Tailwind for styling, and no React.
 * [Quirks of Obsidian Flavored Markdown](Quirks-of-Obsidian-Flavored-Markdown.md) - A quick reference for the quirks of Obsidian Flavored Markdown.
 * [Rule to Assure Collection Schema is Flexible](Rule-to-Assure-Collection-Schema-is-Flexible.md) - A lenient Zod schema doesn't remove the failure, it moves it — the build goes green and the date renders blank instead.
+* [SEO Skills Worth Mining](SEO-Skills-Worth-Mining.md) - The skills in the seo-skills pack we want to learn from when writing our own SEO, copy, and marketing skills.
 * [Tags Must Use Train-Case](Tags-Must-Use-Train-Case.md) - All tags in YAML frontmatter must use Train-Case — capitalize each word, hyphens between words, no spaces, no underscores, no all-lowercase.
 * [Wrap Long String Values in Double Quotes](Wrap-Long-String-Values-in-Double-Quotes.md) - Long YAML string values — descriptions, titles with punctuation, URLs with query strings, ledes — should always be wrapped in double quotes. Cheap insurance against the entire class of YAML-syntax-collision bugs.
 * [Write a Changelog Prior to Meaningful Commits](Write-a-Changelog-Prior-to-Meaningful-Commits.md) - A quick reference for writing a changelog prior to meaningful commits.
