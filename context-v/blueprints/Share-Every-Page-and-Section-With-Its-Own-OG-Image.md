@@ -184,7 +184,7 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
 - **Keep wide-card text off the photo.** Photo on the right 58%, text capped at
   about half the width.
 - **One universal card for the site.** The home page, and any page without its
-  own card, gets a big-type card after lfg-hub's default
+  own card or illustration set (see "Two kinds of share" below), gets a big-type card after lfg-hub's default
   (`ai-labs/dididecks-ai/client-sites/lfg-hub/public/ogimage__LFG-Hub--Default.jpg`):
   mark top left, a bracketed kicker, the headline as large as the frame allows
   with its last word in the accent color, one line under it, and a ruled footer
@@ -199,9 +199,38 @@ a real iMessage thread ([[Share-Cards-Hid-Their-Photos-and-Shrank-Their-Type]]).
   and crop its center square to 200px; if the headline doesn't read in both,
   it isn't done. Then send yourself the link.
 
+### Two kinds of share: content and site
+
+What the share image should do depends on what is being shared.
+
+- **A content share is about the content.** Sharing an article, memo or update,
+  or a heading inside one, sends the page and the section under that heading.
+  The card leads with its text: kicker, title, summary. Art, if any, sits in
+  its slot (below) and never competes with the words.
+- **A site share has room for the illustration.** The home page, about pages,
+  collection indexes and other generic pages aren't about one piece of content,
+  so the illustration can be the whole share image. Generate the full set from
+  one Ideogram prompt: `banner_tall` (3:4), `banner` (16:9 or 1.91:1),
+  `portrait` (4:5) and `square` (1:1). Making all four costs little, and the
+  set travels together:
+  - `banner_tall` is the `og:image`, for iMessage and WhatsApp.
+  - `banner` is `twitter:image`, and the image the edge routes to LinkedIn,
+    Bluesky and Discord
+    ([[Maintain-an-Elegant-Open-Graph-System#Which Image Each Platform Gets]]).
+  - `square` serves thumbnails and cards in the site's own grids.
+  - `portrait` is for posting as an image, not for a meta tag.
+
+  Store them in frontmatter as `banner_tall_image`, `banner_image`,
+  `portrait_image` and `square_image`, with the shared prompt in
+  `image_prompt`. A site page without a set falls back to the universal card.
+
+So the cool illustrated images still have a job; it's the site and generic
+pages. Content and sections get the cards that say what they are.
+
 ### Illustrations as the art layer
 
-A card has two layers: **art** (the photo band) and **text** (kicker, title,
+On a content card, an illustration can still appear, as one layer. A card has
+two layers: **art** (the photo band) and **text** (kicker, title,
 summary, footer, rendered from the page's metadata). An Ideogram illustration
 is just another kind of art. It goes where an event photo goes, and the text
 stays live metadata. A page gets an eye-catching image *and* a card that says

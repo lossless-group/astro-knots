@@ -158,6 +158,18 @@ blueprint's own frontmatter uses:
 | **Square** | `square_image` | 1200×1200 | No tag by default. Use it as `twitter:image` only on a page that sets `twitter:card` to `summary`. |
 | **Portrait** | `portrait_image` | 1200×1500 (4:5) | No tag. It's the image people post *as an image* (WhatsApp status, Instagram, a chat), so offer it as a download or on `/brand-kit`. |
 
+Where the images come from depends on the page
+([[Share-Every-Page-and-Section-With-Its-Own-OG-Image#Two kinds of share: content and site]]):
+
+- **Content pages and their sections** use the cards the site renders from
+  their metadata, tall and wide.
+- **Site and generic pages** (home, about, collection indexes) can use an
+  Ideogram illustration set, all four variants generated from one prompt.
+
+The routing below is the same either way; only the images differ. So far the
+banner, and sometimes the square in on-site thumbnails, are the variants in
+regular use.
+
 ### What plain HTML can and can't do
 
 A static page has **two image slots**, not four:
