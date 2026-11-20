@@ -113,6 +113,7 @@ Different platforms render previews differently. Design for the lowest common de
 - **Image:** Uses `og:image`. Displays at 1200x627 (crops to 1.91:1). Images smaller than 200x200 may not display.
 - **Title:** Uses `og:title`. Truncates around 70 characters
 - **Description:** Uses `og:description`. Truncates around 100 characters in feed
+- **No LinkedIn-specific image tag.** There is no `linkedin:image` (unlike X's `twitter:image`). LinkedIn reads only the `og:*` tags, so the only way to give it a different image from iMessage is the edge routing in *Which Image Each Platform Gets*.
 - **Special tags:** Recognizes `article:author`, `article:published_time`
 - **Cache:** Caches aggressively. Use Post Inspector to force refresh.
 
