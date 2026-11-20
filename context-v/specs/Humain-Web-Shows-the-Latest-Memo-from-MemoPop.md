@@ -28,7 +28,7 @@ Humain's partners will edit memos by chatting with Claude through MemoPop's conn
 
 Today they can't. A memo reaches the site by hand:
 
-- `humain-web/scripts/pull-memos.sh` copies a hand-picked local version for each company (for example `io/<firm>/deals/<Deal>/outputs/<Deal>-v0.0.1/7-<Deal>-v0.0.1.md`) into `src/content/memos/<slug>/memo.md`.
+- `humain-web/scripts/pull-memos.sh` copies a hand-picked local version for each company (for example `io/humain/deals/Chroma/outputs/Chroma-v0.0.1/7-Chroma-v0.0.1.md`) into `src/content/memos/<slug>/memo.md`.
 - `src/lib/lp-content.ts` loads those files with `import.meta.glob`, so they are bundled at build time.
 - `src/pages/lp/memos/[slug].astro` renders them behind the LP gate (`prerender = false`, `hasScope`).
 
@@ -72,11 +72,12 @@ GET /site/v1/firms/{firm}/deals/{deal}/memo/images/{file}
 - **A small mapping file**, `src/content/memo-sources.yaml`, lists each site memo and its MemoPop deal:
 
   ```yaml
-  example-co:   { firm: humain-vc, deal: example-com }
-  another-co:   { firm: humain-vc, deal: anotherco-ai }
+  chroma:               { firm: humain-vc, deal: trychroma-com }
+  profile-health:       { firm: humain-vc, deal: profilehealth-com }
+  cognitive-scientific: { firm: humain-vc, deal: cogsciai }
   ```
 
-  The site's own slugs (`example-co`) stay as they are, so URLs don't change. The MemoPop names match the `memopop_deal` field recorded in each local deal config in `io/humain`.
+  The site's own slugs (`profile-health`) stay as they are, so URLs don't change. The MemoPop names match the `memopop_deal` field recorded in each local deal config in `io/humain`.
 - **`getMemo(slug)` in `src/lib/lp-content.ts`** fetches from the endpoint when the slug has a MemoPop source, and keeps the rest of its contract: frontmatter-style meta (`memo_version`, `memo_date`) plus the body. `memo_version` becomes the compiled version number and `memo_date` the compile time.
 - **Fallback:** if the fetch fails or times out (about 3 s), the page renders the bundled copy from `src/content/memos/` if there is one, and the details strip says it is showing a saved copy. A MemoPop outage never takes the investor area down.
 - **No caching on the site side.** The route already runs per request behind the gate. Set `Cache-Control: private, no-store` so a refresh always shows the newest compile.
@@ -103,10 +104,10 @@ When `compile` finishes for a firm that has a site, its reply includes the page 
 
 ## Open questions
 
-- **Images.** Several site memos carry images (the largest is 3.4 MB with them). How do compiled memos on the server reference images: bucket keys, paths in the workspace, or none yet? The image route above depends on the answer. The site's existing gated image route (`/lp/memos/<slug>/images/<file>`) can proxy them either way.
-- **Which deals are compiled on the server.** The deals imported on 2026-10-15 came from local runs. Check which have a `compiled/` version before choosing the deal for phase 2.
+- **Images.** Several site memos carry images (Metabologic's is 3.4 MB with them). How do compiled memos on the server reference images: bucket keys, paths in the workspace, or none yet? The image route above depends on the answer. The site's existing gated image route (`/lp/memos/<slug>/images/<file>`) can proxy them either way.
+- **Which deals are compiled on the server.** The 12 deals imported on 2026-10-15 came from local runs. Check which have a `compiled/` version before choosing the deal for phase 2.
 - **Version drift.** The site's bundled copies were pulled by hand on 2026-10-13. Some may be newer or older than what the server holds. Compare before switching each memo over, so nobody sees an older memo replace a newer one.
-- **Deals without a site page.** Several deals on the server aren't in the investor area yet. Adding a page for a new deal stays a site change, adding a line to the mapping, until the memo list can come from MemoPop too.
+- **Deals without a site page.** New Silicon, Glen and others aren't in the investor area yet. Adding a page for a new deal stays a site change, adding a line to the mapping, until the memo list can come from MemoPop too.
 
 ## Related
 
