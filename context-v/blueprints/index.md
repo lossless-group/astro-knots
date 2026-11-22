@@ -31,3 +31,4 @@
 * [Slides System for Astro and Markdown](Slides-System-for-Astro-and-Markdown.md) - A comprehensive specification for building presentation slide systems in Astro-Knots sites with RevealJS, Three.js, and full theme/mode integration.
 * [A Standard Table of Contents for Every Markdown Collection](Standard-Table-of-Contents-for-Every-Markdown-Collection.md) - One reading-position ToC everywhere, built on LFM's heading outline — the only source that tells a heading from a `#` inside a code fence.
 * [Styles Architecture Blueprint](Styles-Architecture-Blueprint.md) - Architecture blueprint for Dark Matter's CSS and Tailwind v4 theming system, defining named brand colors, derived scales, semantic tokens, and three display modes.
+* [Using Architecture Conventions For Code Organization](<Using Architecture Conventions for Code Organization.md>) - A clearer breakdown of the differences between `lib` and `utils` directories in a TypeScript/JavaScript project.
