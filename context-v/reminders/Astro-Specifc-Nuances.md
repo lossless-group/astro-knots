@@ -6,7 +6,8 @@ date_first_published: null
 date_last_updated: null
 at_semantic_version: 0.0.0.1
 status: To-Do
-augmented_with: 'Windsurf Cascade on Claude 3.5 Sonnet'
+augmented_with:
+  - 'Windsurf Cascade on Claude 3.5 Sonnet'
 category: Reminders
 date_created: 2025-03-12
 date_modified: 2025-04-21
@@ -19,6 +20,8 @@ tags: [Astro, Web-Frameworks, Code-Generators]
 authors: 
   - Michael Staton
 banner_image: https://ik.imagekit.io/xvpgfijuw/uploads/lossless/reminders/2025-05-05_banner_image_Astro-Specifc-Nuances_45431b20-c669-4f25-ae39-925d80aa2f0b_CZZHD_Rfz.webp
+hex_code: yzwg9b
+type: Reminders
 ---
 This project is in Astro. We are avoiding implementing an additional framework until we absolutely must. 
 

@@ -10,6 +10,7 @@
 * [Preference for Shortcuts in Config to Absolute Paths](Preference-for-Shortcuts-in-Config-to-Absolute-Paths.md) - `../../../components/basics/DeckHeader.astro` breaks the moment you move the importer; `@components/…` reads the same from anywhere.
 * [Preferred Stack](Preferred-Stack.md) - A quick reference for the preferred technology stack: HTML/CSS first, Astro for SSG, Svelte for interactivity, Tailwind for styling, and no React.
 * [Quirks of Obsidian Flavored Markdown](Quirks-of-Obsidian-Flavored-Markdown.md) - A quick reference for the quirks of Obsidian Flavored Markdown.
+* [Respect the framework nuances, read the docs](Astro-Specifc-Nuances.md)
 * [Rule to Assure Collection Schema is Flexible](Rule-to-Assure-Collection-Schema-is-Flexible.md) - A lenient Zod schema doesn't remove the failure, it moves it — the build goes green and the date renders blank instead.
 * [SEO Skills Worth Mining](SEO-Skills-Worth-Mining.md) - The skills in the seo-skills pack we want to learn from when writing our own SEO, copy, and marketing skills.
 * [Tags Must Use Train-Case](Tags-Must-Use-Train-Case.md) - All tags in YAML frontmatter must use Train-Case — capitalize each word, hyphens between words, no spaces, no underscores, no all-lowercase.
