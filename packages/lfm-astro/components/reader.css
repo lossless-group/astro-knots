@@ -16,9 +16,15 @@
  * sets both in its theme (Tier 2 tokens):
  *   --font-display   headings, e.g. Geist
  *   --font-reader    body copy, e.g. a serif
+ * Links in the copy take --color-primary (falling back to the text color).
  *
- * Copied from astro-knots/packages/lfm-astro/components/reader.css. Sites keep
- * the algorithm and change only the tokens.
+ * Reference pattern, not a hard dependency. Copying this file into your site
+ * and adapting it is best practice: every site wants its own layout, style and
+ * markup, so each owns its copy rather than all of them pulling on one shared
+ * version through pull requests. Keep the algorithm; change the tokens. Changes
+ * made here are listed in packages/lfm-astro/WHATS-NEW.md; pick up the ones you
+ * want by hand.
+ * Canonical copy: astro-knots/packages/lfm-astro/components/reader.css
  */
 
 :root {
@@ -80,6 +86,28 @@
 }
 .reader > :where(h2, h3, h4, h5, h6):first-child {
   margin-top: 0;
+}
+
+/* Links in the copy. Sites often reset `a { color: inherit }` globally, which
+   leaves links in an article looking like plain text, so the reader styles
+   them itself: the site's primary color with a soft underline that firms up on
+   hover. Anchors with a class (buttons, chips, cards) keep their own styles,
+   and citation markers ([1]) skip the underline. Without --color-primary the
+   link keeps the text color and still gets the underline. */
+.reader a:not([class]) {
+  color: var(--color-primary, currentColor);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition: text-decoration-color 150ms;
+}
+.reader a:not([class]):hover,
+.reader a:not([class]):focus-visible {
+  text-decoration-color: currentColor;
+}
+.reader sup a:not([class]) {
+  text-decoration: none;
 }
 
 /* The page title, outside .reader: one step above h2 on phones, two on wide screens. */

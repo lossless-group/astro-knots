@@ -17,6 +17,8 @@ canonical_source: "packages/lfm-astro/components/"
 
 The renderer for `> [!type] Title` callouts produced by `@lossless-group/lfm`'s `remark-callouts` plugin. Splits cleanly along the seam where change actually happens: structure, data, styles.
 
+> **Reference pattern, not a hard dependency.** Copy these three files into your site and adapt them: every site wants its own layout, style and markup, so each owns its copy rather than all of them pulling on one shared version through pull requests. Changes made here are listed in [`../WHATS-NEW.md`](../WHATS-NEW.md); pick up the ones you want by hand.
+
 ## Three files
 
 ```
