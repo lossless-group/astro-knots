@@ -2,7 +2,7 @@
 title: "Firm Sites Show the Latest Memo from MemoPop"
 lede: "A VC firm's partners edit a memo by chatting with Claude, compile it, refresh the memo's page in the firm's investor area, and see their change. The page reads the latest compiled memo from MemoPop's server at request time instead of a copy pulled into the site repo."
 date_created: 2026-11-20
-date_modified: 2026-11-20
+date_modified: 2026-11-21
 authors:
   - Michael Staton
 augmented_with:
@@ -57,11 +57,17 @@ The connector serves only `/mcp` (OAuth) and `/healthz` today. Add one read-only
 
 ```
 GET /site/v1/firms/{firm}/deals/{deal}/memo
-  200 → { "deal", "version", "compiled_at", "markdown" }
-  404 → no compiled memo yet
-GET /site/v1/firms/{firm}/deals/{deal}/memo/images/{file}
-  200 → image bytes (if compiled memos reference images; see Open questions)
+  200 → { "ok": true, "firm", "deal", "company", "version", "label",
+          "compiled_at", "markdown", "html_url", "pdf_url",
+          "images_unresolved", "api_version" }
+  401 → no key, or not a site key
+  403 → a site key for another firm
+  404 → no such deal for this firm (code deal_not_found), or no compiled memo yet
 ```
+
+**Built and live (2026-11-21).** The route is `src/connector/site.py` in memopop-orchestrator, deployed at `https://memopop.didi.sh`. The status codes above were checked against the live server with a real site key: no key gave 401, another firm's deal gave 403, a missing deal gave 404, and a compiled deal gave its memo. Errors use the connector's envelope: `{ "ok": false, "error": { "kind", "code", "message", "next", … } }`.
+
+**Images are signed links, so there's no image route.** Each image reference in `markdown` that names a file the deal has in its bucket is rewritten to `/v1/files/<firm>/<key>?expires=…&signature=…`, signed with HMAC and valid for 7 days, readable without a sign-in. A reference it can't match is left as written and listed in `images_unresolved`. So a site renders the markdown as it comes and shouldn't cache the page longer than the links last.
 
 - **Returns the latest compiled version only.** Never research, sections or anything in progress.
 - **Auth: a per-firm site key**, sent as `Authorization: Bearer <key>` and configured in a new variable `MEMOPOP_SITE_KEYS` (`<firm>=<key>`, comma-separated). A site key can read that firm's compiled memos and nothing else. It is separate from `MEMOPOP_STATIC_KEYS`, which are full-access keys for Claude Code and the health check.
@@ -90,7 +96,7 @@ When `compile` finishes for a firm with a site, its reply includes the page URL.
 
 ## Phases
 
-1. **Endpoint**, with tests: the right key gets the memo, a wrong firm or a missing key gets 401 or 404, and a deal never compiled gets 404.
+1. **Endpoint**, with tests: the right key gets the memo, a missing key gets 401, a wrong firm gets 403, and a deal never compiled gets 404. **Done 2026-11-21.**
 2. **One memo end to end** on a preview deploy, using a deal that already has a compiled version.
 3. **Prove the loop in a browser:** open the gated memo page → note the version → in Claude, change one sentence and compile → refresh → the sentence and the version have changed.
 4. **The rest of the firm's memos**, each checked against its bundled copy for version drift, then the link in the compile reply.
@@ -104,7 +110,7 @@ When `compile` finishes for a firm with a site, its reply includes the page URL.
 
 ## Open questions
 
-- **Images.** Do compiled memos on the server reference images, and how: bucket keys, workspace paths, or not yet? The image part of the endpoint depends on this.
+- ~~**Images.**~~ Answered 2026-11-21: they arrive in the markdown as 7-day signed links (see Design §1). There is no image route.
 - **Version drift.** A site's bundled copies may be newer or older than the server's compiled memo. Compare before switching each memo over.
 - **Deals without a page.** Adding a deal to the investor area stays a site change (a listing plus a line in the mapping) until the memo list can come from MemoPop too.
 
